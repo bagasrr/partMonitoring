@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout, reset, getMe } from "../features/AuthSlice";
+import { Logout, reset, getMe } from "../features/authSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginUser, reset, getMe, authSlice } from "../features/AuthSlice";
+import { LoginUser, reset, getMe, authSlice } from "../features/authSlice";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -9,7 +9,7 @@ const Login = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const { user, isError, isLoading, isSuccess, message } = useSelector((state) => state.auth);
+
   const { user, isError, isLoading, isSuccess, message } = useSelector((state) => state.auth);
 
   useEffect(() => {

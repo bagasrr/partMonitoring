@@ -2,7 +2,7 @@ import React from "react";
 import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt } from "react-icons/fa"; // Import ikon yang dibutuhkan
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout, reset } from "../features/AuthSlice";
+import { Logout, reset } from "../features/authSlice";
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

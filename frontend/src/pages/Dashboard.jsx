@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "./layout";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getMe } from "../features/AuthSlice";
+import { getMe } from "../features/authSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
