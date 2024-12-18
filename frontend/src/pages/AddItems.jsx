@@ -1,41 +1,37 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
 import { getAllItem } from "../utils/getItem";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setNotification } from "../features/notificationSlice";
 
 const AddItem = () => {
   const [name, setName] = useState("");
-  const [stock, setStock] = useState(0);
-  const [role, setRole] = useState("");
+  const [stock, setStock] = useState("");
   const [names, setNames] = useState([]);
   const [isNewName, setIsNewName] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchNames = async () => {
-      const items = await getAllItem();
-      const itemNames = items.map((item) => item.name);
-      setNames(itemNames);
-    };
-
     fetchNames();
   }, []);
 
-  const handleSubmit = (e) => {
+  const fetchNames = async () => {
+    const items = await getAllItem();
+    const itemNames = items.map((item) => item.name);
+    setNames(itemNames);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Logic untuk menambahkan item, misalnya mengirim data ke server
-    const newItem = { name, stock, role };
-    console.log(newItem);
-
-    // Tambahkan nama baru ke opsi jika belum ada
-    if (!names.includes(name)) {
-      setNames((prevNames) => [...prevNames, name]);
-    }
-
-    // Reset form
-    setName("");
-    setStock(0);
-    setRole("");
-    setIsNewName(false);
+    await axios.post("http://localhost:4000/api/items", {
+      name: name,
+      stok: parseInt(stock),
+    });
+    dispatch(setNotification("Items Added"));
+    navigate("/items");
   };
 
   return (
@@ -45,7 +41,7 @@ const AddItem = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-              Name
+              Item Name
             </label>
             <select
               id="name"
@@ -91,7 +87,7 @@ const AddItem = () => {
               type="number"
               id="stock"
               value={stock}
-              onChange={(e) => setStock(parseInt(e.target.value))}
+              onChange={(e) => setStock(e.target.value ? parseInt(e.target.value) : "")}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Enter stock quantity"
               required

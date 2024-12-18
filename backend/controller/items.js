@@ -94,12 +94,22 @@ export const getItemById = async (req, res) => {
 export const createItem = async (req, res) => {
   const { name, stok } = req.body;
   try {
-    const response = await itemModel.create({
-      name,
-      stok,
-      userId: req.userId,
+    const prevData = await itemModel.findOne({
+      where: {
+        name,
+      },
     });
-    res.status(200).json({ message: "item created", data: response });
+    if (prevData) {
+      const response = await itemModel.update({ stok: prevData.stok + stok }, { where: { id: prevData.id } });
+      res.status(200).json({ message: "item created", data: response });
+    } else {
+      const response = await itemModel.create({
+        name,
+        stok,
+        userId: req.userId,
+      });
+      res.status(200).json({ message: "item created", data: response });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

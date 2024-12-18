@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout, reset, getMe } from "../features/authSlice";
@@ -32,11 +32,15 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <h1 className="text-2xl font-bold">PartMonitoring</h1>
           </div>
-          <div>
+          <div className="flex items-center gap-3">
             <button onClick={handleLogout} className="text-gray-800 hover:text-white bg-gray-100 hover:bg-red-500 font-bold py-2 px-4 rounded flex items-center">
               <FaSignOutAlt className="mr-2" />
               Logout
             </button>
+            <div className="flex items-center gap-3">
+              <FaUser className="ml-2" />
+              <h1>{user && user.name}</h1>
+            </div>
           </div>
         </div>
       </div>
