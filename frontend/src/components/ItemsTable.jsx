@@ -5,11 +5,13 @@ import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice"; // Import action
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
   const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     items();
@@ -61,7 +63,7 @@ const ItemsTable = () => {
               <TData>
                 <div className="flex gap-5 items-center">
                   <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
-                  <FaEdit className="text-blue-500 cursor-pointer" />
+                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
                 </div>
               </TData>
             </TRow>
