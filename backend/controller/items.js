@@ -1,5 +1,6 @@
-import { imagesModel, itemModel, userModel } from "../models/index.js";
+import { imagesModel, itemModel, machineModel, sectionModel, userModel } from "../models/index.js";
 import { Op } from "sequelize";
+import { addMachine } from "./machines.js";
 export const getAllItems = async (req, res) => {
   try {
     let response;
@@ -12,8 +13,8 @@ export const getAllItems = async (req, res) => {
             attributes: ["uuid", "name", "role"],
           },
           {
-            model: imagesModel,
-            attributes: ["uuid", "url"],
+            model: machineModel,
+            attributes: ["uuid", "machine_name", "machine_number"],
           },
         ],
       });
@@ -29,8 +30,8 @@ export const getAllItems = async (req, res) => {
             attributes: ["uuid", "name", "role"],
           },
           {
-            model: imagesModel,
-            attributes: ["uuid", "url"],
+            model: machineModel,
+            attributes: ["uuid", "machine_name", "machine_number"],
           },
         ],
       });
@@ -62,8 +63,8 @@ export const getItemById = async (req, res) => {
             attributes: ["uuid", "name", "role"],
           },
           {
-            model: imagesModel,
-            attributes: ["uuid", "url"],
+            model: machineModel,
+            attributes: ["uuid", "machine_name", "machine_number"],
           },
         ],
       });
@@ -79,8 +80,8 @@ export const getItemById = async (req, res) => {
             attributes: ["uuid", "name", "role"],
           },
           {
-            model: imagesModel,
-            attributes: ["uuid", "url"],
+            model: machineModel,
+            attributes: ["uuid", "machine_name", "machine_number"],
           },
         ],
       });
@@ -92,26 +93,66 @@ export const getItemById = async (req, res) => {
 };
 
 export const createItem = async (req, res) => {
-  const { name, stok } = req.body;
+  const { name, stok, machine_name, machine_number, section_name, section_number } = req.body;
+
   try {
+    // Cek stok harus lebih dari 0
+    if (stok <= 0) return res.status(400).json({ message: "Stok must be greater than 0" });
+
+    // Cari machine berdasarkan machine_name
+    let machine = await machineModel.findOne({
+      where: {
+        machine_name,
+      },
+    });
+
+    // Jika machine tidak ditemukan, buat machine baru
+    if (!machine) {
+      // Cari section berdasarkan section_name
+      let section = await sectionModel.findOne({ where: { section_name } });
+
+      // Jika section tidak ditemukan, buat section baru
+      if (!section) {
+        section = await sectionModel.create({
+          section_name,
+          section_number,
+          userId: req.userId,
+        });
+      }
+
+      // Buat machine baru dengan sectionId dan userId
+      machine = await machineModel.create({
+        machine_name,
+        machine_number,
+        sectionId: section.id,
+        userId: req.userId,
+      });
+    }
+
+    // Cari item sebelumnya berdasarkan name dan machineId
     const prevData = await itemModel.findOne({
       where: {
         name,
+        machineId: machine.id,
       },
     });
+
+    // Jika prevData ditemukan, update stoknya
     if (prevData) {
       const response = await itemModel.update({ stok: prevData.stok + stok }, { where: { id: prevData.id } });
-      res.status(200).json({ message: "item created", data: response });
+      return res.status(200).json({ message: "Item updated", data: response });
     } else {
+      // Jika prevData tidak ditemukan, buat item baru
       const response = await itemModel.create({
         name,
         stok,
         userId: req.userId,
+        machineId: machine.id,
       });
-      res.status(200).json({ message: "item created", data: response });
+      return res.status(201).json({ message: "Item created", data: response });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 

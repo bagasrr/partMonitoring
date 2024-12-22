@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 
-export const item = {
+export const section = {
   uuid: {
     type: DataTypes.STRING,
     defaultValue: DataTypes.UUIDV4,
@@ -9,14 +9,14 @@ export const item = {
       notEmpty: true,
     },
   },
-  name: {
+  section_name: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
       notEmpty: true,
     },
   },
-  stok: {
+  section_number: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
@@ -24,13 +24,6 @@ export const item = {
     },
   },
   userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
-  },
-  machineId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
