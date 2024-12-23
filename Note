@@ -1,0 +1,7 @@
+
+
+24 Dec 2024
+terakhir nyoba update user, tapi belum nyoba update ganti password, tadi ada error di select rolenya
+
+24 Dec 2024
+Ketika pengujian dari front end menambahkan item menggunakan akun admin item tampil di dashboard admin, tapi ketika ditambahkan dengan nama yang sama menggunakan akun user tidak tampil di dashboard user, tapi tetap bertambah kuantity nya di dashboard admin.

@@ -6,16 +6,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice"; // Import action
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getUsers } from "../utils/getUser";
 
-const ItemsTable = () => {
+const UsersTable = () => {
   const [data, setData] = useState([]);
   const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    items();
-
+    Users();
     // Hapus notifikasi setelah beberapa detik
     if (notification) {
       setTimeout(() => {
@@ -24,13 +24,13 @@ const ItemsTable = () => {
     }
   }, [notification, dispatch]);
 
-  const items = async () => {
-    const response = await getAllItem();
+  const Users = async () => {
+    const response = await getUsers();
     setData(response);
   };
   const handleDelete = async (uuid) => {
-    await axios.delete(`http://localhost:4000/api/items/${uuid}`);
-    dispatch(setNotification("Items Deleted"));
+    await axios.delete(`http://localhost:4000/api/users/${uuid}`);
+    dispatch(setNotification("User Deleted"));
   };
 
   return (
@@ -46,28 +46,20 @@ const ItemsTable = () => {
           <tr>
             <ThData>No</ThData>
             <ThData>Nama</ThData>
-            <ThData>Stok</ThData>
-            <ThData>Username</ThData>
             <ThData>Role</ThData>
-            <ThData>Machine Name</ThData>
-            <ThData>Machine Number</ThData>
-            <ThData>Actions</ThData>
+            <ThData>Action</ThData>
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => (
-            <TRow key={item.uuid}>
+          {data.map((user, index) => (
+            <TRow key={user.uuid}>
               <TData>{index + 1}</TData>
-              <TData>{item.name}</TData>
-              <TData>{item.stok}</TData>
-              <TData>{item.user.name}</TData>
-              <TData>{item.user.role}</TData>
-              <TData>{item.machine.machine_name}</TData>
-              <TData>{item.machine.machine_number}</TData>
+              <TData>{user.name}</TData>
+              <TData>{user.role}</TData>
               <TData>
                 <div className="flex gap-5 items-center">
-                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
-                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
+                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(user.uuid)} />
+                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/users/edit/${user.uuid}`)} />
                 </div>
               </TData>
             </TRow>
@@ -78,4 +70,4 @@ const ItemsTable = () => {
   );
 };
 
-export default ItemsTable;
+export default UsersTable;

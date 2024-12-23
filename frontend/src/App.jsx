@@ -5,6 +5,9 @@ import Login from "./pages/Login";
 import Items from "./pages/Items";
 import AddItems from "./pages/AddItem";
 import EditItem from "./pages/EditItem";
+import NewAddItem from "./pages/NewAddItem";
+import Users from "./pages/Users";
+import EditUser from "./pages/EditUser";
 
 const router = createBrowserRouter([
   {
@@ -21,11 +24,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/items/add",
-    element: <AddItems />,
+    element: <NewAddItem />,
   },
   {
     path: "/items/edit/:id",
     element: <EditItem />,
+  },
+  {
+    path: "/users",
+    element: <Users />,
+  },
+  {
+    path: "/users/edit/:id",
+    element: <EditUser />,
   },
 ]);
 
