@@ -8,6 +8,7 @@ import EditItem from "./pages/EditItem";
 import NewAddItem from "./pages/NewAddItem";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
+import AddUser from "./pages/AddUser";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: "/users/edit/:id",
     element: <EditUser />,
+  },
+  {
+    path: "/users/add/",
+    element: <AddUser />,
   },
 ]);
 

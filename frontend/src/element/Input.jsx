@@ -1,12 +1,22 @@
 import { useState } from "react";
 
-export const NormalInput = ({ value, type, id, onChange, label }) => {
+export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "off", maxLength = 100, placeholder, className, isError }) => {
   return (
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
         {label}
       </label>
-      <input type={type} id={id} value={value} onChange={onChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      <input
+        type={type}
+        id={id}
+        value={value}
+        onChange={onChange}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${isError ? "border-red-500" : ""} ${className}`}
+        autoComplete={autoComplete}
+        required
+        maxLength={maxLength}
+        placeholder={placeholder}
+      />
     </div>
   );
 };
@@ -68,5 +78,13 @@ export const Label = ({ children, htmlFor }) => {
     <label htmlFor={htmlFor} className="block text-gray-700 text-sm font-bold mb-2">
       {children}
     </label>
+  );
+};
+
+export const Button = ({ children, onClick, type }) => {
+  return (
+    <button type={type} onClick={onClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ">
+      {children}
+    </button>
   );
 };

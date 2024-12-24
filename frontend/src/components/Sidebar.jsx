@@ -31,15 +31,19 @@ const Sidebar = () => {
             </Link>
           </li>
         </ul>
-        <h2 className="text-lg font-semibold mb-4">ADMIN</h2>
-        <ul className="mb-8">
-          <li className="mb-2 flex items-center">
-            <FaUsers className="mr-2" />
-            <Link to="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
-              Users
-            </Link>
-          </li>
-        </ul>
+        {user.role === "admin" && (
+          <>
+            <h2 className="text-lg font-semibold mb-4">ADMIN</h2>
+            <ul className="mb-8">
+              <li className="mb-2 flex items-center">
+                <FaUsers className="mr-2" />
+                <Link to="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Users
+                </Link>
+              </li>
+            </ul>
+          </>
+        )}
         <h2 className="text-lg font-semibold mb-4">SETTINGS</h2>
         <ul>
           <li className="mb-2 flex items-center">
