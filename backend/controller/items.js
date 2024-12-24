@@ -4,38 +4,20 @@ import { addMachine } from "./machines.js";
 export const getAllItems = async (req, res) => {
   try {
     let response;
-    if (req.role === "admin") {
-      response = await itemModel.findAll({
-        attributes: ["uuid", "name", "stok"],
-        include: [
-          {
-            model: userModel,
-            attributes: ["uuid", "name", "role"],
-          },
-          {
-            model: machineModel,
-            attributes: ["uuid", "machine_name", "machine_number"],
-          },
-        ],
-      });
-    } else {
-      response = await itemModel.findAll({
-        attributes: ["uuid", "name", "stok"],
-        where: {
-          userId: req.userId,
+
+    response = await itemModel.findAll({
+      attributes: ["uuid", "name", "stok"],
+      include: [
+        {
+          model: userModel,
+          attributes: ["uuid", "name", "role"],
         },
-        include: [
-          {
-            model: userModel,
-            attributes: ["uuid", "name", "role"],
-          },
-          {
-            model: machineModel,
-            attributes: ["uuid", "machine_name", "machine_number"],
-          },
-        ],
-      });
-    }
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+      ],
+    });
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });

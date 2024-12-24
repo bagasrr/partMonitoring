@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
-  const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
+  const notification = useSelector((state) => state.notification.message);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -47,11 +48,15 @@ const ItemsTable = () => {
             <ThData>No</ThData>
             <ThData>Nama</ThData>
             <ThData>Stok</ThData>
-            <ThData>Username</ThData>
-            <ThData>Role</ThData>
+            {user && user.role === "admin" && (
+              <>
+                <ThData>Username</ThData>
+                <ThData>Role</ThData>
+              </>
+            )}
             <ThData>Machine Name</ThData>
             <ThData>Machine Number</ThData>
-            <ThData>Actions</ThData>
+            {user && user.role === "admin" && <ThData>Actions</ThData>}
           </tr>
         </thead>
         <tbody>
@@ -60,16 +65,22 @@ const ItemsTable = () => {
               <TData>{index + 1}</TData>
               <TData>{item.name}</TData>
               <TData>{item.stok}</TData>
-              <TData>{item.user.name}</TData>
-              <TData>{item.user.role}</TData>
+              {user && user.role === "admin" && (
+                <>
+                  <TData>{item.user.name}</TData>
+                  <TData>{item.user.role}</TData>
+                </>
+              )}
               <TData>{item.machine.machine_name}</TData>
               <TData>{item.machine.machine_number}</TData>
-              <TData>
-                <div className="flex gap-5 items-center">
-                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
-                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
-                </div>
-              </TData>
+              {user && user.role === "admin" && (
+                <TData>
+                  <div className="flex gap-5 items-center">
+                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
+                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
+                  </div>
+                </TData>
+              )}
             </TRow>
           ))}
         </tbody>

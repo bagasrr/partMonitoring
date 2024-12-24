@@ -31,7 +31,7 @@ const Sidebar = () => {
             </Link>
           </li>
         </ul>
-        {user.role === "admin" && (
+        {user && user.role === "admin" && (
           <>
             <h2 className="text-lg font-semibold mb-4">ADMIN</h2>
             <ul className="mb-8">
