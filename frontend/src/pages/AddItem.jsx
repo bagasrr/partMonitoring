@@ -15,9 +15,6 @@ const AddItem = () => {
   const [machine, setMachine] = useState("");
   const [machines, setMachines] = useState([]);
   const [isNewMachine, setIsNewMachine] = useState(false);
-  const [section, setSection] = useState("");
-  const [sections, setSections] = useState([]);
-  const [isNewSection, setIsNewSection] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);

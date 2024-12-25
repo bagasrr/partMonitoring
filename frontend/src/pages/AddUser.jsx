@@ -22,11 +22,10 @@ const AddUser = () => {
         password: password,
         confPassword: confPassword,
       });
+      navigate("/users");
     } catch (error) {
       setError(error.response.data.message);
     }
-
-    // navigate("/users");
   };
   return (
     <Layout>

@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
-import { NormalInput } from "../element/Input";
+import { Button, NormalInput } from "../element/Input";
 
 const EditUser = () => {
   const [name, setName] = useState("");
@@ -14,7 +14,8 @@ const EditUser = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { id } = useParams(); // Mengambil id dari useParams
+  const { id } = useParams();
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchUserDetails();
@@ -28,14 +29,18 @@ const EditUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.patch(`http://localhost:4000/api/users/${id}`, {
-      name: name,
-      role: role,
-      password: password,
-      confPassword: confirmPassword,
-    });
-    dispatch(setNotification("User Edit Success"));
-    navigate("/users");
+    try {
+      await axios.patch(`http://localhost:4000/api/users/${id}`, {
+        name: name,
+        role: role,
+        password: password,
+        confPassword: confirmPassword,
+      });
+      dispatch(setNotification("User Edit Success"));
+      navigate("/users");
+    } catch (error) {
+      setError(error.response.data.message);
+    }
   };
 
   return (
@@ -72,13 +77,12 @@ const EditUser = () => {
             </select>
           </div>
 
-          <NormalInput value={password} type="password" id="password" onChange={(e) => setPassword(e.target.value)} label="Password" autoComplete="new-password" />
+          <NormalInput value={password} type="password" id="password" onChange={(e) => setPassword(e.target.value)} label="New Password" placeholder={"*********"} />
 
-          <NormalInput value={confirmPassword} type="password" id="confirmPassword" onChange={(e) => setConfirmPassword(e.target.value)} label="Confirm Password" autoComplete="new-password" />
+          <NormalInput value={confirmPassword} type="password" id="confirmPassword" onChange={(e) => setConfirmPassword(e.target.value)} label="Confirm Password" placeholder={"*********"} />
 
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Update User
-          </button>
+          {error && <p className="text-red-500 font-bold text-center text-sm my-2">{error}</p>}
+          <Button type="submit">Save</Button>
         </form>
       </div>
     </Layout>

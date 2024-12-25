@@ -1,5 +1,7 @@
 import React from "react";
-import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt } from "react-icons/fa"; // Import ikon yang dibutuhkan
+import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaOutdent } from "react-icons/fa";
+import { PiNotePencilBold } from "react-icons/pi";
+import { MdCreateNewFolder } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout, reset } from "../features/authSlice";
@@ -24,12 +26,16 @@ const Sidebar = () => {
               Dashboard
             </Link>
           </li>
-          <li className="mb-2 flex items-center">
-            <FaBox className="mr-2" />
-            <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
-              Items
-            </Link>
-          </li>
+          {user && user.role === "admin" && (
+            <>
+              <li className="mb-2 flex items-center">
+                <FaBox className="mr-2" />
+                <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Items
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
         {user && user.role === "admin" && (
           <>
@@ -44,6 +50,32 @@ const Sidebar = () => {
             </ul>
           </>
         )}
+        {user && user.role !== "admin" && (
+          <>
+            <h2 className="text-lg font-semibold mb-4">PARTS</h2>
+            <ul className="mb-8">
+              <li className="mb-2 flex items-center">
+                <MdCreateNewFolder className="mr-2" />
+                <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  List Part
+                </Link>
+              </li>
+              <li className="mb-2 flex items-center">
+                <MdCreateNewFolder className="mr-2" />
+                <Link to="/items/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Part Masuk
+                </Link>
+              </li>
+              <li className="mb-2 flex items-center">
+                <PiNotePencilBold className="mr-2" />
+                <Link to="/items/change" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Ganti Part
+                </Link>
+              </li>
+            </ul>
+          </>
+        )}
+
         <h2 className="text-lg font-semibold mb-4">SETTINGS</h2>
         <ul>
           <li className="mb-2 flex items-center">

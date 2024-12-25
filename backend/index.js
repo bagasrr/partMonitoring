@@ -20,6 +20,13 @@ const store = new sessionStore({
 })();
 
 app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
+
+app.use(
   session({
     secret: process.env.SESS_SECRET,
     resave: false,
@@ -27,16 +34,12 @@ app.use(
     store,
     cookie: {
       secure: "auto",
+      httpOnly: true,
+      sameSite: "lax",
     },
   })
 );
 
-app.use(
-  cors({
-    credentials: true,
-    origin: "http://localhost:5173",
-  })
-);
 app.use("/api", routes);
 
 // store.sync();
