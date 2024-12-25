@@ -3,12 +3,13 @@ import Dashboard from "./pages/Dashboard";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import Items from "./pages/Items";
-import AddItems from "./pages/AddItem";
 import EditItem from "./pages/EditItem";
 import NewAddItem from "./pages/NewAddItem";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
 import AddUser from "./pages/AddUser";
+import ChangePartForm from "./pages/ChangePartForm";
+import History from "./pages/History";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,14 @@ const router = createBrowserRouter([
   {
     path: "/users/add/",
     element: <AddUser />,
+  },
+  {
+    path: "/items/changepart",
+    element: <ChangePartForm />,
+  },
+  {
+    path: "/history",
+    element: <History />,
   },
 ]);
 

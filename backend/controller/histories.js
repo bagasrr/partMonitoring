@@ -1,38 +1,56 @@
 import { historyModel, itemModel, machineModel, userModel } from "../models/index.js";
 
 export const createHistory = async (req, res) => {
-  const { itemId, userId, machineId, changeType, description } = req.body;
+  const { changeType, description, itemName, usedStock } = req.body;
 
   try {
-    const history = await historyModel.create({
-      itemId,
-      userId,
-      machineId,
+    const item = await itemModel.findOne({
+      where: {
+        name: itemName,
+      },
+    });
+    console.log(usedStock);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    const response = await historyModel.create({
+      itemId: item.id,
+      userId: req.userId,
+      machineId: item.machineId,
+      prevStock: item.stok,
+      usedStock,
+      afterStock: item.stok - usedStock,
       changeType,
       description,
     });
 
-    res.status(201).json({ message: "History created", history });
+    await itemModel.update({ stok: response.afterStock }, { where: { id: item.id } });
+
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const getHistoryByItem = async (req, res) => {
-  const { itemId } = req.params;
-
+export const getHistories = async (req, res) => {
   try {
-    const histories = await historyModel.findAll({
-      where: { itemId },
+    const response = await historyModel.findAll({
+      attributes: ["uuid", "prevStock", "usedStock", "afterStock", "changeType", "description", "createdAt", "updatedAt"],
       include: [
-        { model: itemModel, attributes: ["name"] },
-        { model: userModel, attributes: ["name"] },
-        { model: machineModel, attributes: ["machine_name"] },
+        {
+          model: userModel,
+          attributes: ["uuid", "name", "role"],
+        },
+        {
+          model: itemModel,
+          attributes: ["uuid", "name", "stok"],
+        },
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
       ],
-      order: [["createdAt", "DESC"]],
     });
-
-    res.status(200).json(histories);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

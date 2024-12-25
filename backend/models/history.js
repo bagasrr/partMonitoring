@@ -9,6 +9,27 @@ export const history = {
       notEmpty: true,
     },
   },
+  prevStock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
+  usedStock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
+  afterStock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
   itemId: {
     type: DataTypes.INTEGER,
     allowNull: false,

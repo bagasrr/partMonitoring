@@ -1,5 +1,5 @@
 import React from "react";
-import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaOutdent } from "react-icons/fa";
+import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
 import { PiNotePencilBold } from "react-icons/pi";
 import { IoMdListBox } from "react-icons/io";
 import { MdCreateNewFolder } from "react-icons/md";
@@ -25,6 +25,12 @@ const Sidebar = () => {
             <FaTachometerAlt className="mr-2" />
             <Link to="/dashboard" className="block px-4 py-2 hover:bg-gray-700 rounded">
               Dashboard
+            </Link>
+          </li>
+          <li className="mb-2 flex items-center">
+            <FaHistory className="mr-2" />
+            <Link to="/history" className="block px-4 py-2 hover:bg-gray-700 rounded">
+              History
             </Link>
           </li>
           {user && user.role === "admin" && (
@@ -69,7 +75,7 @@ const Sidebar = () => {
               </li>
               <li className="mb-2 flex items-center">
                 <PiNotePencilBold className="mr-2" />
-                <Link to="/items/change" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                <Link to="/items/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
                   Ganti Part
                 </Link>
               </li>
