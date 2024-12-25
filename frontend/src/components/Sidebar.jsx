@@ -1,6 +1,7 @@
 import React from "react";
 import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaOutdent } from "react-icons/fa";
 import { PiNotePencilBold } from "react-icons/pi";
+import { IoMdListBox } from "react-icons/io";
 import { MdCreateNewFolder } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,7 +56,7 @@ const Sidebar = () => {
             <h2 className="text-lg font-semibold mb-4">PARTS</h2>
             <ul className="mb-8">
               <li className="mb-2 flex items-center">
-                <MdCreateNewFolder className="mr-2" />
+                <IoMdListBox className="mr-2" />
                 <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
                   List Part
                 </Link>
