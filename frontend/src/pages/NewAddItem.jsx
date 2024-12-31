@@ -15,6 +15,7 @@ const AddItemForm = () => {
   const [isNewName, setIsNewName] = useState(false);
   const [machine, setMachine] = useState("");
   const [machines, setMachines] = useState([]);
+  const [desc, setDesc] = useState("");
   const [isNewMachine, setIsNewMachine] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -44,6 +45,7 @@ const AddItemForm = () => {
       name,
       stok: parseInt(stock),
       machine_name: machine,
+      description: desc,
     });
     dispatch(setNotification("Items Added"));
     navigate("/items");
@@ -57,6 +59,13 @@ const AddItemForm = () => {
           <ItemInput name={name} names={names} isNewName={isNewName} setName={setName} setIsNewName={setIsNewName} />
           <StockInput stock={stock} setStock={setStock} />
           <MachineInput machine={machine} machines={machines} isNewMachine={isNewMachine} setMachine={setMachine} setIsNewMachine={setIsNewMachine} user={user} />
+
+          <div className="mt-4">
+            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">
+              Deskripsi
+            </label>
+            <textarea id="description" name="description" className="w-full p-2 border border-gray-300 rounded-md" placeholder="Deskripsi" onChange={(e) => setDesc(e.target.value)} />
+          </div>
           <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Add Item
           </button>
