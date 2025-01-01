@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
 import axios from "axios";
 import { TData, ThData, TRow } from "../element/Table";
+import Pagination from "../components/Pagination";
 
 const History = () => {
   const [histories, setHistories] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -34,14 +35,15 @@ const History = () => {
     return new Date(dateString).toLocaleDateString("en-GB", options);
   };
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const handlePageClick = (selectedItem) => {
+    const { selected } = selectedItem;
+    setCurrentPage(selected);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = histories.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(histories.length / itemsPerPage);
+  const pageCount = Math.ceil(histories.length / itemsPerPage);
 
   return (
     <Layout>
@@ -78,13 +80,7 @@ const History = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={`px-4 py-2 mx-1 border rounded ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"}`}>
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      <Pagination pageCount={pageCount} handlePageClick={handlePageClick} currentPage={currentPage} />
     </Layout>
   );
 };

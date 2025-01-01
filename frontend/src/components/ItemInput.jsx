@@ -1,10 +1,10 @@
 import React from "react";
 
-const ItemInput = ({ name, names, isNewName, setName, setIsNewName }) => {
+const ItemInput = ({ label, name, names, isNewName, setName, setIsNewName }) => {
   return (
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-        Item Name
+        {label}
       </label>
       <select
         id="name"

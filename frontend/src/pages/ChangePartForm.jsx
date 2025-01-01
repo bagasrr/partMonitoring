@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import Layout from "./Layout";
+import { NormalInput } from "../element/Input";
+import { useNavigate } from "react-router-dom";
 
 const ChangePartForm = () => {
   const [items, setItems] = useState([]);
   const [machines, setMachines] = useState([]);
-  const [itemId, setItemId] = useState("");
-  const [machineId, setMachineId] = useState("");
+  const [usedStock, setUsedStock] = useState("");
+  const [itemName, setItemName] = useState("");
   const [changeType, setChangeType] = useState("");
   const [description, setDescription] = useState("");
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItemsAndMachines = async () => {
@@ -32,68 +35,46 @@ const ChangePartForm = () => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:4000/api/history", {
-        itemId,
-        machineId,
+        itemName,
+        usedStock,
         userId: user.id,
         changeType,
         description,
       });
-      console.log(itemId, machineId, user.id, changeType, description);
-      alert("History created successfully");
+      navigate("/dashboard");
     } catch (error) {
       console.error(error.message);
     }
   };
-  console.log(items);
   return (
     <Layout>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">Change Part</h1>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="itemId">
-            Item
+            Nama Part
           </label>
           <select
-            id="itemId"
-            value={itemId}
+            id="itemName"
+            value={itemName}
             onChange={(e) => {
               console.log(e.target.value);
-              setItemId(e.target.value);
+              setItemName(e.target.value);
             }}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
           >
             <option value="" disabled>
-              Select Item
+              Select Part
             </option>
             {items.map((item) => (
-              <option key={item.id} value={item.id}>
+              <option key={item.uuid} value={item.id}>
                 {item.name}
               </option>
             ))}
           </select>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="machineId">
-            Machine
-          </label>
-          <select
-            id="machineId"
-            value={machineId}
-            onChange={(e) => setMachineId(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          >
-            <option value="" disabled>
-              Select Machine
-            </option>
-            {machines.map((machine) => (
-              <option key={machine.id} value={machine.id}>
-                {machine.machine_name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <NormalInput label="Stok terpakai" type="number" id="usedStock" onChange={(e) => setUsedStock(e.target.value)} placeholder={"Masukkan stok terpakai"} />
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="changeType">
             Change Type
@@ -108,24 +89,24 @@ const ChangePartForm = () => {
             <option value="" disabled>
               Select Change Type
             </option>
-            <option value="Addition">Addition</option>
-            <option value="Replacement">Replacement</option>
-            <option value="Repair">Repair</option>
-            <option value="Removal">Removal</option>
-            <option value="Inspection">Inspection</option>
+            <option value="Replacement">Penggantian</option>
+            <option value="Repair">Perbaikan</option>
           </select>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-            Description
+            Deskripsi
           </label>
           <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Masukkan Deskripsi"
+            maxLength={500}
+            rows={4}
             required
-          ></textarea>
+          />
         </div>
         <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           Submit

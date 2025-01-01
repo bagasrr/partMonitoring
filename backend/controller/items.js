@@ -75,81 +75,6 @@ export const getItemById = async (req, res) => {
   }
 };
 
-// export const createItem = async (req, res) => {
-//   const { name, stok, machine_name, machine_number, section_name, section_number } = req.body;
-
-//   try {
-//     // Cek stok harus lebih dari 0
-//     if (stok <= 0) return res.status(400).json({ message: "Stok must be greater than 0" });
-
-//     // Cari machine berdasarkan machine_name
-//     let machine = await machineModel.findOne({
-//       where: {
-//         machine_name,
-//       },
-//     });
-
-//     // Jika machine tidak ditemukan, buat machine baru
-//     if (!machine) {
-//       // Cari section berdasarkan section_name
-//       let section = await sectionModel.findOne({ where: { section_name } });
-
-//       // Jika section tidak ditemukan, buat section baru
-//       if (!section) {
-//         section = await sectionModel.create({
-//           section_name,
-//           section_number,
-//           userId: req.userId,
-//         });
-//       }
-
-//       // Buat machine baru dengan sectionId dan userId
-//       machine = await machineModel.create({
-//         machine_name,
-//         machine_number,
-//         sectionId: section.id,
-//         userId: req.userId,
-//       });
-//     }
-
-//     // Cari item sebelumnya berdasarkan name dan machineId
-//     const prevData = await itemModel.findOne({
-//       where: {
-//         name,
-//         machineId: machine.id,
-//       },
-//     });
-
-//     // Jika prevData ditemukan, update stoknya
-//     if (prevData) {
-//       const response = await itemModel.update({ stok: prevData.stok + stok }, { where: { id: prevData.id } });
-//       return res.status(200).json({ message: "Item updated", data: response });
-//     } else {
-//       // Jika prevData tidak ditemukan, buat item baru
-//       const response = await itemModel.create({
-//         name,
-//         stok,
-//         userId: req.userId,
-//         machineId: machine.id,
-//       });
-
-//       const history = await historyModel.create({
-//         itemId: response.id,
-//         userId: req.userId,
-//         machineId: response.machineId,
-//         prevStock: 0,
-//         usedStock: stok,
-//         afterStock: stok,
-//         changeType: "ADDNew",
-//         description,
-//       })
-//       return res.status(201).json({ message: "Item created", data: response });
-//     }
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
 export const createItem = async (req, res) => {
   const { name, stok, machine_name, machine_number, section_name, section_number, description } = req.body;
 
@@ -284,7 +209,6 @@ export const deleteItem = async (req, res) => {
       },
     });
     if (!item) return res.status(404).json({ message: "item not found" });
-    const { name, stok } = req.body;
     let response;
     if (req.role === "admin") {
       response = await itemModel.destroy({
@@ -300,6 +224,17 @@ export const deleteItem = async (req, res) => {
         },
       });
     }
+
+    await historyModel.create({
+      itemId: item.id,
+      userId: req.userId,
+      machineId: item.machineId,
+      prevStock: item.stok,
+      usedStock: item.stok,
+      afterStock: 0,
+      changeType: "DELETE",
+    });
+
     res.status(200).json({ message: "item deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });

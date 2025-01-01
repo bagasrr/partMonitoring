@@ -7,11 +7,14 @@ import { clearNotification, setNotification } from "../features/notificationSlic
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
+import Pagination from "./Pagination";
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
   const notification = useSelector((state) => state.notification.message);
   const { user } = useSelector((state) => state.auth);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -39,9 +42,17 @@ const ItemsTable = () => {
 
   const filteredData = data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.machine.machine_name.toLowerCase().includes(search.toLowerCase()));
 
-  console.log(filteredData.length);
+  const handlePageClick = (selectedItem) => {
+    const { selected } = selectedItem;
+    setCurrentPage(selected);
+  };
+
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
   return (
-    <div className="overflow-x-auto">
+    <div>
       {notification && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
           <strong className="font-bold">Success!</strong>
@@ -54,7 +65,7 @@ const ItemsTable = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Search items or machines"
+          placeholder="Search items or machines name"
         />
       </div>
       <table className="min-w-full bg-white">
@@ -83,7 +94,7 @@ const ItemsTable = () => {
             </tr>
           )}
           {filteredData &&
-            filteredData.map((item, index) => (
+            currentItems.map((item, index) => (
               <TRow key={item.uuid}>
                 <TData>{index + 1}</TData>
                 <TData>{highlightText(item.name, search)}</TData>
@@ -108,6 +119,7 @@ const ItemsTable = () => {
             ))}
         </tbody>
       </table>
+      <Pagination pageCount={pageCount} handlePageClick={handlePageClick} currentPage={currentPage} />
     </div>
   );
 };
