@@ -6,8 +6,10 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import { NormalInput } from "../element/Input";
+import { adminArea } from "../utils/adminArea";
 
 const EditItem = () => {
+  adminArea();
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
   const navigate = useNavigate();

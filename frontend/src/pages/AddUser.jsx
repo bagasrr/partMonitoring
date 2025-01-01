@@ -3,8 +3,10 @@ import { Button, Label, NormalInput } from "../element/Input";
 import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { adminArea } from "../utils/adminArea";
 
 const AddUser = () => {
+  adminArea();
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [role, setRole] = useState("");
@@ -14,7 +16,6 @@ const AddUser = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(userName, role, password, confPassword);
     try {
       await axios.post("http://localhost:4000/api/users", {
         name: userName,

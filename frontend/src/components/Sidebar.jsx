@@ -1,8 +1,8 @@
 import React from "react";
 import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
-import { PiNotePencilBold } from "react-icons/pi";
+import { PiEngineFill, PiEngineLight, PiNotePencilBold } from "react-icons/pi";
 import { IoMdListBox } from "react-icons/io";
-import { MdCreateNewFolder } from "react-icons/md";
+import { MdCreateNewFolder, MdMeetingRoom } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout, reset } from "../features/authSlice";
@@ -52,6 +52,19 @@ const Sidebar = () => {
                 <FaUsers className="mr-2" />
                 <Link to="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
                   Users
+                </Link>
+              </li>
+              <li className="mb-2 flex items-center">
+                <PiEngineFill className="mr-2" />
+                <Link to="/machines" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Machines
+                </Link>
+              </li>
+              <li className="mb-2 flex items-center">
+                <MdMeetingRoom className="mr-2" />
+
+                <Link to="/sections" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                  Section Room
                 </Link>
               </li>
             </ul>

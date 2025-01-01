@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "off", maxLength = 100, placeholder, className, isError }) => {
+export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "off", maxLength = 500, placeholder, className, isError }) => {
   return (
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>

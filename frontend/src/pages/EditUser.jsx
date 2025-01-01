@@ -6,8 +6,10 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import { Button, NormalInput } from "../element/Input";
+import { adminArea } from "../utils/adminArea";
 
 const EditUser = () => {
+  adminArea();
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");

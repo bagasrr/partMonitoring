@@ -8,7 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../utils/getUser";
 
-const UsersTable = () => {
+const SectionsTable = () => {
   const [data, setData] = useState([]);
   const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
   const dispatch = useDispatch();
@@ -70,4 +70,4 @@ const UsersTable = () => {
   );
 };
 
-export default UsersTable;
+export default SectionsTable;

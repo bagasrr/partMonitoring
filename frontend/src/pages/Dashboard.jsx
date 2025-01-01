@@ -3,6 +3,7 @@ import Layout from "./Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../features/authSlice";
+import ChartComponent from "../components/ChartExample";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,9 @@ const Dashboard = () => {
   return (
     <Layout>
       <h1 className="text-xl font-bold">Welcome - {user && user.name}</h1>
+      <div>
+        <ChartComponent />
+      </div>
     </Layout>
   );
 };

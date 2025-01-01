@@ -1,6 +1,6 @@
 import React from "react";
 import Dashboard from "./pages/Dashboard";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Items from "./pages/Items";
 import EditItem from "./pages/EditItem";
@@ -10,6 +10,11 @@ import EditUser from "./pages/EditUser";
 import AddUser from "./pages/AddUser";
 import ChangePartForm from "./pages/ChangePartForm";
 import History from "./pages/History";
+import Machines from "./pages/Machines";
+import Sections from "./pages/Sections";
+import EditMachine from "./pages/EditGroup/EditMachine";
+import AddMachine from "./pages/AddGroup/AddMachine";
+import YoureNotAdmin from "./pages/YoureNotAdmin";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +56,26 @@ const router = createBrowserRouter([
   {
     path: "/history",
     element: <History />,
+  },
+  {
+    path: "/machines/add",
+    element: <AddMachine />,
+  },
+  {
+    path: "/machines",
+    element: <Machines />,
+  },
+  {
+    path: "/machines/edit/:id",
+    element: <EditMachine />,
+  },
+  {
+    path: "/sections",
+    element: <Sections />,
+  },
+  {
+    path: "/yourenotadmin",
+    element: <YoureNotAdmin />,
   },
 ]);
 
