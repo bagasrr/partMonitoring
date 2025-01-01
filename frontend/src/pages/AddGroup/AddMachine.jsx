@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { adminArea } from "../../utils/adminArea";
-import Title from "../../element/Title";
-import { Button, Label, NormalInput, NormalInputUnReq } from "../../element/Input";
-import Layout from "../Layout";
+import { Label, NormalInput } from "../../element/Input";
 import { getSections } from "../../utils/getSection";
 import FormLayout from "../FormLayout";
 

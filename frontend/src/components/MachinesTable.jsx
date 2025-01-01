@@ -7,11 +7,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../utils/getMachine";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
+import SearchBar from "./SearchBar"; // Import komponen SearchBar
+import highlightText from "../element/highlightText"; // Import fungsi highlightText
+import Pagination from "./Pagination"; // Import komponen Pagination
 
 const MachinesTable = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedMachine, setSelectedMachine] = useState(null);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(0); // Menambah state untuk halaman saat ini
+  const itemsPerPage = 5; // Jumlah item per halaman
   const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,6 +42,7 @@ const MachinesTable = () => {
       await axios.delete(`http://localhost:4000/api/machines/${selectedMachine}`);
       dispatch(setNotification("Machines Deleted"));
       setShowModal(false); // Tutup modal setelah penghapusan
+      Machines(); // Refresh data setelah penghapusan
     }
   };
 
@@ -48,6 +55,18 @@ const MachinesTable = () => {
     setShowModal(false);
   };
 
+  const handlePageClick = (selectedItem) => {
+    const { selected } = selectedItem;
+    setCurrentPage(selected);
+  };
+
+  const filteredData = data.filter((machine) => machine.machine_name.toLowerCase().includes(search.toLowerCase()) || machine.section.section_name.toLowerCase().includes(search.toLowerCase()));
+
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+
   return (
     <div>
       {notification && (
@@ -56,6 +75,7 @@ const MachinesTable = () => {
           <span className="block sm:inline"> {notification}</span>
         </div>
       )}
+      <SearchBar search={search} setSearch={setSearch} placeholder="Search machines or sections" />
       <table className="min-w-full bg-white">
         <thead>
           <tr>
@@ -68,12 +88,19 @@ const MachinesTable = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((machine, index) => (
+          {filteredData.length === 0 && (
+            <tr>
+              <td colSpan="8" className="text-center py-4">
+                No data found
+              </td>
+            </tr>
+          )}
+          {currentItems.map((machine, index) => (
             <TRow key={machine.uuid}>
               <TData>{index + 1}</TData>
-              <TData>{machine.machine_name}</TData>
+              <TData>{highlightText(machine.machine_name, search)}</TData>
               <TData>{machine.machine_number}</TData>
-              <TData>{machine.section.section_name}</TData>
+              <TData>{highlightText(machine.section.section_name, search)}</TData>
               <TData>{machine.section.section_number}</TData>
               <TData>
                 <div className="flex gap-5 items-center justify-center">
@@ -85,7 +112,7 @@ const MachinesTable = () => {
           ))}
         </tbody>
       </table>
-
+      {pageCount > 0 && <Pagination pageCount={pageCount} handlePageClick={handlePageClick} forcePage={currentPage} />}
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus mesin ini?">
         <p>
           Jika menghapus mesin ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan mesin ini akan <span className="text-red-500 text-2xl"> terhapus.</span>

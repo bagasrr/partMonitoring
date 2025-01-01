@@ -8,6 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
 import Pagination from "./Pagination";
+import SearchBar from "./SearchBar"; // Import komponen SearchBar
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
@@ -51,6 +52,7 @@ const ItemsTable = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+
   return (
     <div>
       {notification && (
@@ -59,15 +61,7 @@ const ItemsTable = () => {
           <span className="block sm:inline"> {notification}</span>
         </div>
       )}
-      <div className="mb-4">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Search items or machines name"
-        />
-      </div>
+      <SearchBar search={search} setSearch={setSearch} placeholder="Search items or machines name" />
       <table className="min-w-full bg-white">
         <thead>
           <tr>
@@ -119,7 +113,7 @@ const ItemsTable = () => {
             ))}
         </tbody>
       </table>
-      <Pagination pageCount={pageCount} handlePageClick={handlePageClick} currentPage={currentPage} />
+      {pageCount > 0 && <Pagination pageCount={pageCount} handlePageClick={handlePageClick} forcePage={currentPage} />}
     </div>
   );
 };
