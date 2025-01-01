@@ -19,9 +19,6 @@ const AddMachine = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Machine : ", machineName);
-    console.log("Machine Number : ", machineNumber);
-    console.log("Section : ", sectionName);
     try {
       await axios.post("http://localhost:4000/api/machines", {
         machine_name: machineName,

@@ -15,6 +15,7 @@ import Sections from "./pages/Sections";
 import EditMachine from "./pages/EditGroup/EditMachine";
 import AddMachine from "./pages/AddGroup/AddMachine";
 import YoureNotAdmin from "./pages/YoureNotAdmin";
+import AddSection from "./pages/AddGroup/AddSection";
 
 const router = createBrowserRouter([
   {
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
   {
     path: "/sections",
     element: <Sections />,
+  },
+  {
+    path: "/sections/add",
+    element: <AddSection />,
   },
   {
     path: "/yourenotadmin",
