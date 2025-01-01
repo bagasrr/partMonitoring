@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { getAllItem } from "../utils/getItem";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice"; // Import action
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../utils/getMachine";
-import { Button } from "../element/Input";
+import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 
 const MachinesTable = () => {
   const [data, setData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMachine, setSelectedMachine] = useState(null);
   const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,9 +31,22 @@ const MachinesTable = () => {
     console.log(response);
     setData(response);
   };
-  const handleDelete = async (uuid) => {
-    await axios.delete(`http://localhost:4000/api/machines/${uuid}`);
-    dispatch(setNotification("Machines Deleted"));
+
+  const handleDelete = async () => {
+    if (selectedMachine) {
+      await axios.delete(`http://localhost:4000/api/machines/${selectedMachine}`);
+      dispatch(setNotification("Machines Deleted"));
+      setShowModal(false); // Tutup modal setelah penghapusan
+    }
+  };
+
+  const handleOpenModal = (uuid) => {
+    setSelectedMachine(uuid);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -64,17 +78,7 @@ const MachinesTable = () => {
               <TData>{machine.section.section_number}</TData>
               <TData>
                 <div className="flex gap-5 items-center justify-center">
-                  {/* <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(machine.uuid)} /> */}
-                  <FaTrash
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => (
-                      <div className="fixed top-0 w-full bg-white shadow-md z-20 flex gap-5 items-center justify-center">
-                        <h1>Are you sure?</h1>
-                        <button onClick={() => handleDelete(machine.uuid)}>Yes</button>
-                        <button>No</button>
-                      </div>
-                    )}
-                  />
+                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(machine.uuid)} />
                   <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/machines/edit/${machine.uuid}`)} />
                 </div>
               </TData>
@@ -82,6 +86,12 @@ const MachinesTable = () => {
           ))}
         </tbody>
       </table>
+
+      <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus mesin ini?">
+        <p>
+          Jika menghapus mesin ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan mesin ini akan <span className="text-red-500 text-2xl"> terhapus.</span>
+        </p>
+      </DeleteConfirmModalBox>
     </div>
   );
 };
