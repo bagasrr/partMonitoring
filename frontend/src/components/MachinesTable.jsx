@@ -28,7 +28,6 @@ const MachinesTable = () => {
 
   const Machines = async () => {
     const response = await getMachines();
-    console.log(response);
     setData(response);
   };
 
