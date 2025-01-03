@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { machineModel } from "../models/index.js";
+import { itemModel, machineModel } from "../models/index.js";
 import { sectionModel } from "../models/index.js";
 import { userModel } from "../models/index.js";
 
@@ -186,5 +186,18 @@ export const deleteMachine = async (req, res) => {
     res.status(200).json({ message: "Machine deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMachinesWithItems = async (req, res) => {
+  try {
+    const machines = await machineModel.findAll({
+      include: {
+        model: itemModel,
+      },
+    });
+    res.status(200).json(machines);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

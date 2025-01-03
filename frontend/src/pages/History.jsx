@@ -80,7 +80,7 @@ const History = () => {
           </tbody>
         </table>
       </div>
-      <Pagination pageCount={pageCount} handlePageClick={handlePageClick} currentPage={currentPage} />
+      {pageCount > 0 && <Pagination pageCount={pageCount} handlePageClick={handlePageClick} currentPage={currentPage} />}
     </Layout>
   );
 };

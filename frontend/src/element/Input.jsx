@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "off", maxLength = 500, placeholder, className, isError }) => {
   return (
-    <div className="mb-4">
+    <div className="mb-4 w-full">
       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
         {label}
       </label>
@@ -17,6 +18,40 @@ export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "
         maxLength={maxLength}
         placeholder={placeholder}
       />
+    </div>
+  );
+};
+
+export const StokInput = ({ setStock, name }) => {
+  const [Validate, setValidate] = useState(false);
+  const handleStockChange = (e) => {
+    try {
+      const value = e.target.value;
+      if (value < 0) {
+        setValidate(true);
+      } else {
+        setValidate(false);
+        setStock(value);
+      }
+      console.log(value);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+        Stok
+      </label>
+      <input
+        type="number"
+        id={name}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline  ${Validate ? "border-red-500" : ""}`}
+        min={0}
+        required
+        onChange={handleStockChange}
+      />
+      {Validate && <p className="text-red-500 text-xs mt-1 font-bold">Stok Harus Lebih dari 0</p>}
     </div>
   );
 };
@@ -86,5 +121,25 @@ export const Button = ({ children, onClick, type }) => {
     <button type={type} onClick={onClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ">
       {children}
     </button>
+  );
+};
+
+export const TextArea = ({ value, id, onChange, label, autoComplete = "off", maxLength = 500, placeholder, className, isError }) => {
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
+        {label}
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={onChange}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${isError ? "border-red-500" : ""} ${className}`}
+        autoComplete={autoComplete}
+        required
+        maxLength={maxLength}
+        placeholder={placeholder}
+      />
+    </div>
   );
 };

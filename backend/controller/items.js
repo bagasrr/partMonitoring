@@ -132,7 +132,7 @@ export const createItem = async (req, res) => {
         prevStock: prevData.stok,
         usedStock: stok,
         afterStock: prevData.stok + stok,
-        changeType: "UPDATE",
+        changeType: "Part Masuk",
         description,
       });
 
@@ -154,7 +154,7 @@ export const createItem = async (req, res) => {
         prevStock: 0,
         usedStock: stok,
         afterStock: stok,
-        changeType: "ADDNew",
+        changeType: "Add New Item",
         description,
       });
 
