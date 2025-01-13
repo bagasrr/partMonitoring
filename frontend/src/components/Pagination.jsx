@@ -1,7 +1,12 @@
 import React from "react";
 import ReactPaginate from "react-paginate";
 
-const Pagination = ({ pageCount, handlePageClick, currentPage }) => {
+const Pagination = ({ pageCount, onPageChange, currentPage }) => {
+  const handleClick = (selectedItem) => {
+    console.log("Pagination clicked:", selectedItem); // Logging untuk memastikan dipanggil
+    onPageChange(selectedItem); // Menggunakan nama prop yang konsisten
+  };
+
   return (
     <ReactPaginate
       previousLabel={""}
@@ -10,7 +15,7 @@ const Pagination = ({ pageCount, handlePageClick, currentPage }) => {
       pageCount={pageCount}
       marginPagesDisplayed={1}
       pageRangeDisplayed={2}
-      onPageChange={handlePageClick}
+      onPageChange={handleClick} // Menggunakan fungsi handleClick untuk logging
       containerClassName={"flex mt-5 justify-center"}
       pageClassName={"mx-1"}
       pageLinkClassName={"px-4 py-2 border rounded text-blue-500 hover:bg-blue-500 hover:text-white focus:outline-none"}
