@@ -22,7 +22,7 @@ export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "
   );
 };
 
-export const StokInput = ({ setStock, name }) => {
+export const StokInput = ({ setStock, name, label = "Stock" }) => {
   const [Validate, setValidate] = useState(false);
   const handleStockChange = (e) => {
     try {
@@ -41,7 +41,7 @@ export const StokInput = ({ setStock, name }) => {
   return (
     <div className="mb-4">
       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
-        Stok
+        {label}
       </label>
       <input
         type="number"
@@ -51,7 +51,7 @@ export const StokInput = ({ setStock, name }) => {
         required
         onChange={handleStockChange}
       />
-      {Validate && <p className="text-red-500 text-xs mt-1 font-bold">Stok Harus Lebih dari 0</p>}
+      {Validate && <p className="text-red-500 text-xs mt-1 font-bold">Nilai Harus Lebih dari 0</p>}
     </div>
   );
 };

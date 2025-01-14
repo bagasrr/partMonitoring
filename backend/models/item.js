@@ -31,6 +31,16 @@ export const item = {
     },
     defaultValue: null,
   },
+
+  lowerLimit: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

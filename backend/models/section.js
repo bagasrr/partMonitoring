@@ -23,6 +23,10 @@ export const section = {
       notEmpty: true,
     },
   },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

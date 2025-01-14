@@ -23,6 +23,10 @@ export const machine = {
       notEmpty: true,
     },
   },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   sectionId: {
     type: DataTypes.INTEGER,
     allowNull: false,

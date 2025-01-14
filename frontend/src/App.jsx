@@ -16,6 +16,7 @@ import EditMachine from "./pages/EditGroup/EditMachine";
 import AddMachine from "./pages/AddGroup/AddMachine";
 import YoureNotAdmin from "./pages/YoureNotAdmin";
 import AddSection from "./pages/AddGroup/AddSection";
+import AddPart from "./pages/AddGroup/AddPart";
 
 const router = createBrowserRouter([
   {
@@ -31,8 +32,12 @@ const router = createBrowserRouter([
     element: <Items />,
   },
   {
-    path: "/items/add",
+    path: "/items/add/new",
     element: <NewAddItem />,
+  },
+  {
+    path: "/items/add/",
+    element: <AddPart />,
   },
   {
     path: "/items/edit/:id",

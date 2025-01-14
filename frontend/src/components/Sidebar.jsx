@@ -17,7 +17,7 @@ const Sidebar = () => {
     navigate("/");
   };
   return (
-    <div className="fixed left-0 top-16 h-full w-64 bg-gray-800 text-white shadow-md">
+    <div className="fixed overflow-y-auto pb-20 left-0 top-16 h-full w-64 bg-gray-800 text-white shadow-md">
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-4">GENERAL</h2>
         <ul className="mb-8">
@@ -70,31 +70,31 @@ const Sidebar = () => {
             </ul>
           </>
         )}
-        {user && user.role !== "admin" && (
-          <>
-            <h2 className="text-lg font-semibold mb-4">PARTS</h2>
-            <ul className="mb-8">
-              <li className="mb-2 flex items-center">
-                <IoMdListBox className="mr-2" />
-                <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  List Part
-                </Link>
-              </li>
-              <li className="mb-2 flex items-center">
-                <MdCreateNewFolder className="mr-2" />
-                <Link to="/items/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Part Masuk
-                </Link>
-              </li>
-              <li className="mb-2 flex items-center">
-                <PiNotePencilBold className="mr-2" />
-                <Link to="/items/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Ganti Part
-                </Link>
-              </li>
-            </ul>
-          </>
-        )}
+        {/* {user && user.role !== "admin" && (
+          <> */}
+        <h2 className="text-lg font-semibold mb-4">PARTS</h2>
+        <ul className="mb-8">
+          <li className="mb-2 flex items-center">
+            <IoMdListBox className="mr-2" />
+            <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
+              List Part
+            </Link>
+          </li>
+          <li className="mb-2 flex items-center">
+            <MdCreateNewFolder className="mr-2" />
+            <Link to="/items/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
+              Part Masuk
+            </Link>
+          </li>
+          <li className="mb-2 flex items-center">
+            <PiNotePencilBold className="mr-2" />
+            <Link to="/items/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
+              Ganti Part
+            </Link>
+          </li>
+        </ul>
+        {/* </>
+        )} */}
 
         <h2 className="text-lg font-semibold mb-4">SETTINGS</h2>
         <ul>

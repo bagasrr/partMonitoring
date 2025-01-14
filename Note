@@ -1,4 +1,5 @@
-
+14 Jan 2025
+terjadi masalah ketika menghapus data item dan lainnya lalu mengakses histori, karena histori mengambil data dari itemid macchineid dan lainnya jadi ketika dihapus terdapat error, karena idnya null
 
 24 Dec 2024
 terakhir nyoba update user, tapi belum nyoba update ganti password, tadi ada error di select rolenya

@@ -23,6 +23,13 @@ export const history = {
       notEmpty: false,
     },
   },
+  newStock: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      notEmpty: false,
+    },
+  },
   afterStock: {
     type: DataTypes.INTEGER,
     allowNull: true,
@@ -30,8 +37,8 @@ export const history = {
       notEmpty: false,
     },
   },
-  itemId: {
-    type: DataTypes.INTEGER,
+  itemName: {
+    type: DataTypes.STRING,
     allowNull: true,
     validate: {
       notEmpty: false,
@@ -44,15 +51,15 @@ export const history = {
       notEmpty: true,
     },
   },
-  machineId: {
-    type: DataTypes.INTEGER,
+  machineName: {
+    type: DataTypes.STRING,
     allowNull: true,
     validate: {
       notEmpty: true,
     },
   },
-  sectionId: {
-    type: DataTypes.INTEGER,
+  sectionName: {
+    type: DataTypes.STRING,
     allowNull: true,
     validate: {
       notEmpty: false,
@@ -65,6 +72,7 @@ export const history = {
       notEmpty: true,
     },
   },
+
   description: {
     type: DataTypes.STRING,
     allowNull: true,

@@ -12,6 +12,7 @@ import { getSections } from "../utils/getSection";
 const AddItemForm = () => {
   const [name, setName] = useState("");
   const [stock, setStock] = useState("");
+  const [minStock, setMinStock] = useState("");
   const [names, setNames] = useState([]);
   const [isNewName, setIsNewName] = useState(false);
   const [machine, setMachine] = useState("");
@@ -78,6 +79,7 @@ const AddItemForm = () => {
       machine_name: machine,
       machine_number: machineNumber,
       section_name: section,
+      lowerLimit: parseInt(minStock),
       section_number: sectionNumber,
       description: desc,
     });
@@ -88,12 +90,13 @@ const AddItemForm = () => {
   return (
     <Layout>
       <div className={`${isNewMachine ? "w-fit" : "w-1/2"} mx-auto bg-white shadow-md rounded-lg p-6 flex flex-col items-center `}>
-        <h1 className="text-2xl font-bold text-center mb-4">Tambahkan Part</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Tambahkan Part Baru</h1>
         <form onSubmit={handleSubmit}>
           <div className="flex justify-center gap-10">
             <div>
               <ItemInput label="Part Name" name={name} names={names} isNewName={isNewName} setName={setName} setIsNewName={setIsNewName} />
               <StokInput name="stock" setStock={setStock} />
+              <StokInput label="Min Stock" name="minStock" setStock={minStock} />
               <TextArea label="Deskripsi" value={desc} id="desc" onChange={(e) => setDesc(e.target.value)} placeholder={"Masukkan Deskripsi"} />
 
               <MachineInput machine={machine} machines={machines} isNewMachine={isNewMachine} setMachine={setMachine} setIsNewMachine={setIsNewMachine} user={user} />
