@@ -23,6 +23,14 @@ export const item = {
       notEmpty: true,
     },
   },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    validate: {
+      notEmpty: false,
+    },
+    defaultValue: null,
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

@@ -11,11 +11,11 @@ const Items = () => {
 
   return (
     <Layout>
-      <Title>Items</Title>
+      <Title>List Part</Title>
       {user && user.role === "admin" && (
         <div className="mb-10">
           <Link to="/items/add" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  w-fit">
-            Tambah Item
+            Tambah Part Baru
           </Link>
         </div>
       )}

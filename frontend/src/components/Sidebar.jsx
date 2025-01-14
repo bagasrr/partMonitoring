@@ -30,7 +30,7 @@ const Sidebar = () => {
           <li className="mb-2 flex items-center">
             <FaHistory className="mr-2" />
             <Link to="/history" className="block px-4 py-2 hover:bg-gray-700 rounded">
-              History
+              Histori
             </Link>
           </li>
           {user && user.role === "admin" && (
@@ -38,7 +38,7 @@ const Sidebar = () => {
               <li className="mb-2 flex items-center">
                 <FaBox className="mr-2" />
                 <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Items
+                  List Part
                 </Link>
               </li>
             </>
@@ -51,20 +51,20 @@ const Sidebar = () => {
               <li className="mb-2 flex items-center">
                 <FaUsers className="mr-2" />
                 <Link to="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Users
+                  List User
                 </Link>
               </li>
               <li className="mb-2 flex items-center">
                 <PiEngineFill className="mr-2" />
                 <Link to="/machines" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Machines
+                  List Mesin
                 </Link>
               </li>
               <li className="mb-2 flex items-center">
                 <MdMeetingRoom className="mr-2" />
 
                 <Link to="/sections" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                  Section Room
+                  List Ruangan
                 </Link>
               </li>
             </ul>

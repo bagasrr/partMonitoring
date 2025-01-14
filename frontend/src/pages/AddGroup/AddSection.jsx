@@ -21,7 +21,7 @@ const AddSection = () => {
     dispatch(setNotification(`Section ${sectionName}Added`));
   };
   return (
-    <FormLayout formTitle={"Add Section"} onSubmit={handleSubmit}>
+    <FormLayout formTitle={"Tambah Ruangan"} onSubmit={handleSubmit}>
       <NormalInput label="Nama Ruangan" id="section_name" type="text" onChange={(e) => setSectionName(e.target.value)} />
       <NormalInput label="Nomor Ruangan" id="section_number" type="text" onChange={(e) => setSectionNumber(e.target.value)} />
     </FormLayout>

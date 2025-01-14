@@ -11,30 +11,30 @@ export const history = {
   },
   prevStock: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
-      notEmpty: true,
+      notEmpty: false,
     },
   },
   usedStock: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
-      notEmpty: true,
+      notEmpty: false,
     },
   },
   afterStock: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
-      notEmpty: true,
+      notEmpty: false,
     },
   },
   itemId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
-      notEmpty: true,
+      notEmpty: false,
     },
   },
   userId: {
@@ -46,9 +46,16 @@ export const history = {
   },
   machineId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     validate: {
       notEmpty: true,
+    },
+  },
+  sectionId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      notEmpty: false,
     },
   },
   changeType: {

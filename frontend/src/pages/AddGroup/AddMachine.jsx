@@ -54,7 +54,7 @@ const AddMachine = () => {
       <NormalInput label="Nomor Mesin" id="machineNumber" type="text" onChange={(e) => setMachineNumber(e.target.value)} placeholder="Masukkan Nomor Mesin" />
 
       <div className="mb-4 flex flex-col">
-        <Label htmlFor="sectionName">Pilih Section</Label>
+        <Label htmlFor="sectionName">Pilih Ruangan</Label>
         <select
           id="sectionName"
           name="sectionName"

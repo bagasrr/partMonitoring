@@ -2,29 +2,28 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setNotification } from "../features/notificationSlice"; // Import action
+import { clearNotification, setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../utils/getMachine";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
-import SearchBar from "./SearchBar"; // Import komponen SearchBar
-import highlightText from "../element/highlightText"; // Import fungsi highlightText
-import Pagination from "./Pagination"; // Import komponen Pagination
+import SearchBar from "./SearchBar";
+import highlightText from "../element/highlightText";
+import Pagination from "./Pagination";
 
 const MachinesTable = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(0); // Menambah state untuk halaman saat ini
-  const itemsPerPage = 5; // Jumlah item per halaman
-  const notification = useSelector((state) => state.notification.message); // Gunakan selector Redux
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
+  const notification = useSelector((state) => state.notification.message);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     Machines();
-    // Hapus notifikasi setelah beberapa detik
     if (notification) {
       setTimeout(() => {
         dispatch(clearNotification());
@@ -41,8 +40,8 @@ const MachinesTable = () => {
     if (selectedMachine) {
       await axios.delete(`http://localhost:4000/api/machines/${selectedMachine}`);
       dispatch(setNotification("Machines Deleted"));
-      setShowModal(false); // Tutup modal setelah penghapusan
-      Machines(); // Refresh data setelah penghapusan
+      setShowModal(false);
+      Machines();
     }
   };
 
@@ -60,6 +59,11 @@ const MachinesTable = () => {
     setCurrentPage(selected);
   };
 
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setCurrentPage(0);
+  };
+
   const filteredData = data.filter((machine) => machine.machine_name.toLowerCase().includes(search.toLowerCase()) || machine.section.section_name.toLowerCase().includes(search.toLowerCase()));
 
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
@@ -75,7 +79,7 @@ const MachinesTable = () => {
           <span className="block sm:inline"> {notification}</span>
         </div>
       )}
-      <SearchBar search={search} setSearch={setSearch} placeholder="Search machines or sections" />
+      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search machines or sections" />
       <table className="min-w-full bg-white">
         <thead>
           <tr>
@@ -97,7 +101,7 @@ const MachinesTable = () => {
           )}
           {currentItems.map((machine, index) => (
             <TRow key={machine.uuid}>
-              <TData>{index + 1}</TData>
+              <TData>{index + 1 + indexOfFirstItem}</TData>
               <TData>{highlightText(machine.machine_name, search)}</TData>
               <TData>{machine.machine_number}</TData>
               <TData>{highlightText(machine.section.section_name, search)}</TData>
@@ -112,7 +116,7 @@ const MachinesTable = () => {
           ))}
         </tbody>
       </table>
-      {pageCount > 0 && <Pagination pageCount={pageCount} handlePageClick={handlePageClick} forcePage={currentPage} />}
+      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus mesin ini?">
         <p>
           Jika menghapus mesin ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan mesin ini akan <span className="text-red-500 text-2xl"> terhapus.</span>

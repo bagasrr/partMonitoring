@@ -93,7 +93,6 @@ const AddItemForm = () => {
           <div className="flex justify-center gap-10">
             <div>
               <ItemInput label="Part Name" name={name} names={names} isNewName={isNewName} setName={setName} setIsNewName={setIsNewName} />
-              {/* <NormalInput label="Stok" value={stock} type="number" id="stock" onChange={(e) => setStock(e.target.value)} placeholder={"Masukkan Stok"} /> */}
               <StokInput name="stock" setStock={setStock} />
               <TextArea label="Deskripsi" value={desc} id="desc" onChange={(e) => setDesc(e.target.value)} placeholder={"Masukkan Deskripsi"} />
 

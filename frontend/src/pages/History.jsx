@@ -2,23 +2,26 @@ import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
 import axios from "axios";
 import Pagination from "../components/Pagination";
+import SearchBar from "../components/SearchBar"; // Import SearchBar component
+import highlightText from "../element/highlightText"; // Import highlightText function
 
 const History = () => {
   const [histories, setHistories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [search, setSearch] = useState("");
   const itemsPerPage = 10;
   const [selectedUuid, setSelectedUuid] = useState(null);
 
   useEffect(() => {
-    getHistory();
+    fetchHistory();
   }, [currentPage]);
 
-  const getHistory = async () => {
+  const fetchHistory = async () => {
     try {
       const response = await axios.get("http://localhost:4000/api/history");
       const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setHistories(sortedData);
-      console.log("Data fetched:", sortedData); // Logging untuk memastikan data terambil
+      console.log("Data fetched:", sortedData); // Logging to ensure data is fetched
     } catch (error) {
       console.log(error);
     }
@@ -38,23 +41,32 @@ const History = () => {
 
   const handlePageClick = (selectedItem) => {
     const { selected } = selectedItem;
-    console.log(`Page clicked: ${selected}`); // Logging untuk debugging
+    console.log(`Page clicked: ${selected}`); // Logging for debugging
     setCurrentPage(selected);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setCurrentPage(0); // Reset page on search change
   };
 
   const handleShowDetail = (uuid) => {
     setSelectedUuid(uuid === selectedUuid ? null : uuid);
   };
 
+  const filteredData = histories.filter(
+    (his) => his.item.name.toLowerCase().includes(search.toLowerCase()) || his.user.name.toLowerCase().includes(search.toLowerCase()) || formatDate(his.createdAt).toLowerCase().includes(search.toLowerCase())
+  );
+
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = histories.slice(indexOfFirstItem, indexOfLastItem);
-  const pageCount = Math.ceil(histories.length / itemsPerPage);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
-  console.log("Current items:", currentItems); // Logging untuk memastikan data yang ditampilkan
+  console.log("Current items:", currentItems); // Logging to ensure displayed data
 
-  // Reset currentPage jika melebihi pageCount
+  // Reset currentPage if it exceeds pageCount
   useEffect(() => {
     if (currentPage > pageCount - 1 && currentPage !== 0) {
       setCurrentPage(0);
@@ -63,22 +75,21 @@ const History = () => {
 
   return (
     <Layout key={currentPage}>
-      {" "}
-      {/* Tambahkan key untuk force update */}
       <h1 className="text-2xl font-bold mb-10">History</h1>
+      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search history by name or date" />
       <div className="w-full">
         {currentItems.map((his) => (
           <div className="py-5 px-2 shadow-md my-2 hover:bg-slate-200" key={his.uuid} onClick={() => handleShowDetail(his.uuid)}>
             <div className="flex justify-between">
               <div className="flex items-baseline gap-2">
-                <strong className="font-bold text-xl">{his.item.name}</strong>
+                <strong className="font-bold text-xl">{highlightText(his.item.name, search)}</strong>
                 <p className="text-xs">telah dilakukan</p>
-                <u>{his.changeType}</u>
+                <u>{highlightText(his.changeType, search)}</u>
               </div>
               <div className="flex flex-col items-end text-xs">
-                <p>{formatDate(his.createdAt)}</p>
+                <p>{highlightText(formatDate(his.createdAt), search)}</p>
                 <p>
-                  by <strong>{his.user.name}</strong>
+                  by <strong>{highlightText(his.user.name, search)}</strong>
                 </p>
               </div>
             </div>
@@ -93,9 +104,9 @@ const History = () => {
                 <p>Deskripsi </p>
               </div>
               <div className="font-bold">
-                <p>: {his.user.name}</p>
-                <p>: {his.item.name}</p>
-                <p>: {formatDate(his.createdAt)}</p>
+                <p>: {highlightText(his.user.name, search)}</p>
+                <p>: {highlightText(his.item.name, search)}</p>
+                <p>: {highlightText(formatDate(his.createdAt), search)}</p>
                 <p>: {his.prevStock}</p>
                 <p>: {his.usedStock}</p>
                 <p>: {his.afterStock}</p>
@@ -105,13 +116,7 @@ const History = () => {
           </div>
         ))}
       </div>
-      {pageCount > 0 && (
-        <Pagination
-          pageCount={pageCount}
-          onPageChange={handlePageClick} // Menggunakan nama prop yang konsisten
-          currentPage={currentPage}
-        />
-      )}
+      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
     </Layout>
   );
 };
