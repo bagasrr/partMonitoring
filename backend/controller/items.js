@@ -203,26 +203,54 @@ export const createItem = async (req, res) => {
 export const updateItem = async (req, res) => {
   try {
     const item = await itemModel.findOne({
-      where: { uuid: req.params.id, deletedAt: null },
+      where: {
+        uuid: req.params.id,
+        deletedAt: null,
+      },
     });
     if (!item) return res.status(404).json({ message: "Item not found" });
-    const { name, amount, description, status, lowerLimit } = req.body;
-    let response;
 
+    const { name, amount, description, status, lowerLimit, machine_name, machine_number } = req.body;
+
+    // Find or create the new machine
+    let machine = await machineModel.findOne({ where: { machine_name } });
+
+    if (!machine) {
+      // Create new machine if it doesn't exist
+      machine = await machineModel.create({
+        machine_name,
+        machine_number,
+        sectionId: item.sectionId, // Assuming the section remains the same
+        userId: req.userId,
+      });
+
+      // Create history record for machine creation
+      await historyModel.create({
+        name: machine.machine_name,
+        changeType: "Create Machine",
+        category: "Machine",
+        username: req.name,
+        description: "Machine created during item update",
+      });
+
+      // Log the machine creation in audit logs
+      await logAuditEvent("Machine", machine.id, "create", {
+        machine_name: machine.machine_name,
+        machine_number: machine.machine_number,
+      });
+    }
+
+    // Update item fields
+    let response;
     if (req.role === "admin") {
-      response = await itemModel.update({ name, amount, description, status, lowerLimit }, { where: { id: item.id } });
+      response = await itemModel.update({ name, amount, description, status, lowerLimit, machineId: machine.id }, { where: { id: item.id } });
     } else {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-      response = await itemModel.update({
-         name, amount, description, status, lowerLimit 
-        }, { 
-          where: { 
-            [Op.and]: [{ id: item.id }, { userId: req.userId }] 
-          } });
+      response = await itemModel.update({ name, amount, description, status, lowerLimit, machineId: machine.id }, { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } });
     }
 
     // Log the update action in the audit logs
-    await logAuditEvent("Item", item.id, "update", { name, amount, description, status, lowerLimit });
+    await logAuditEvent("Item", item.id, "update", { name, amount, description, status, lowerLimit, machineId: machine.id });
 
     // Create history record
     await historyModel.create({
@@ -230,8 +258,10 @@ export const updateItem = async (req, res) => {
       changeType: "Update Item",
       category: "Item",
       username: req.name,
-      prevStock: 
-      description: "Item updated",
+      description,
+      prevStock: item.amount,
+      usedStock: amount,
+      afterStock: amount,
     });
 
     // Check stock levels

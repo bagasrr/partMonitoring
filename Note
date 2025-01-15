@@ -1,3 +1,11 @@
+15 jan 2025
+update item belum bisa karena belum mecakup semua aspek yang ada di item , di cek lagi nanti
+
+
+15 jan 2025
+Update item stok input
+
+
 14 Jan 2025
 terjadi masalah ketika menghapus data item dan lainnya lalu mengakses histori, karena histori mengambil data dari itemid macchineid dan lainnya jadi ketika dihapus terdapat error, karena idnya null
 

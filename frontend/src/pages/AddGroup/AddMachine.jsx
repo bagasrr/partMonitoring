@@ -19,7 +19,6 @@ const AddMachine = () => {
   const [sectionData, setSectionData] = useState([]);
   const [isNewMachine, setIsNewMachine] = useState(false);
   const dispatch = useDispatch();
-  // const notification = useSelector((state) => state.notification.message);
   const notification = useNotification();
   const handleSubmit = async (e) => {
     e.preventDefault();
