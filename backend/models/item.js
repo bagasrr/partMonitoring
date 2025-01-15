@@ -16,7 +16,7 @@ export const item = {
       notEmpty: true,
     },
   },
-  stok: {
+  amount: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
@@ -31,7 +31,11 @@ export const item = {
     },
     defaultValue: null,
   },
-
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "Not Set",
+  },
   lowerLimit: {
     type: DataTypes.INTEGER,
     allowNull: false,

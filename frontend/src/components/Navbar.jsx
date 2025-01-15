@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { FaSignOutAlt, FaUser } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout, reset, getMe } from "../features/authSlice";
 
@@ -26,11 +26,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full bg-white shadow-md z-20">
+    <nav className="fixed top-0 w-full bg-lime-500 shadow-md z-20 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold">PartMonitoring</h1>
+            <Link to={"/dashboard"} className="text-2xl font-bold">
+              PartMonitoring
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={handleLogout} className="text-gray-800 hover:text-white bg-gray-100 hover:bg-red-500 font-bold py-2 px-4 rounded flex items-center">

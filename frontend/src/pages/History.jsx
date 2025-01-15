@@ -19,6 +19,7 @@ const History = () => {
   const fetchHistory = async () => {
     try {
       const response = await axios.get("http://localhost:4000/api/history");
+      console.log("res : ", response);
       const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setHistories(sortedData);
       console.log("Data fetched:", sortedData); // Logging to ensure data is fetched
@@ -55,9 +56,7 @@ const History = () => {
     setSelectedUuid(uuid === selectedUuid ? null : uuid);
   };
 
-  const filteredData = histories.filter(
-    (his) => his.item.name.toLowerCase().includes(search.toLowerCase()) || his.user.name.toLowerCase().includes(search.toLowerCase()) || formatDate(his.createdAt).toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredData = histories.filter((his) => his.name.toLowerCase().includes(search.toLowerCase()) || his.username.toLowerCase().includes(search.toLowerCase()) || formatDate(his.createdAt).toLowerCase().includes(search.toLowerCase()));
 
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -73,6 +72,7 @@ const History = () => {
     }
   }, [pageCount, currentPage]);
 
+  console.log(currentItems);
   return (
     <Layout key={currentPage}>
       <h1 className="text-2xl font-bold mb-10">History</h1>
@@ -82,34 +82,36 @@ const History = () => {
           <div className="py-5 px-2 shadow-md my-2 hover:bg-slate-200" key={his.uuid} onClick={() => handleShowDetail(his.uuid)}>
             <div className="flex justify-between">
               <div className="flex items-baseline gap-2">
-                <strong className="font-bold text-xl">{highlightText(his.item.name, search)}</strong>
+                <strong className="font-bold text-xl">{highlightText(his.name, search)}</strong>
                 <p className="text-xs">telah dilakukan</p>
                 <u>{highlightText(his.changeType, search)}</u>
               </div>
               <div className="flex flex-col items-end text-xs">
                 <p>{highlightText(formatDate(his.createdAt), search)}</p>
                 <p>
-                  by <strong>{highlightText(his.user.name, search)}</strong>
+                  by <strong>{highlightText(his.username, search)}</strong>
                 </p>
               </div>
             </div>
             <div className={`detail transition-max-height duration-300 ease-out ${selectedUuid === his.uuid ? "max-h-72" : "max-h-0"} overflow-hidden gap-3 flex`}>
               <div>
                 <p>Aktor </p>
-                <p>Nama Part </p>
+                <p>Entitas</p>
                 <p>Tanggal Kejadian </p>
-                <p>Jumlah Sebelum </p>
-                <p>Jumlah Terpakai </p>
-                <p>Jumlah Sisa </p>
+                {his.prevStock != null && <p>Jumlah Sebelum </p>}
+                {his.newStock != null && <p>Jumlah Baru </p>}
+                {his.usedStock != null && <p>Jumlah Terpakai </p>}
+                {his.afterStock != null && <p>Jumlah Akhir </p>}
                 <p>Deskripsi </p>
               </div>
               <div className="font-bold">
-                <p>: {highlightText(his.user.name, search)}</p>
-                <p>: {highlightText(his.item.name, search)}</p>
+                <p>: {highlightText(his.username, search)}</p>
+                <p>: {highlightText(his.name, search)}</p>
                 <p>: {highlightText(formatDate(his.createdAt), search)}</p>
-                <p>: {his.prevStock}</p>
-                <p>: {his.usedStock}</p>
-                <p>: {his.afterStock}</p>
+                {his.prevStock != null && <p>: {his.prevStock}</p>}
+                {his.newStock != null && <p>: {his.newStock}</p>}
+                {his.usedStock != null && <p>: {his.usedStock}</p>}
+                {his.afterStock != null && <p>: {his.afterStock}</p>}
                 <p>: {his.description}</p>
               </div>
             </div>

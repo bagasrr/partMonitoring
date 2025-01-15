@@ -73,19 +73,25 @@ const AddItemForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4000/api/items", {
-      name,
-      stok: parseInt(stock),
-      machine_name: machine,
-      machine_number: machineNumber,
-      section_name: section,
-      lowerLimit: parseInt(minStock),
-      section_number: sectionNumber,
-      description: desc,
-    });
-    dispatch(setNotification("Items Added"));
-    navigate("/items");
+    try {
+      await axios.post("http://localhost:4000/api/items", {
+        name,
+        stok: parseInt(stock),
+        machine_name: machine,
+        machine_number: machineNumber,
+        section_name: section,
+        lowerLimit: parseInt(minStock),
+        section_number: sectionNumber,
+        description: desc,
+      });
+      dispatch(setNotification("Items Added"));
+      navigate("/items");
+    } catch (error) {
+      alert(error.response.data.message);
+    }
   };
+
+  console.log(minStock);
 
   return (
     <Layout>
@@ -96,7 +102,7 @@ const AddItemForm = () => {
             <div>
               <ItemInput label="Part Name" name={name} names={names} isNewName={isNewName} setName={setName} setIsNewName={setIsNewName} />
               <StokInput name="stock" setStock={setStock} />
-              <StokInput label="Min Stock" name="minStock" setStock={minStock} />
+              <StokInput label="Min Stock" name="minStock" setStock={setMinStock} />
               <TextArea label="Deskripsi" value={desc} id="desc" onChange={(e) => setDesc(e.target.value)} placeholder={"Masukkan Deskripsi"} />
 
               <MachineInput machine={machine} machines={machines} isNewMachine={isNewMachine} setMachine={setMachine} setIsNewMachine={setIsNewMachine} user={user} />
@@ -105,7 +111,7 @@ const AddItemForm = () => {
             {isNewMachine && (
               <div>
                 <div className="flex flex-col">
-                  <Label htmlFor="sectionName">Pilih Section</Label>
+                  <Label htmlFor="sectionName">Pilih Ruangan</Label>
                   <select
                     id="sectionName"
                     name="sectionName"
@@ -122,9 +128,9 @@ const AddItemForm = () => {
                         {section.section_name}
                       </option>
                     ))}
-                    <option value="new">Enter New Section</option>
+                    <option value="new">Masukkan Nama Ruangan Baru</option>
                   </select>
-                  {isNewSection && <NormalInput id="sectionName" type="text" onChange={(e) => setSection(e.target.value)} placeholder="Masukkan Nama Section" />}
+                  {isNewSection && <NormalInput id="sectionName" type="text" onChange={(e) => setSection(e.target.value)} placeholder="Masukkan Nama Ruangan" />}
                 </div>
                 {isNewSection && <NormalInput label="Nomor Ruangan" id="sectionNumber" type="text" onChange={(e) => setSectionNumber(e.target.value)} placeholder="Masukkan Nomor Ruangan" />}
               </div>

@@ -12,7 +12,7 @@ export const itemModel = db.define("item", item, { paranoid: true });
 // export const imagesModel = db.define("images", images);
 export const machineModel = db.define("machine", machine, { paranoid: true });
 export const sectionModel = db.define("section", section, { paranoid: true });
-export const historyModel = db.define("history", history);
+export const historyModel = db.define("history", history, { paranoid: true });
 export const AuditLogModel = db.define("audit_log", AuditLog);
 
 userModel.hasMany(itemModel);
@@ -40,17 +40,16 @@ itemModel.belongsTo(machineModel, {
   foreignKey: "machineId",
 });
 
-itemModel.hasMany(historyModel);
-historyModel.belongsTo(itemModel, {
-  foreignKey: "itemId",
-});
+// itemModel.hasMany(historyModel);
+// historyModel.belongsTo(itemModel, {
+//   foreignKey: "itemId",
+// });
+// machineModel.hasMany(historyModel);
+// historyModel.belongsTo(machineModel, {
+//   foreignKey: "machineId",
+// });
 
-userModel.hasMany(historyModel);
-historyModel.belongsTo(userModel, {
-  foreignKey: "userId",
-});
-
-machineModel.hasMany(historyModel);
-historyModel.belongsTo(machineModel, {
-  foreignKey: "machineId",
-});
+// userModel.hasMany(historyModel);
+// historyModel.belongsTo(userModel, {
+//   foreignKey: "userId",
+// });

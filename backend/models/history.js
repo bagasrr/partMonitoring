@@ -9,6 +9,35 @@ export const history = {
       notEmpty: true,
     },
   },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    validate: {
+      notEmpty: false,
+    },
+  },
+  changeType: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   prevStock: {
     type: DataTypes.INTEGER,
     allowNull: true,
@@ -36,45 +65,5 @@ export const history = {
     validate: {
       notEmpty: false,
     },
-  },
-  itemName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      notEmpty: false,
-    },
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
-  },
-  machineName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      notEmpty: true,
-    },
-  },
-  sectionName: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      notEmpty: false,
-    },
-  },
-  changeType: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
-  },
-
-  description: {
-    type: DataTypes.STRING,
-    allowNull: true,
   },
 };

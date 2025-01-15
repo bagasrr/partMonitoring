@@ -1,256 +1,3 @@
-// import { historyModel, imagesModel, itemModel, machineModel, sectionModel, userModel } from "../models/index.js";
-// import { Op } from "sequelize";
-// import { addMachine } from "./machines.js";
-// import { response } from "express";
-// export const getAllItems = async (req, res) => {
-//   try {
-//     let response;
-
-//     response = await itemModel.findAll({
-//       attributes: ["uuid", "name", "stok"],
-//       include: [
-//         {
-//           model: userModel,
-//           attributes: ["uuid", "name", "role"],
-//         },
-//         {
-//           model: machineModel,
-//           attributes: ["uuid", "machine_name", "machine_number"],
-//         },
-//       ],
-//     });
-//     res.status(200).json(response);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const getItemById = async (req, res) => {
-//   try {
-//     const items = await itemModel.findOne({
-//       where: {
-//         uuid: req.params.id,
-//       },
-//     });
-//     if (!items) return res.status(404).json({ message: "item not found" });
-//     let response;
-//     if (req.role === "admin") {
-//       response = await itemModel.findOne({
-//         attributes: ["uuid", "name", "stok"],
-//         where: {
-//           id: items.id,
-//         },
-//         include: [
-//           {
-//             model: userModel,
-//             attributes: ["uuid", "name", "role"],
-//           },
-//           {
-//             model: machineModel,
-//             attributes: ["uuid", "machine_name", "machine_number"],
-//           },
-//         ],
-//       });
-//     } else {
-//       response = await itemModel.findOne({
-//         attributes: ["uuid", "name", "stok"],
-//         where: {
-//           [Op.and]: [{ id: items.id }, { userId: req.userId }],
-//         },
-//         include: [
-//           {
-//             model: userModel,
-//             attributes: ["uuid", "name", "role"],
-//           },
-//           {
-//             model: machineModel,
-//             attributes: ["uuid", "machine_name", "machine_number"],
-//           },
-//         ],
-//       });
-//     }
-//     res.status(200).json(response);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const createItem = async (req, res) => {
-//   const { name, stok, machine_name, machine_number, section_name, section_number, description } = req.body;
-
-//   try {
-//     // Cek stok harus lebih dari 0
-//     if (stok <= 0) return res.status(400).json({ message: "Stok must be greater than 0" });
-
-//     // Cari machine berdasarkan machine_name
-//     let machine = await machineModel.findOne({
-//       where: {
-//         machine_name,
-//       },
-//     });
-
-//     // Jika machine tidak ditemukan, buat machine baru
-//     if (!machine) {
-//       // Cari section berdasarkan section_name
-//       let section = await sectionModel.findOne({ where: { section_name } });
-
-//       // Jika section tidak ditemukan, buat section baru
-//       if (!section) {
-//         section = await sectionModel.create({
-//           section_name,
-//           section_number,
-//           userId: req.userId,
-//         });
-//       }
-
-//       // Buat machine baru dengan sectionId dan userId
-//       machine = await machineModel.create({
-//         machine_name,
-//         machine_number,
-//         sectionId: section.id,
-//         userId: req.userId,
-//       });
-//     }
-
-//     // Cari item sebelumnya berdasarkan name dan machineId
-//     const prevData = await itemModel.findOne({
-//       where: {
-//         name,
-//         machineId: machine.id,
-//       },
-//     });
-
-//     // Jika prevData ditemukan, update stoknya
-//     if (prevData) {
-//       await itemModel.update({ stok: prevData.stok + stok }, { where: { id: prevData.id } });
-
-//       // Buat histori baru untuk update stok
-//       await historyModel.create({
-//         itemId: prevData.id,
-//         userId: req.userId,
-//         machineId: prevData.machineId,
-//         prevStock: prevData.stok,
-//         usedStock: stok,
-//         afterStock: prevData.stok + stok,
-//         changeType: "Tambah Stok Part",
-//         description,
-//       });
-
-//       return res.status(200).json({ message: "Item updated" });
-//     } else {
-//       // Jika prevData tidak ditemukan, buat item baru
-//       const response = await itemModel.create({
-//         name,
-//         stok,
-//         userId: req.userId,
-//         machineId: machine.id,
-//         description,
-//       });
-
-//       // Buat histori baru untuk item yang baru ditambahkan
-//       await historyModel.create({
-//         itemId: response.id,
-//         userId: req.userId,
-//         machineId: response.machineId,
-//         prevStock: 0,
-//         usedStock: stok,
-//         afterStock: stok,
-//         changeType: "Tambah Item Baru",
-//         description,
-//       });
-
-//       return res.status(201).json({ message: "Item created", data: response });
-//     }
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const addStockItem = async (req, res) => {
-//   try {
-//     const item = await itemModel.findOne({
-//       where: {
-//         uuid: req.params.id,
-//       },
-//     });
-//   } catch (error) {}
-// };
-// export const updateItem = async (req, res) => {
-//   try {
-//     const item = await itemModel.findOne({
-//       where: {
-//         uuid: req.params.id,
-//       },
-//     });
-//     if (!item) return res.status(404).json({ message: "item not found" });
-//     const { name, stok } = req.body;
-//     let response;
-//     if (req.role === "admin") {
-//       response = await itemModel.update(
-//         { name, stok },
-//         {
-//           where: {
-//             id: item.id,
-//           },
-//         }
-//       );
-//     } else {
-//       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-//       response = await itemModel.update(
-//         { name, stok },
-//         {
-//           where: {
-//             [Op.and]: [{ id: item.id }, { userId: req.userId }],
-//           },
-//         }
-//       );
-//     }
-//     res.status(200).json({ message: "item updated" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const deleteItem = async (req, res) => {
-//   try {
-//     const item = await itemModel.findOne({
-//       where: {
-//         uuid: req.params.id,
-//       },
-//     });
-//     if (!item) return res.status(404).json({ message: "item not found" });
-//     let response;
-//     if (req.role === "admin") {
-//       response = await itemModel.destroy({
-//         where: {
-//           id: item.id,
-//         },
-//       });
-//     } else {
-//       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to delete this item" });
-//       response = await itemModel.destroy({
-//         where: {
-//           [Op.and]: [{ id: item.id }, { userId: req.userId }],
-//         },
-//       });
-//     }
-
-//     await historyModel.create({
-//       itemId: item.id,
-//       userId: req.userId,
-//       machineId: item.machineId,
-//       prevStock: item.stok,
-//       usedStock: item.stok,
-//       afterStock: 0,
-//       changeType: "DELETE",
-//     });
-
-//     res.status(200).json({ message: "item deleted" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel } from "../models/index.js";
 import { Op } from "sequelize";
 import { checkStockLevels } from "../services/mailsent.js"; // Import stock alert utility
@@ -270,10 +17,8 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
 
 export const getAllItems = async (req, res) => {
   try {
-    let response;
-
-    response = await itemModel.findAll({
-      attributes: ["uuid", "name", "stok"],
+    const response = await itemModel.findAll({
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit"],
       where: {
         deletedAt: null, // Exclude soft-deleted items
       },
@@ -296,225 +41,203 @@ export const getAllItems = async (req, res) => {
 
 export const getItemById = async (req, res) => {
   try {
-    const items = await itemModel.findOne({
+    const item = await itemModel.findOne({
       where: {
         uuid: req.params.id,
         deletedAt: null, // Exclude soft-deleted items
       },
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit"],
+      include: [
+        {
+          model: userModel,
+          attributes: ["uuid", "name", "role"],
+        },
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+      ],
     });
-    if (!items) return res.status(404).json({ message: "item not found" });
-    let response;
-    if (req.role === "admin") {
-      response = await itemModel.findOne({
-        attributes: ["uuid", "name", "stok"],
-        where: {
-          id: items.id,
-          deletedAt: null,
-        },
-        include: [
-          {
-            model: userModel,
-            attributes: ["uuid", "name", "role"],
-          },
-          {
-            model: machineModel,
-            attributes: ["uuid", "machine_name", "machine_number"],
-          },
-        ],
-      });
-    } else {
-      response = await itemModel.findOne({
-        attributes: ["uuid", "name", "stok"],
-        where: {
-          [Op.and]: [{ id: items.id }, { userId: req.userId }, { deletedAt: null }],
-        },
-        include: [
-          {
-            model: userModel,
-            attributes: ["uuid", "name", "role"],
-          },
-          {
-            model: machineModel,
-            attributes: ["uuid", "machine_name", "machine_number"],
-          },
-        ],
-      });
-    }
-    res.status(200).json(response);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.status(200).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 export const createItem = async (req, res) => {
-  const { name, stok, machine_name, machine_number, section_name, section_number, description, lowerLimit } = req.body;
+  const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number } = req.body;
 
   try {
-    // Cek stok harus lebih dari 0
-    if (stok <= 0) return res.status(400).json({ message: "Stok must be greater than 0" });
+    // Validate that amount is greater than 0
+    if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
 
-    // Cari machine berdasarkan machine_name
-    let machine = await machineModel.findOne({
-      where: {
-        machine_name,
-      },
-    });
+    // Find or create machine
+    let machine = await machineModel.findOne({ where: { machine_name } });
 
-    // Jika machine tidak ditemukan, buat machine baru
     if (!machine) {
-      // Cari section berdasarkan section_name
+      // Find or create section
       let section = await sectionModel.findOne({ where: { section_name } });
 
-      // Jika section tidak ditemukan, buat section baru
       if (!section) {
         section = await sectionModel.create({
           section_name,
           section_number,
           userId: req.userId,
         });
+
+        // Create history record for section creation
+        await historyModel.create({
+          name: section.section_name,
+          changeType: "Create Section",
+          category: "Section",
+          username: req.name,
+          description: "Section created",
+        });
+
+        // Log the section creation in audit logs
+        await logAuditEvent("Section", section.id, "create", {
+          section_name: section.section_name,
+          section_number: section.section_number,
+        });
       }
 
-      // Buat machine baru dengan sectionId dan userId
       machine = await machineModel.create({
         machine_name,
         machine_number,
         sectionId: section.id,
         userId: req.userId,
       });
+
+      // Create history record for machine creation
+      await historyModel.create({
+        name: machine.machine_name,
+        changeType: "Create Machine",
+        category: "Machine",
+        username: req.name,
+        description: "Machine created",
+      });
+
+      // Log the machine creation in audit logs
+      await logAuditEvent("Machine", machine.id, "create", {
+        machine_name: machine.machine_name,
+        machine_number: machine.machine_number,
+        section_name: section.section_name,
+      });
     }
 
-    // Cari item sebelumnya berdasarkan name dan machineId
-    const prevData = await itemModel.findOne({
-      where: {
-        name,
-        machineId: machine.id,
-      },
+    // Check if item already exists
+    const prevItem = await itemModel.findOne({
+      where: { name, machineId: machine.id },
     });
 
-    // Jika prevData ditemukan, update stoknya
-    if (prevData) {
-      await itemModel.update({ stok: prevData.stok + stok }, { where: { id: prevData.id } });
+    if (prevItem) {
+      await itemModel.update({ amount: prevItem.amount + amount }, { where: { id: prevItem.id } });
 
-      // Buat histori baru untuk update stok
+      // Create history record
       await historyModel.create({
-        itemId: prevData.id,
-        userId: req.userId,
-        machineId: prevData.machineId,
-        prevStock: prevData.stok,
-        usedStock: stok,
-        afterStock: prevData.stok + stok,
-        itemName: name,
-        machineName: machine.machine_name,
-        sectionName: section.section_name,
-        changeType: "Tambah Stok Part",
+        name,
+        changeType: "Increase Item Amount",
+        category: "Item",
+        username: req.name,
         description,
+        prevStock: prevItem.amount,
+        newStock: amount,
+        afterStock: prevItem.amount + amount,
       });
 
       // Log the update action in the audit logs
-      await logAuditEvent("Item", prevData.id, "update", {
-        prevStock: prevData.stok,
-        addedStock: stok,
-        afterStock: prevData.stok + stok,
+      await logAuditEvent("Item", prevItem.id, "update", {
+        name: prevItem.name,
+        prevAmount: prevItem.amount,
+        newAmount: prevItem.amount + amount,
         description,
       });
 
       // Check stock levels
       await checkStockLevels();
 
-      return res.status(200).json({ message: "Item updated" });
+      return res.status(200).json({ message: "Item amount updated" });
     } else {
-      // Jika prevData tidak ditemukan, buat item baru
-      const response = await itemModel.create({
+      const newItem = await itemModel.create({
         name,
-        stok,
+        amount,
+        description,
+        status,
+        lowerLimit,
         userId: req.userId,
         machineId: machine.id,
-        description,
-        lowerLimit,
       });
 
-      // Buat histori baru untuk item yang baru ditambahkan
+      // Create history record for new item creation
       await historyModel.create({
-        itemId: response.id,
-        userId: req.userId,
-        machineId: response.machineId,
-        prevStock: 0,
-        usedStock: stok,
-        afterStock: stok,
-        itemName: name,
-        machineName: machine.machine_name,
-        sectionName: section.section_name,
-        changeType: "Tambah Item Baru",
+        name,
+        changeType: "Create New Item",
+        category: "Item",
+        username: req.name,
         description,
+        prevStock: 0,
+        newStock: amount,
+        afterStock: amount,
       });
 
       // Log the create action in the audit logs
-      await logAuditEvent("Item", response.id, "create", {
-        name: response.name,
-        stok: response.stok,
+      await logAuditEvent("Item", newItem.id, "create", {
+        name: newItem.name,
+        amount: newItem.amount,
         description,
+        status,
         lowerLimit,
       });
 
       // Check stock levels
       await checkStockLevels();
 
-      return res.status(201).json({ message: "Item created", data: response });
+      return res.status(201).json({ message: "Item created", data: newItem });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-export const addStockItem = async (req, res) => {
-  try {
-    const item = await itemModel.findOne({
-      where: {
-        uuid: req.params.id,
-      },
-    });
-  } catch (error) {}
-};
-
 export const updateItem = async (req, res) => {
   try {
     const item = await itemModel.findOne({
-      where: {
-        uuid: req.params.id,
-      },
+      where: { uuid: req.params.id, deletedAt: null },
     });
-    if (!item) return res.status(404).json({ message: "item not found" });
-    const { name, stok, lowerLimit } = req.body;
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    const { name, amount, description, status, lowerLimit } = req.body;
     let response;
+
     if (req.role === "admin") {
-      response = await itemModel.update(
-        { name, stok, lowerLimit },
-        {
-          where: {
-            id: item.id,
-          },
-        }
-      );
+      response = await itemModel.update({ name, amount, description, status, lowerLimit }, { where: { id: item.id } });
     } else {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-      response = await itemModel.update(
-        { name, stok, lowerLimit },
-        {
-          where: {
-            [Op.and]: [{ id: item.id }, { userId: req.userId }],
-          },
-        }
-      );
+      response = await itemModel.update({
+         name, amount, description, status, lowerLimit 
+        }, { 
+          where: { 
+            [Op.and]: [{ id: item.id }, { userId: req.userId }] 
+          } });
     }
 
-    // Log the update action
     // Log the update action in the audit logs
-    await logAuditEvent("Item", item.id, "update", { name, stok, lowerLimit });
+    await logAuditEvent("Item", item.id, "update", { name, amount, description, status, lowerLimit });
+
+    // Create history record
+    await historyModel.create({
+      name,
+      changeType: "Update Item",
+      category: "Item",
+      username: req.name,
+      prevStock: 
+      description: "Item updated",
+    });
 
     // Check stock levels
     await checkStockLevels();
 
-    res.status(200).json({ message: "item updated" });
+    res.status(200).json({ message: "Item updated" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -525,49 +248,83 @@ export const deleteItem = async (req, res) => {
     const item = await itemModel.findOne({
       where: {
         uuid: req.params.id,
+        deletedAt: null,
       },
     });
-    if (!item) return res.status(404).json({ message: "item not found" });
+    if (!item) return res.status(404).json({ message: "Item not found" });
     let response;
     if (req.role === "admin") {
       response = await itemModel.update(
         { deletedAt: new Date() }, // Perform soft delete
-        {
-          where: {
-            id: item.id,
-          },
-        }
+        { where: { id: item.id } }
       );
     } else {
-      if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to delete this item" });
+      if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to delete this, please contact your administrator" });
       response = await itemModel.update(
         { deletedAt: new Date() }, // Perform soft delete
-        {
-          where: {
-            [Op.and]: [{ id: item.id }, { userId: req.userId }],
-          },
-        }
+        { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
       );
     }
 
+    // Create history record
     await historyModel.create({
-      itemId: item.id,
-      userId: req.userId,
-      machineId: item.machineId,
-      prevStock: item.stok,
-      usedStock: item.stok,
-      afterStock: 0,
-      itemName: item.name,
-      machineName: item.machineName, // Make sure you have these attributes in the item
-      sectionName: item.sectionName, // Make sure you have these attributes in the item
-      changeType: "DELETE",
+      name: item.name,
+      changeType: "Delete Item",
+      category: "Item",
+      username: req.name,
       description: "Item deleted",
     });
 
     // Log the delete action in the audit logs
-    await logAuditEvent("Item", item.id, "delete", { name: item.name, stok: item.stok });
+    await logAuditEvent("Item", item.id, "delete", { name: item.name, amount: item.amount });
 
-    res.status(200).json({ message: "item deleted" });
+    res.status(200).json({ message: "Item deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const addItemAmount = async (req, res) => {
+  const { name, amountToAdd, description } = req.body;
+
+  try {
+    // Validate that amountToAdd is greater than 0
+    if (amountToAdd <= 0) return res.status(400).json({ message: "Amount to add must be greater than 0" });
+
+    // Find the item by name
+    const item = await itemModel.findOne({
+      where: {
+        name,
+        deletedAt: null, // Exclude soft-deleted items
+      },
+    });
+
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    // Update the amount
+    await itemModel.update({ amount: item.amount + amountToAdd }, { where: { id: item.id } });
+
+    // Create history record
+    await historyModel.create({
+      name: item.name,
+      changeType: "",
+      category: "Item",
+      username: req.name,
+      description,
+      prevStock: item.amount,
+      usedStock: amountToAdd,
+      afterStock: item.amount + amountToAdd,
+    });
+
+    // Log the update action in the audit logs
+    await logAuditEvent("Item", item.id, "update", {
+      name: item.name,
+      prevAmount: item.amount,
+      newAmount: item.amount + amountToAdd,
+      description,
+    });
+
+    res.status(200).json({ message: "Item amount updated", data: { name, newAmount: item.amount + amountToAdd } });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

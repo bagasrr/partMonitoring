@@ -203,7 +203,7 @@
 // };
 
 import { Op } from "sequelize";
-import { itemModel, machineModel, sectionModel, userModel, AuditLogModel, historyModel } from "../models/index.js"; // Adjust the paths as necessary
+import { historyModel, machineModel, sectionModel, itemModel, userModel, AuditLogModel } from "../models/index.js"; // Adjust the paths as necessary
 
 // Function to log audit events
 const logAuditEvent = async (entityType, entityId, action, details) => {
@@ -258,9 +258,9 @@ export const addMachine = async (req, res) => {
 
     // Create history record
     await historyModel.create({
-      itemName: newMachine.machine_name,
+      name: newMachine.machine_name,
       changeType: "Create Machine",
-      userId: req.userId,
+      username: req.name, // Use req.name for the username field
       description: "Machine created",
     });
 
@@ -386,9 +386,9 @@ export const updateMachine = async (req, res) => {
 
       // Create history record
       await historyModel.create({
-        itemName: machine.machine_name,
+        name: machine.machine_name,
         changeType: "Update Machine",
-        userId: userId,
+        username: req.name, // Use req.name for the username field
         description: "Machine updated",
       });
 
@@ -428,9 +428,9 @@ export const updateMachine = async (req, res) => {
 
       // Create history record
       await historyModel.create({
-        itemName: machine.machine_name,
+        name: machine.machine_name,
         changeType: "Update Machine",
-        userId: userId,
+        username: req.name, // Use req.name for the username field
         description: "Machine updated",
       });
 
@@ -454,11 +454,20 @@ export const deleteMachine = async (req, res) => {
       { where: { id: machine.id } }
     );
 
+    // Soft delete related items for the machine
+    await itemModel.update({ deletedAt: new Date() }, { where: { machineId: machine.id } });
+
+    // Update related history records
+    await historyModel.update(
+      { machineId: null }, // Set to default value or handle accordingly
+      { where: { machineId: machine.id } }
+    );
+
     // Create history record
     await historyModel.create({
-      itemName: machine.machine_name,
+      name: machine.machine_name,
       changeType: "Delete Machine",
-      userId: req.userId,
+      username: req.name, // Use req.name for the username field
       description: "Machine deleted",
     });
 
@@ -487,6 +496,6 @@ export const getMachinesWithItems = async (req, res) => {
     });
     res.status(200).json(machines);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json;
   }
 };

@@ -12,8 +12,8 @@ const transporter = nodemailer.createTransport({
 const sendStockAlert = async (item) => {
   try {
     const mailOptions = {
-      from: "your-email@gmail.com",
-      to: "recipient-email@example.com",
+      from: "monitoringbybarra.adhan@gmail.com",
+      to: "kuliah.bagass@gmail.com",
       subject: `Stock Alert: ${item.name}`,
       text: `The stock for ${item.name} is below the lower limit. Current stock: ${item.stok}.`,
     };

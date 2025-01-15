@@ -126,10 +126,10 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
   }
 };
 
-export const getAllSection = async (req, res) => {
-  let response;
+// Mendapatkan semua section
+export const getAllSections = async (req, res) => {
   try {
-    response = await sectionModel.findAll({
+    const response = await sectionModel.findAll({
       attributes: ["uuid", "section_name", "section_number"],
       where: {
         deletedAt: null, // Exclude soft-deleted sections
@@ -148,6 +148,7 @@ export const getAllSection = async (req, res) => {
   }
 };
 
+// Mendapatkan section berdasarkan ID
 export const getSectionById = async (req, res) => {
   try {
     const response = await sectionModel.findOne({
@@ -163,82 +164,14 @@ export const getSectionById = async (req, res) => {
         },
       ],
     });
-    if (response === null) return res.status(404).json({ message: "Section not found" });
+    if (!response) return res.status(404).json({ message: "Section not found" });
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const createSection = async (req, res) => {
-  const { section_name, section_number } = req.body;
-  const section = await sectionModel.findOne({
-    where: {
-      section_name,
-    },
-  });
-  if (section) return res.status(400).json({ message: "Section already exists" });
-  try {
-    const response = await sectionModel.create({
-      section_name,
-      section_number,
-      userId: req.userId,
-    });
-
-    // Log the create action in the audit logs
-    await logAuditEvent("Section", response.id, "create", {
-      section_name: response.section_name,
-      section_number: response.section_number,
-    });
-
-    // Create history record
-    await historyModel.create({
-      itemName: response.section_name,
-      changeType: "Create Section",
-      userId: req.userId,
-      description: "Section created",
-    });
-
-    res.status(200).json({ message: "Section created", response });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const deleteSection = async (req, res) => {
-  try {
-    const section = await sectionModel.findOne({ where: { uuid: req.params.id } });
-    if (!section) return res.status(404).json({ message: "Section not found" });
-
-    // Soft delete the section
-    await sectionModel.update(
-      { deletedAt: new Date() }, // Perform soft delete
-      { where: { uuid: req.params.id } }
-    );
-
-    // Soft delete related machines
-    await machineModel.update({ deletedAt: new Date() }, { where: { sectionId: section.id } });
-
-    // Soft delete related items
-    await itemModel.update({ deletedAt: new Date() }, { where: { machineId: { [Op.in]: (await machineModel.findAll({ where: { sectionId: section.id }, attributes: ["id"] })).map((machine) => machine.id) } } });
-
-    // Create history record
-    await historyModel.create({
-      itemName: section.section_name,
-      changeType: "Delete Section",
-      userId: req.userId,
-      description: "Section deleted",
-    });
-
-    // Log the delete action in the audit logs
-    await logAuditEvent("Section", section.id, "delete", { section_name: section.section_name });
-
-    res.status(200).json({ message: "Section deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
+// Memperbarui section
 export const updateSection = async (req, res) => {
   try {
     const section = await sectionModel.findOne({
@@ -248,6 +181,7 @@ export const updateSection = async (req, res) => {
       },
     });
     if (!section) return res.status(404).json({ message: "Section not available" });
+
     const { section_name, section_number } = req.body;
     let response;
     if (req.role === "admin") {
@@ -256,6 +190,16 @@ export const updateSection = async (req, res) => {
         {
           where: {
             id: section.id,
+          },
+        }
+      );
+    } else {
+      if (req.userId !== section.userId) return res.status(403).json({ message: "You are not allowed to update this section" });
+      response = await sectionModel.update(
+        { section_name, section_number },
+        {
+          where: {
+            [Op.and]: [{ id: section.id }, { userId: req.userId }],
           },
         }
       );
@@ -269,7 +213,7 @@ export const updateSection = async (req, res) => {
 
     // Create history record
     await historyModel.create({
-      itemName: section.section_name,
+      name: section.section_name,
       changeType: "Update Section",
       userId: req.userId,
       description: "Section updated",
@@ -281,45 +225,84 @@ export const updateSection = async (req, res) => {
   }
 };
 
-// export const deleteSection = async (req, res) => {
-//   try {
-//     const section = await sectionModel.findOne({ where: { uuid: req.params.id } });
-//     if (!section) return res.status(404).json({ message: "Section not found" });
+//buat section
+export const addSection = async (req, res) => {
+  const { section_name, section_number } = req.body;
 
-//     // Soft delete the section
-//     await sectionModel.update(
-//       { deletedAt: new Date() }, // Perform soft delete
-//       { where: { uuid: req.params.id } }
-//     );
+  const section = await sectionModel.findOne({
+    where: {
+      section_name,
+    },
+  });
+  if (section) return res.status(400).json({ message: "Section Room already exists" });
 
-//     // Soft delete related machines
-//     const machines = await machineModel.findAll({ where: { sectionId: section.id } });
-//     for (const machine of machines) {
-//       await machineModel.update(
-//         { deletedAt: new Date() },
-//         { where: { id: machine.id } }
-//       );
+  try {
+    let newSection = await sectionModel.create({
+      section_name,
+      section_number,
+      userId: req.userId, // userId is obtained from the middleware
+    });
 
-//       // Soft delete related items for each machine
-//       await itemModel.update(
-//         { deletedAt: new Date() },
-//         { where: { machineId: machine.id } }
-//       );
-//     }
+    // Log the create action in the audit logs
+    await logAuditEvent("Section", newSection.id, "create", {
+      section_name: newSection.section_name,
+      section_number: newSection.section_number,
+    });
 
-//     // Create history record
-//     await historyModel.create({
-//       itemName: section.section_name,
-//       changeType: "Delete Section",
-//       userId: req.userId,
-//       description: "Section deleted",
-//     });
+    // Create history record
+    await historyModel.create({
+      name: newSection.section_name,
+      changeType: "Create Section",
+      username: req.name, // Use req.name for the username field
+      description: "Section created",
+    });
 
-//     // Log the delete action in the audit logs
-//     await logAuditEvent("Section", section.id, "delete", { section_name: section.section_name });
+    res.status(201).json(newSection);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-//     res.status(200).json({ message: "Section and related entities deleted" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+//hapus section
+export const deleteSection = async (req, res) => {
+  try {
+    const section = await sectionModel.findOne({ where: { uuid: req.params.id, deletedAt: null } });
+    if (!section) return res.status(404).json({ message: "Section not found" });
+
+    // Soft delete the section
+    await sectionModel.update(
+      { deletedAt: new Date() }, // Perform soft delete
+      { where: { uuid: req.params.id } }
+    );
+
+    // Soft delete related machines and items
+    const machines = await machineModel.findAll({ where: { sectionId: section.id } });
+    for (const machine of machines) {
+      await machineModel.update({ deletedAt: new Date() }, { where: { id: machine.id } });
+
+      // Soft delete related items for each machine
+      await itemModel.update({ deletedAt: new Date() }, { where: { machineId: machine.id } });
+    }
+
+    // Update related history records
+    await historyModel.update(
+      { sectionId: null }, // Set to default value or handle accordingly
+      { where: { sectionId: section.id } }
+    );
+
+    // Create history record
+    await historyModel.create({
+      name: section.section_name,
+      changeType: "Delete Section",
+      username: req.name, // Use req.name for the username field
+      description: "Section deleted",
+    });
+
+    // Log the delete action in the audit logs
+    await logAuditEvent("Section", section.id, "delete", { section_name: section.section_name });
+
+    res.status(200).json({ message: "Section and related entities deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

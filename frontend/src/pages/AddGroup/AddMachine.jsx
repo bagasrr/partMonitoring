@@ -5,6 +5,9 @@ import { adminArea } from "../../utils/adminArea";
 import { Label, NormalInput } from "../../element/Input";
 import { getSections } from "../../utils/getSection";
 import FormLayout from "../FormLayout";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotification } from "../../features/notificationSlice";
+import useNotification from "../../services/Notification";
 
 const AddMachine = () => {
   adminArea();
@@ -15,7 +18,9 @@ const AddMachine = () => {
   const [sectionNumber, setSectionNumber] = useState("");
   const [sectionData, setSectionData] = useState([]);
   const [isNewMachine, setIsNewMachine] = useState(false);
-
+  const dispatch = useDispatch();
+  // const notification = useSelector((state) => state.notification.message);
+  const notification = useNotification();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -28,6 +33,7 @@ const AddMachine = () => {
       navigate("/machines");
     } catch (error) {
       console.log(error.response);
+      dispatch(setNotification(error.response.data.message));
     }
   };
 
@@ -50,6 +56,7 @@ const AddMachine = () => {
   };
   return (
     <FormLayout formTitle={"Tambah Mesin"} onSubmit={handleSubmit}>
+      {notification && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{notification}</p>}
       <NormalInput label="Nama Mesin" id="machineName" type="text" onChange={(e) => setMachineName(e.target.value)} placeholder="Masukkan Nama Mesin" />
       <NormalInput label="Nomor Mesin" id="machineNumber" type="text" onChange={(e) => setMachineNumber(e.target.value)} placeholder="Masukkan Nomor Mesin" />
 

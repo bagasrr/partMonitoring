@@ -71,7 +71,7 @@ const ItemsTable = () => {
           <tr>
             <ThData>No</ThData>
             <ThData>Nama Item</ThData>
-            <ThData>Stok</ThData>
+            <ThData>Amount</ThData>
             {user && user.role === "admin" && (
               <>
                 <ThData>Username</ThData>
@@ -95,7 +95,7 @@ const ItemsTable = () => {
             <TRow key={item.uuid}>
               <TData>{index + 1 + indexOfFirstItem}</TData>
               <TData>{highlightText(item.name, search)}</TData>
-              <TData>{item.stok}</TData>
+              <TData>{item.amount}</TData>
               {user && user.role === "admin" && (
                 <>
                   <TData>{item.user.name}</TData>

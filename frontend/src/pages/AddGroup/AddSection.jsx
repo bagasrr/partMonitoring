@@ -5,26 +5,37 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
+import useNotification from "../../services/Notification";
 
 const AddSection = () => {
   const [sectionName, setSectionName] = useState("");
   const [sectionNumber, setSectionNumber] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const notification = useNotification();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:4000/api/sections", {
-      section_name: sectionName,
-      section_number: sectionNumber,
-    });
-    navigate("/sections");
-    dispatch(setNotification(`Section ${sectionName}Added`));
+    try {
+      await axios.post("http://localhost:4000/api/sections", {
+        section_name: sectionName,
+        section_number: sectionNumber,
+      });
+      navigate("/sections");
+      dispatch(setNotification(`Section ${sectionName}Added`));
+    } catch (error) {
+      dispatch(setNotification(error.response.data.message));
+    }
   };
   return (
-    <FormLayout formTitle={"Tambah Ruangan"} onSubmit={handleSubmit}>
-      <NormalInput label="Nama Ruangan" id="section_name" type="text" onChange={(e) => setSectionName(e.target.value)} />
-      <NormalInput label="Nomor Ruangan" id="section_number" type="text" onChange={(e) => setSectionNumber(e.target.value)} />
-    </FormLayout>
+    <>
+      <FormLayout formTitle={"Tambah Ruangan"} onSubmit={handleSubmit}>
+        {notification && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{notification}</p>}
+
+        <NormalInput label="Nama Ruangan" id="section_name" type="text" onChange={(e) => setSectionName(e.target.value)} />
+        <NormalInput label="Nomor Ruangan" id="section_number" type="text" onChange={(e) => setSectionNumber(e.target.value)} />
+      </FormLayout>
+    </>
   );
 };
 

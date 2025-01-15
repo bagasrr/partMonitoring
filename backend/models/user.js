@@ -31,4 +31,9 @@ export const user = {
       notEmpty: true,
     },
   },
+
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 };
