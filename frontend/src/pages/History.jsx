@@ -98,6 +98,7 @@ const History = () => {
                 <p>Aktor </p>
                 <p>Entitas</p>
                 <p>Tanggal Kejadian </p>
+                {his.category != null && <p>Categori </p>}
                 {his.prevStock != null && <p>Jumlah Sebelum </p>}
                 {his.newStock != null && <p>Jumlah Baru </p>}
                 {his.usedStock != null && <p>Jumlah Terpakai </p>}
@@ -108,6 +109,7 @@ const History = () => {
                 <p>: {highlightText(his.username, search)}</p>
                 <p>: {highlightText(his.name, search)}</p>
                 <p>: {highlightText(formatDate(his.createdAt), search)}</p>
+                {his.category != null && <p>: {his.category}</p>}
                 {his.prevStock != null && <p>: {his.prevStock}</p>}
                 {his.newStock != null && <p>: {his.newStock}</p>}
                 {his.usedStock != null && <p>: {his.usedStock}</p>}

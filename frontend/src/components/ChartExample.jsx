@@ -8,36 +8,51 @@ const ChartComponent = () => {
     labels: [],
     datasets: [
       {
-        label: "",
+        label: "Amount",
         data: [],
-        backgroundColor: [],
-        borderColor: [],
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+      {
+        label: "Lower Limit",
+        data: [],
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 1,
       },
     ],
   });
 
+  const [itemDetails, setItemDetails] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getAllItem();
-        // const data = await response.json();
-        console.log(data);
         if (Array.isArray(data)) {
           const transformedData = {
-            labels: data.map((item) => item.name),
+            labels: data.map((item) => (item.name.length > 10 ? item.name.substring(0, 10) + "..." : item.name)),
             datasets: [
               {
-                label: "Stok Barang",
-                data: data.map((item) => item.stok),
+                label: "Amount",
+                data: data.map((item) => item.amount),
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
                 borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+              },
+              {
+                label: "Lower Limit",
+                data: data.map((item) => item.lowerLimit),
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)",
                 borderWidth: 1,
               },
             ],
           };
 
           setChartData(transformedData);
+          setItemDetails(data);
         } else {
           console.error("Data tidak valid:", data);
         }
@@ -51,8 +66,57 @@ const ChartComponent = () => {
 
   return (
     <div>
-      <h2>Bar Chart Stok Barang</h2>
-      <Bar data={chartData} options={{ responsive: true }} />
+      <h2>Bar Chart Stock dan Lower Limit</h2>
+      <Bar
+        data={chartData}
+        options={{
+          responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const item = itemDetails[context.dataIndex];
+                  return [
+                    `Name: ${item.name}`,
+                    `Amount: ${item.amount}`,
+                    `Description: ${item.description}`,
+                    `Lower Limit: ${item.lowerLimit}`,
+                    `Machine Name: ${item.machine.machine_name}`,
+                    `Machine Number: ${item.machine.machine_number}`,
+                  ];
+                },
+              },
+            },
+            hover: {
+              mode: "index",
+              intersect: false,
+            },
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: "Items",
+              },
+              ticks: {
+                maxRotation: 0,
+                minRotation: 0,
+                callback: function (value, index, values) {
+                  return value.length > 10 ? value.substring(0, 10) + "..." : value;
+                },
+              },
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: "Quantity",
+              },
+            },
+          },
+        }}
+      />
     </div>
   );
 };

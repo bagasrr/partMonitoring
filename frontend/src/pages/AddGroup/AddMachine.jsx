@@ -18,6 +18,7 @@ const AddMachine = () => {
   const [sectionNumber, setSectionNumber] = useState("");
   const [sectionData, setSectionData] = useState([]);
   const [isNewMachine, setIsNewMachine] = useState(false);
+
   const dispatch = useDispatch();
   const notification = useNotification();
   const handleSubmit = async (e) => {
@@ -30,6 +31,7 @@ const AddMachine = () => {
         section_number: sectionNumber,
       });
       navigate("/machines");
+      dispatch(setNotification(`Machine ${machineName} Added`));
     } catch (error) {
       console.log(error.response);
       dispatch(setNotification(error.response.data.message));

@@ -252,9 +252,10 @@ export const addSection = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: newSection.section_name,
-      changeType: "Create Section",
+      changeType: "Create Section Room",
+      category: "Ruangan",
       username: req.name, // Use req.name for the username field
-      description: "Section created",
+      description: "Section room created",
     });
 
     res.status(201).json(newSection);

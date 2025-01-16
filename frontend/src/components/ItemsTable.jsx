@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { getAllItem } from "../utils/getItem";
+import { updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice";
@@ -40,6 +41,16 @@ const ItemsTable = () => {
     fetchItems();
   };
 
+  const handleStatusChange = async (e, itemId) => {
+    const newStatus = e.target.value;
+    try {
+      await updateItemStatus(itemId, { status: newStatus });
+      fetchItems(); // Refresh items after update
+    } catch (error) {
+      console.error("Error updating item status:", error);
+    }
+  };
+
   const handlePageClick = (selectedItem) => {
     const { selected } = selectedItem;
     setCurrentPage(selected);
@@ -48,6 +59,19 @@ const ItemsTable = () => {
   const handleSearchChange = (value) => {
     setSearch(value);
     setCurrentPage(0);
+  };
+
+  const getStatusColorClass = (status) => {
+    switch (status) {
+      case "Siap Pakai":
+        return "bg-green-100 text-green-700";
+      case "Rusak":
+        return "bg-red-100 text-red-700";
+      case "Repair":
+        return "bg-blue-100 text-blue-700";
+      default:
+        return "bg-white text-gray-700";
+    }
   };
 
   const filteredData = data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.machine.machine_name.toLowerCase().includes(search.toLowerCase()));
@@ -61,7 +85,7 @@ const ItemsTable = () => {
     <div>
       {notification && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-          <strong className="font-bold">Success!</strong>
+          {/* <strong className="font-bold">Success!</strong> */}
           <span className="block sm:inline">{notification}</span>
         </div>
       )}
@@ -72,12 +96,8 @@ const ItemsTable = () => {
             <ThData>No</ThData>
             <ThData>Nama Item</ThData>
             <ThData>Amount</ThData>
-            {user && user.role === "admin" && (
-              <>
-                <ThData>Username</ThData>
-                <ThData>Role</ThData>
-              </>
-            )}
+            <ThData>Status</ThData>
+            <ThData>Deskripsi</ThData>
             <ThData>Machine Name</ThData>
             <ThData>Machine Number</ThData>
             {user && user.role === "admin" && <ThData>Actions</ThData>}
@@ -96,12 +116,22 @@ const ItemsTable = () => {
               <TData>{index + 1 + indexOfFirstItem}</TData>
               <TData>{highlightText(item.name, search)}</TData>
               <TData>{item.amount}</TData>
-              {user && user.role === "admin" && (
-                <>
-                  <TData>{item.user.name}</TData>
-                  <TData>{item.user.role}</TData>
-                </>
-              )}
+              <TData>
+                {user && user.role === "admin" ? (
+                  <select value={item.status} onChange={(e) => handleStatusChange(e, item.uuid)} className={`p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>
+                    <option value="Not Set" disabled>
+                      Not Set
+                    </option>
+                    <option value="Siap Pakai">Siap Pakai</option>
+                    <option value="Rusak">Rusak</option>
+                    <option value="Repair">Repair</option>
+                    <option value="Perbaikan">Perbaikan</option>
+                  </select>
+                ) : (
+                  <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
+                )}
+              </TData>
+              <TData>{item.description}</TData>
               <TData>{highlightText(item.machine.machine_name, search)}</TData>
               <TData>{item.machine.machine_number}</TData>
               {user && user.role === "admin" && (

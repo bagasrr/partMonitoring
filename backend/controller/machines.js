@@ -262,6 +262,7 @@ export const addMachine = async (req, res) => {
       changeType: "Create Machine",
       username: req.name, // Use req.name for the username field
       description: "Machine created",
+      category: "Machine",
     });
 
     res.status(201).json(newMachine);

@@ -3,7 +3,6 @@ import Dashboard from "./pages/Dashboard";
 import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Items from "./pages/Items";
-import EditItem from "./pages/EditItem";
 import NewAddItem from "./pages/NewAddItem";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
@@ -18,6 +17,8 @@ import YoureNotAdmin from "./pages/YoureNotAdmin";
 import AddSection from "./pages/AddGroup/AddSection";
 import AddPart from "./pages/AddGroup/AddPart";
 import AddItemPages from "./pages/AddGroup/AddItemPages";
+import EditItem from "./pages/EditGroup/EditItem";
+import AddMachineNew from "./pages/AddGroup/AddMachineNew";
 
 const router = createBrowserRouter([
   {
@@ -66,7 +67,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/machines/add",
-    element: <AddMachine />,
+    element: <AddMachineNew />,
   },
   {
     path: "/machines",

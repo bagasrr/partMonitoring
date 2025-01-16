@@ -243,14 +243,41 @@ export const updateItem = async (req, res) => {
     // Update item fields
     let response;
     if (req.role === "admin") {
-      response = await itemModel.update({ name, amount, description, status, lowerLimit, machineId: machine.id }, { where: { id: item.id } });
+      response = await itemModel.update(
+        {
+          name,
+          amount,
+          description,
+          status,
+          lowerLimit,
+          machineId: machine.id,
+        },
+        { where: { id: item.id } }
+      );
     } else {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-      response = await itemModel.update({ name, amount, description, status, lowerLimit, machineId: machine.id }, { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } });
+      response = await itemModel.update(
+        {
+          name,
+          amount,
+          description,
+          status,
+          lowerLimit,
+          machineId: machine.id,
+        },
+        { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
+      );
     }
 
     // Log the update action in the audit logs
-    await logAuditEvent("Item", item.id, "update", { name, amount, description, status, lowerLimit, machineId: machine.id });
+    await logAuditEvent("Item", item.id, "update", {
+      name,
+      amount,
+      description,
+      status,
+      lowerLimit,
+      machineId: machine.id,
+    });
 
     // Create history record
     await historyModel.create({
@@ -260,7 +287,6 @@ export const updateItem = async (req, res) => {
       username: req.name,
       description,
       prevStock: item.amount,
-      usedStock: amount,
       afterStock: amount,
     });
 
@@ -268,6 +294,31 @@ export const updateItem = async (req, res) => {
     await checkStockLevels();
 
     res.status(200).json({ message: "Item updated" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateItemStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const item = await itemModel.findOne({ where: { uuid: req.params.id, deletedAt: null } });
+
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    const prevStatus = item.status; // Update the item status
+
+    await itemModel.update({ status }, { where: { uuid: req.params.id } }); // Create history record
+
+    await historyModel.create({
+      name: item.name,
+      changeType: "Update Status",
+      category: "Item",
+      username: req.name,
+      description: `Status changed from ${prevStatus} to ${status}`,
+    }); // Log the update action in the audit logs
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+    res.status(200).json({ message: "Item status updated" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

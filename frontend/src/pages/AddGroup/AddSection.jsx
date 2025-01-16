@@ -22,7 +22,7 @@ const AddSection = () => {
         section_number: sectionNumber,
       });
       navigate("/sections");
-      dispatch(setNotification(`Section ${sectionName}Added`));
+      dispatch(setNotification(`Section ${sectionName} Added`));
     } catch (error) {
       dispatch(setNotification(error.response.data.message));
     }
