@@ -1,5 +1,5 @@
-import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel } from "../models/index.js";
-import { Op } from "sequelize";
+import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel } from "../models/index.js";
+import { Op, where } from "sequelize";
 import { checkStockLevels } from "../services/mailsent.js"; // Import stock alert utility
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
@@ -18,7 +18,7 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
 export const getAllItems = async (req, res) => {
   try {
     const response = await itemModel.findAll({
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit"],
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
       where: {
         deletedAt: null, // Exclude soft-deleted items
       },
@@ -46,7 +46,7 @@ export const getItemById = async (req, res) => {
         uuid: req.params.id,
         deletedAt: null, // Exclude soft-deleted items
       },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit"],
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
       include: [
         {
           model: userModel,
@@ -65,8 +65,27 @@ export const getItemById = async (req, res) => {
   }
 };
 
+// Get items based on machine ID
+export const getItemsByMachineId = async (req, res) => {
+  const { machine_id } = req.query;
+
+  try {
+    const items = await itemModel.findAll({
+      where: { machineId: machine_id },
+    });
+
+    if (!items.length) {
+      return res.status(404).json({ message: "No items found for this machine" });
+    }
+
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const createItem = async (req, res) => {
-  const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number } = req.body;
+  const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year } = req.body;
 
   try {
     // Validate that amount is greater than 0
@@ -128,7 +147,7 @@ export const createItem = async (req, res) => {
 
     // Check if item already exists
     const prevItem = await itemModel.findOne({
-      where: { name, machineId: machine.id },
+      where: { name, machineId: machine.id, year },
     });
 
     if (prevItem) {
@@ -167,6 +186,8 @@ export const createItem = async (req, res) => {
         lowerLimit,
         userId: req.userId,
         machineId: machine.id,
+        replacementType,
+        year,
       });
 
       // Create history record for new item creation
@@ -200,6 +221,27 @@ export const createItem = async (req, res) => {
   }
 };
 
+// export const createItem = async (req, res) => {
+//   const { name, amount, description, status, lowerLimit, machine_name, replacementType, year } = req.body;
+//   try {
+//     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
+
+//     const machine = machineModel.findOne({ where: machine_name });
+//     await itemModel.create({
+//       name,
+//       amount,
+//       description,
+//       status,
+//       lowerLimit,
+//       machineId: machine.id,
+//       replacementType,
+//       year,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const updateItem = async (req, res) => {
   try {
     const item = await itemModel.findOne({
@@ -210,7 +252,7 @@ export const updateItem = async (req, res) => {
     });
     if (!item) return res.status(404).json({ message: "Item not found" });
 
-    const { name, amount, description, status, lowerLimit, machine_name, machine_number } = req.body;
+    const { name, amount, description, status, lowerLimit, machine_name, machine_number, replacementType, year } = req.body;
 
     // Find or create the new machine
     let machine = await machineModel.findOne({ where: { machine_name } });
@@ -241,33 +283,36 @@ export const updateItem = async (req, res) => {
     }
 
     // Update item fields
-    let response;
     if (req.role === "admin") {
-      response = await itemModel.update(
+      await itemModel.update(
         {
           name,
           amount,
           description,
           status,
+          year,
+          replacementType,
           lowerLimit,
           machineId: machine.id,
         },
         { where: { id: item.id } }
       );
-    } else {
-      if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-      response = await itemModel.update(
-        {
-          name,
-          amount,
-          description,
-          status,
-          lowerLimit,
-          machineId: machine.id,
-        },
-        { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
-      );
     }
+    // else {
+    //   if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
+    //   response = await itemModel.update(
+    //     {
+    //       name,
+    //       amount,
+    //       description,
+    //       status,
+    //       lowerLimit,
+
+    //       machineId: machine.id,
+    //     },
+    //     { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
+    //   );
+    // }
 
     // Log the update action in the audit logs
     await logAuditEvent("Item", item.id, "update", {
@@ -276,6 +321,8 @@ export const updateItem = async (req, res) => {
       description,
       status,
       lowerLimit,
+      year,
+      replacementType,
       machineId: machine.id,
     });
 
@@ -313,7 +360,7 @@ export const updateItemStatus = async (req, res) => {
     await historyModel.create({
       name: item.name,
       changeType: "Update Status",
-      category: "Item",
+      category: "Part Status",
       username: req.name,
       description: `Status changed from ${prevStatus} to ${status}`,
     }); // Log the update action in the audit logs
@@ -408,5 +455,157 @@ export const addItemAmount = async (req, res) => {
     res.status(200).json({ message: "Item amount updated", data: { name, newAmount: item.amount + amountToAdd } });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const changeItem = async (req, res) => {
+  // res.status(200).json("konek");
+  const { itemName, replaceItemName, itemStartUseDate, itemEndUseDate, machineName, reason, itemYear, replaceItemYear, itemStatus, useAmount } = req.body;
+
+  // Validate required fields
+  if (!itemName || !itemYear || !reason || useAmount === undefined) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+  try {
+    console.log("Received data:", req.body);
+    // Find the item by name
+    const item = await itemModel.findOne({
+      where: {
+        name: itemName,
+        year: itemYear,
+        deletedAt: null, // Exclude soft-deleted items
+      },
+    });
+
+    if (!item) return res.status(404).json({ message: `item not found` });
+
+    let newAmount = item.amount - useAmount;
+    if (item.replacementType === "Replace") {
+      await itemModel.update(
+        {
+          amount: newAmount,
+        },
+        { where: { id: item.id } }
+      );
+
+      // Create history record
+      await historyModel.create({
+        name: item.name,
+        changeType: "Change Part",
+        category: "Part Replace",
+        username: req.name,
+        prevStock: item.amount,
+        usedStock: useAmount,
+        afterStock: newAmount,
+        description: `Replace ${useAmount} ea ${itemName}`,
+      });
+
+      // Log the update action in the audit logs
+      await logAuditEvent("part", item.id, "update", {
+        name: item.name,
+        prevAmount: item.amount,
+        newAmount: item.amount - useAmount,
+        description: `Replace ${useAmount} ea ${itemName}`,
+      });
+    } else {
+      // Find the replacement item
+      const replacementItem = await itemModel.findOne({
+        where: {
+          name: replaceItemName,
+          year: replaceItemYear,
+          deletedAt: null, // Exclude soft-deleted items
+        },
+      });
+
+      if (!replacementItem) return res.status(404).json({ message: "Replacement item not found" });
+
+      const machine = await machineModel.findOne({
+        where: {
+          machine_name: machineName,
+          deletedAt: null, // Exclude soft-deleted items
+        },
+      });
+      if (!machine) return res.status(404).json({ message: "Machine not found" });
+
+      const itemUseHistory = await itemUseHistoryModel.findOne({
+        where: {
+          itemId: item.id,
+        },
+      });
+
+      await itemUseHistoryModel.create({
+        itemId: item.id,
+        replacementItemId: replacementItem.id,
+        machineId: machine.id,
+        itemStartUseDate,
+        itemEndUseDate,
+        useCount: 1 || itemUseHistory.useCount + 1,
+        reason,
+      });
+
+      if (itemStatus == "Broken") {
+        await itemModel.update(
+          {
+            status: "Broken",
+          },
+          { where: { id: item.id } }
+        );
+        //masukin email otomatis ke admin
+
+        // Create history record
+        await historyModel.create({
+          name: item.name,
+          changeType: "Change Part",
+          category: "Part",
+          username: req.name,
+          description: `Part ${itemName} - ${item.year}changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
+        });
+
+        // Log the update action in the audit logs
+        await logAuditEvent("Item", item.id, "update", {
+          name: item.name,
+          prevStatus: item.status,
+          newStatus: "Broken",
+          description: `Part ${itemName} - ${item.year}changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
+        });
+      }
+
+      //ganti status Replace item
+      await itemModel.update(
+        {
+          status: "In Use",
+        },
+        { where: { id: replacementItem.id } }
+      );
+
+      // ganti status item
+      await itemModel.update(
+        {
+          status: itemStatus,
+        },
+        { where: { id: item.id } }
+      );
+
+      // Create history record
+      await historyModel.create({
+        name: item.name,
+        changeType: "Change Part",
+        category: "Part",
+        username: req.name,
+        description: ` ${itemName} - ${item.year} changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
+      });
+
+      // Log the update action in the audit logs
+      await logAuditEvent("Item", item.id, "update", {
+        name: item.name,
+        prevStatus: item.status,
+        newStatus: "In Use",
+        description: `Part ${itemName} changed to ${replaceItemName} With reason : ${reason}`,
+      });
+    }
+
+    res.status(200).json({ message: "Item updated" });
+  } catch (error) {
+    res.status(500).json({ message: "Woi" + error.message });
   }
 };

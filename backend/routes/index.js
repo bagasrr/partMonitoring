@@ -1,6 +1,6 @@
 import express from "express";
 import userRoute from "./usersRoute.js";
-import itemRoute from "./itemsRoute.js";
+import itemRoute from "./itemRoute.js";
 import authRoute from "./authRoute.js";
 import machineRoute from "./machinesRoute.js";
 import { adminOnly, verifyUser } from "../middleware/Auth.js";

@@ -8,6 +8,8 @@ const EditItemForm = () => {
     name: "",
     amount: "",
     description: "",
+    year: "",
+    replacementType: "",
     status: "Not Set",
     lowerLimit: 0,
   });
@@ -87,13 +89,22 @@ const EditItemForm = () => {
         <FormField label="Name" name="name" value={formData.name} onChange={handleChange} />
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} />
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} />
+        <FormField label="Year" name="year" value={formData.year} onChange={handleChange} />
+        <FormField label="Replacement Type" name="replacementType" type="select" value={formData.replacementType} onChange={handleChange}>
+          <option value="" disabled>
+            Pilih tipe penggantian
+          </option>
+          <option value="Swap">Swap</option>
+          <option value="Replace">Replace</option>
+        </FormField>
         <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
           <option value="Not Set" disabled>
             Not Set
           </option>
-          <option value="Siap Pakai">Siap Pakai</option>
-          <option value="Rusak">Rusak</option>
-          <option value="Perbaikan">Perbaikan</option>
+          <option value="In Use">In Use</option>
+          <option value="Broken">Broken</option>
+          <option value="Repair">Repair</option>
+          <option value="Spare">Spare</option>
         </FormField>
         <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} />
         <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">

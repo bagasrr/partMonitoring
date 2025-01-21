@@ -63,12 +63,14 @@ const ItemsTable = () => {
 
   const getStatusColorClass = (status) => {
     switch (status) {
-      case "Siap Pakai":
+      case "In Use":
         return "bg-green-100 text-green-700";
-      case "Rusak":
+      case "Broken":
         return "bg-red-100 text-red-700";
       case "Repair":
         return "bg-blue-100 text-blue-700";
+      case "Spare":
+        return "bg-yellow-100 text-yellow-700";
       default:
         return "bg-white text-gray-700";
     }
@@ -97,6 +99,8 @@ const ItemsTable = () => {
             <ThData>Nama Item</ThData>
             <ThData>Amount</ThData>
             <ThData>Status</ThData>
+            <ThData>Year</ThData>
+            <ThData>Replacement Type</ThData>
             <ThData>Deskripsi</ThData>
             <ThData>Machine Name</ThData>
             <ThData>Machine Number</ThData>
@@ -122,15 +126,17 @@ const ItemsTable = () => {
                     <option value="Not Set" disabled>
                       Not Set
                     </option>
-                    <option value="Siap Pakai">Siap Pakai</option>
-                    <option value="Rusak">Rusak</option>
+                    <option value="In Use">In Use</option>
+                    <option value="Broken">Broken</option>
                     <option value="Repair">Repair</option>
-                    <option value="Perbaikan">Perbaikan</option>
+                    <option value="Spare">Spare</option>
                   </select>
                 ) : (
                   <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
                 )}
               </TData>
+              <TData>{item.year}</TData>
+              <TData>{item.replacementType}</TData>
               <TData>{item.description}</TData>
               <TData>{highlightText(item.machine.machine_name, search)}</TData>
               <TData>{item.machine.machine_number}</TData>

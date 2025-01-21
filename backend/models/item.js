@@ -59,4 +59,14 @@ export const item = {
       notEmpty: true,
     },
   },
+  replacementType: {
+    type: DataTypes.ENUM("Swap", "Replace"),
+    allowNull: false,
+    defaultValue: "Swap",
+  },
+  year: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 2024,
+  },
 };
