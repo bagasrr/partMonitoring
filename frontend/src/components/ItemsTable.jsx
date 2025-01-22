@@ -92,67 +92,67 @@ const ItemsTable = () => {
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search items or machines name" />
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <ThData>No</ThData>
-            <ThData>Nama Item</ThData>
-            <ThData>Amount</ThData>
-            <ThData>Status</ThData>
-            <ThData>Year</ThData>
-            <ThData>Replacement Type</ThData>
-            <ThData>Deskripsi</ThData>
-            <ThData>Machine Name</ThData>
-            <ThData>Machine Number</ThData>
-            {user && user.role === "admin" && <ThData>Actions</ThData>}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.length === 0 && (
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white overflow-x-auto">
+          <thead>
             <tr>
-              <td colSpan="8" className="text-center py-4">
-                No data found
-              </td>
+              <ThData>No</ThData>
+              <ThData>Nama Item</ThData>
+              <ThData>Amount</ThData>
+              <ThData>Status</ThData>
+              <ThData>Year</ThData>
+              <ThData>Replacement Type</ThData>
+              <ThData>Deskripsi</ThData>
+              <ThData>Machine Name</ThData>
+              {user && user.role === "admin" && <ThData>Actions</ThData>}
             </tr>
-          )}
-          {currentItems.map((item, index) => (
-            <TRow key={item.uuid}>
-              <TData>{index + 1 + indexOfFirstItem}</TData>
-              <TData>{highlightText(item.name, search)}</TData>
-              <TData>{item.amount}</TData>
-              <TData>
-                {user && user.role === "admin" ? (
-                  <select value={item.status} onChange={(e) => handleStatusChange(e, item.uuid)} className={`p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>
-                    <option value="Not Set" disabled>
-                      Not Set
-                    </option>
-                    <option value="In Use">In Use</option>
-                    <option value="Broken">Broken</option>
-                    <option value="Repair">Repair</option>
-                    <option value="Spare">Spare</option>
-                  </select>
-                ) : (
-                  <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
-                )}
-              </TData>
-              <TData>{item.year}</TData>
-              <TData>{item.replacementType}</TData>
-              <TData>{item.description}</TData>
-              <TData>{highlightText(item.machine.machine_name, search)}</TData>
-              <TData>{item.machine.machine_number}</TData>
-              {user && user.role === "admin" && (
+          </thead>
+          <tbody>
+            {filteredData.length === 0 && (
+              <tr>
+                <td colSpan="8" className="text-center py-4">
+                  No data found
+                </td>
+              </tr>
+            )}
+            {currentItems.map((item, index) => (
+              <TRow key={item.uuid}>
+                <TData>{index + 1 + indexOfFirstItem}</TData>
+                <TData>{highlightText(item.name, search)}</TData>
+                <TData>{item.amount}</TData>
                 <TData>
-                  <div className="flex gap-5 items-center">
-                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
-                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
-                  </div>
+                  {user && user.role === "admin" ? (
+                    <select value={item.status} onChange={(e) => handleStatusChange(e, item.uuid)} className={`p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>
+                      <option value="Not Set" disabled>
+                        Not Set
+                      </option>
+                      <option value="In Use">In Use</option>
+                      <option value="Broken">Broken</option>
+                      <option value="Repair">Repair</option>
+                      <option value="Spare">Spare</option>
+                    </select>
+                  ) : (
+                    <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
+                  )}
                 </TData>
-              )}
-            </TRow>
-          ))}
-        </tbody>
-      </table>
-      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+                <TData>{item.year}</TData>
+                <TData>{item.replacementType}</TData>
+                <TData>{item.description}</TData>
+                <TData>{highlightText(item.machine.machine_name, search)}</TData>
+                {user && user.role === "admin" && (
+                  <TData>
+                    <div className="flex gap-5 items-center">
+                      <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
+                      <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
+                    </div>
+                  </TData>
+                )}
+              </TRow>
+            ))}
+          </tbody>
+        </table>
+        {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+      </div>
     </div>
   );
 };

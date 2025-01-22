@@ -4,6 +4,9 @@ import FormField from "../FormField";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../../utils/getMachine";
 import { getSections } from "../../utils/getSection";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotification } from "../../features/notificationSlice";
+import useNotification from "../../services/Notification";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
@@ -11,6 +14,10 @@ const AddItemForm = () => {
   const [sections, setSections] = useState([]);
   const [isNewMachine, setIsNewMachine] = useState(false);
   const [isNewSection, setIsNewSection] = useState(false);
+  const [error, setError] = useState(false);
+  const [errors, setErrors] = useState({});
+  const notification = useNotification();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,8 +32,6 @@ const AddItemForm = () => {
     replacementType: "",
     year: "",
   });
-  const [errors, setErrors] = useState({});
-  const [notification, setNotification] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,8 +71,9 @@ const AddItemForm = () => {
 
     try {
       const data = await createItem(formData);
-      setNotification("Item created successfully!");
-      setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
+      // setNotification("Part created successfully!");
+      dispatch(setNotification(`Part ${formData.name} Added`));
+      navigate("/items");
       setFormData({
         name: "",
         amount: 0,
@@ -79,10 +85,9 @@ const AddItemForm = () => {
         section_name: "",
         section_number: "",
       });
-      navigate("/items");
     } catch (error) {
-      setNotification(`Error: ${error.message}`);
-      setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
+      setError(true);
+      // setNotification(`Error: ${error.message}`);
     }
   };
 
@@ -137,7 +142,7 @@ const AddItemForm = () => {
   return (
     <div>
       {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
-      <form onSubmit={handleSubmit} className="shadow-md p-3 rounded">
+      <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
         <FormField label="Name" name="name" value={formData.name} onChange={handleChange} />
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} />
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} />

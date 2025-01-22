@@ -3,19 +3,15 @@ import Dashboard from "./pages/Dashboard";
 import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Items from "./pages/Items";
-import NewAddItem from "./pages/NewAddItem";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
 import AddUser from "./pages/AddUser";
-import ChangePartForm from "./pages/ChangePartForm";
 import History from "./pages/History";
 import Machines from "./pages/Machines";
 import Sections from "./pages/Sections";
 import EditMachine from "./pages/EditGroup/EditMachine";
-import AddMachine from "./pages/AddGroup/AddMachine";
 import YoureNotAdmin from "./pages/YoureNotAdmin";
 import AddSection from "./pages/AddGroup/AddSection";
-import AddPart from "./pages/AddGroup/AddPart";
 import AddItemPages from "./pages/AddGroup/AddItemPages";
 import EditItem from "./pages/EditGroup/EditItem";
 import AddMachineNew from "./pages/AddGroup/AddMachineNew";
@@ -40,10 +36,6 @@ const router = createBrowserRouter([
     element: <AddItemPages />,
   },
   {
-    path: "/items/add/",
-    element: <AddPart />,
-  },
-  {
     path: "/items/edit/:id",
     element: <EditItem />,
   },
@@ -61,7 +53,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/items/changepart",
-    element: <ChangePartForm />,
+    element: <AddPartReplacementPages />,
   },
   {
     path: "/history",
@@ -90,10 +82,6 @@ const router = createBrowserRouter([
   {
     path: "/yourenotadmin",
     element: <YoureNotAdmin />,
-  },
-  {
-    path: "/changepart",
-    element: <AddPartReplacementPages />,
   },
   {
     path: "/itemusage",
