@@ -11,7 +11,7 @@ export const createItem = async (itemData) => {
 };
 
 // Fetch all items
-export const fetchItems = async () => {
+export const getItems = async () => {
   try {
     const response = await axios.get("http://localhost:4000/api/items");
     return response.data;

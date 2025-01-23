@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
-import { getAllItem } from "../utils/getItem";
+import { getItems } from "../utils/items";
 
 const ChartComponent = () => {
   const [chartData, setChartData] = useState({
@@ -29,7 +29,7 @@ const ChartComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getAllItem();
+        const data = await getItems();
         if (Array.isArray(data)) {
           const transformedData = {
             labels: data.map((item) => (item.name.length > 10 ? item.name.substring(0, 10) + "..." : item.name)),

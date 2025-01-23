@@ -10,26 +10,23 @@ import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import highlightText from "../element/highlightText"; // Import fungsi highlightText
 import Pagination from "./Pagination"; // Import komponen Pagination
+import useNotification from "../services/Notification"; // Importe useNotification
+import TablePagination from "./TablePagination";
 
 const SectionsTable = () => {
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedSectionName, setSelectedSectionName] = useState(null);
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(0); // State for current page
-  const itemsPerPage = 5; // Number of items per page
-  const notification = useSelector((state) => state.notification.message); // Use Redux selector
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
+  const notification = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSections();
-    // Clear notification after a few seconds
-    if (notification) {
-      setTimeout(() => {
-        dispatch(clearNotification());
-      }, 3000);
-    }
   }, [notification, dispatch]);
 
   const fetchSections = async () => {
@@ -44,7 +41,8 @@ const SectionsTable = () => {
     fetchSections(); // Refresh data after deletion
   };
 
-  const handleOpenModal = (uuid) => {
+  const handleOpenModal = (uuid, selected) => {
+    setSelectedSectionName(selected);
     setSelectedSection(uuid);
     setShowModal(true);
   };
@@ -73,50 +71,54 @@ const SectionsTable = () => {
   return (
     <div>
       {notification && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className={`border ${deleted ? "bg-rose-100 border-rose-400 text-rose-700" : "bg-green-100  border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline">{notification}</span>
+          <span className="block sm:inline"> {notification}</span>
         </div>
       )}
+
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search sections" />
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <ThData>No</ThData>
-            <ThData>Nama Ruangan</ThData>
-            <ThData>Nomor Ruangan</ThData>
-            <ThData>Action</ThData>
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.length === 0 && (
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white">
+          <thead>
             <tr>
-              <td colSpan="4" className="text-center py-4">
-                No data found
-              </td>
+              <ThData>No</ThData>
+              <ThData>Nama Ruangan</ThData>
+              <ThData>Nomor Ruangan</ThData>
+              <ThData>Action</ThData>
             </tr>
-          )}
-          {currentItems.map((section, index) => (
-            <TRow key={section.uuid}>
-              <TData>{index + 1 + indexOfFirstItem}</TData>
-              <TData>{highlightText(section.section_name, search)}</TData>
-              <TData>{section.section_number}</TData>
-              <TData>
-                <div className="flex gap-5 items-center justify-center">
-                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(section.uuid)} />
-                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/sections/edit/${section.uuid}`)} />
-                </div>
-              </TData>
-            </TRow>
-          ))}
-        </tbody>
-      </table>
-      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+          </thead>
+          <tbody>
+            {currentItems.length === 0 && (
+              <tr>
+                <td colSpan="4" className="text-center py-4">
+                  No data found
+                </td>
+              </tr>
+            )}
+            {currentItems.map((section, index) => (
+              <TRow key={section.uuid}>
+                <TData>{index + 1 + indexOfFirstItem}</TData>
+                <TData>{highlightText(section.section_name, search)}</TData>
+                <TData>{section.section_number}</TData>
+                <TData>
+                  <div className="flex gap-5 items-center justify-center">
+                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(section.uuid, section.section_name)} />
+                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/sections/edit/${section.uuid}`)} />
+                  </div>
+                </TData>
+              </TRow>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus Ruangan ini?">
         <p>
-          Jika menghapus Ruangan ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan <span className="text-red-500 text-2xl"> terhapus.</span>
+          Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">selectedSectionName</span>} ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}
+          <span className="text-red-500 text-2xl"> terhapus.</span>
         </p>
       </DeleteConfirmModalBox>
+      <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
   );
 };

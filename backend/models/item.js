@@ -67,6 +67,5 @@ export const item = {
   year: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 2024,
   },
 };

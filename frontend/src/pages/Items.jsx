@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchItems } from "../utils/items";
+import { getItems } from "../utils/items";
 import ItemTable from "../components/ItemsTable";
 import Layout from "./Layout";
 import { Link } from "react-router-dom";
@@ -12,9 +12,9 @@ const App = () => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const getItems = async () => {
+    const fetchItems = async () => {
       try {
-        const data = await fetchItems();
+        const data = await getItems();
         setItems(data);
         // Dispatch an action to store items in the Redux store, if needed
         dispatch({ type: "SET_ITEMS", payload: data });
@@ -23,7 +23,7 @@ const App = () => {
       }
     };
 
-    getItems();
+    fetchItems();
   }, [dispatch]);
 
   return (

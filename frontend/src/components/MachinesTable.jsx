@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setNotification } from "../features/notificationSlice";
+import { setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../utils/getMachine";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar";
 import highlightText from "../element/highlightText";
-import Pagination from "./Pagination";
+import useNotification from "../services/Notification"; // Importe useNotification
+import TablePagination from "./TablePagination";
 
 const MachinesTable = () => {
   const [data, setData] = useState([]);
@@ -17,18 +18,15 @@ const MachinesTable = () => {
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5;
-  const notification = useSelector((state) => state.notification.message);
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
+  const notification = useNotification();
+  const [deleted, setDeleted] = useState(false);
+  const [selectedName, setSelectedName] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     Machines();
-    if (notification) {
-      setTimeout(() => {
-        dispatch(clearNotification());
-      }, 3000);
-    }
   }, [notification, dispatch]);
 
   const Machines = async () => {
@@ -38,14 +36,18 @@ const MachinesTable = () => {
 
   const handleDelete = async () => {
     if (selectedMachine) {
+      setDeleted(true);
       await axios.delete(`http://localhost:4000/api/machines/${selectedMachine}`);
-      dispatch(setNotification("Machines Deleted"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      dispatch(setNotification(`Machines ${selectedName} Deleted`));
       setShowModal(false);
       Machines();
     }
   };
 
-  const handleOpenModal = (uuid) => {
+  const handleOpenModal = (uuid, selected) => {
+    setSelectedName(selected);
     setSelectedMachine(uuid);
     setShowModal(true);
   };
@@ -74,54 +76,57 @@ const MachinesTable = () => {
   return (
     <div>
       {notification && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div className={`border ${deleted ? "bg-rose-100 border-rose-400 text-rose-700" : "bg-green-100  border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <strong className="font-bold">Success!</strong>
           <span className="block sm:inline"> {notification}</span>
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search machines or sections" />
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <ThData>No</ThData>
-            <ThData>Nama Mesin</ThData>
-            <ThData>No Mesin</ThData>
-            <ThData>Ruangan</ThData>
-            <ThData>No Ruangan</ThData>
-            <ThData>Action</ThData>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.length === 0 && (
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white">
+          <thead>
             <tr>
-              <td colSpan="8" className="text-center py-4">
-                No data found
-              </td>
+              <ThData>No</ThData>
+              <ThData>Nama Mesin</ThData>
+              <ThData>No Mesin</ThData>
+              <ThData>Ruangan</ThData>
+              <ThData>No Ruangan</ThData>
+              <ThData>Action</ThData>
             </tr>
-          )}
-          {currentItems.map((machine, index) => (
-            <TRow key={machine.uuid}>
-              <TData>{index + 1 + indexOfFirstItem}</TData>
-              <TData>{highlightText(machine.machine_name, search)}</TData>
-              <TData>{machine.machine_number}</TData>
-              <TData>{highlightText(machine.section.section_name, search)}</TData>
-              <TData>{machine.section.section_number}</TData>
-              <TData>
-                <div className="flex gap-5 items-center justify-center">
-                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(machine.uuid)} />
-                  <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/machines/edit/${machine.uuid}`)} />
-                </div>
-              </TData>
-            </TRow>
-          ))}
-        </tbody>
-      </table>
-      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+          </thead>
+          <tbody>
+            {filteredData.length === 0 && (
+              <tr>
+                <td colSpan="8" className="text-center py-4">
+                  No data found
+                </td>
+              </tr>
+            )}
+            {currentItems.map((machine, index) => (
+              <TRow key={machine.uuid}>
+                <TData>{index + 1 + indexOfFirstItem}</TData>
+                <TData>{highlightText(machine.machine_name, search)}</TData>
+                <TData>{machine.machine_number}</TData>
+                <TData>{highlightText(machine.section.section_name, search)}</TData>
+                <TData>{machine.section.section_number}</TData>
+                <TData>
+                  <div className="flex gap-5 items-center justify-center">
+                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(machine.uuid, machine.machine_name)} />
+                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/machines/edit/${machine.uuid}`)} />
+                  </div>
+                </TData>
+              </TRow>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus mesin ini?">
         <p>
           Jika menghapus mesin ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan mesin ini akan <span className="text-red-500 text-2xl"> terhapus.</span>
         </p>
       </DeleteConfirmModalBox>
+
+      <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
   );
 };

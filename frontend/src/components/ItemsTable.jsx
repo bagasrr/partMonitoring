@@ -1,43 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { getAllItem } from "../utils/getItem";
-import { updateItemStatus } from "../utils/items"; // Updated import statement
+import { getItems, updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
-import Pagination from "./Pagination";
 import SearchBar from "./SearchBar";
+import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
+import TablePagination from "./TablePagination";
+import useNotification from "../services/Notification"; // Importe useNotification
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
-  const notification = useSelector((state) => state.notification.message);
+  const notification = useNotification(); // Panggil useNotification
   const { user } = useSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUUIDItem, setSelectedUUIDItem] = useState(null);
+  const [selectedItemName, setSelectedItemName] = useState(null);
+  const [deleted, setDeleted] = useState(false);
 
   useEffect(() => {
     fetchItems();
-    if (notification) {
-      setTimeout(() => {
-        dispatch(clearNotification());
-      }, 3000);
-    }
   }, [notification, dispatch]);
 
   const fetchItems = async () => {
-    const response = await getAllItem();
+    const response = await getItems();
     setData(response);
   };
 
-  const handleDelete = async (uuid) => {
-    await axios.delete(`http://localhost:4000/api/items/${uuid}`);
+  const handleDelete = async () => {
+    await axios.delete(`http://localhost:4000/api/items/${selectedUUIDItem}`);
     dispatch(setNotification("Items Deleted"));
+    setShowModal(false);
+    setDeleted(true);
     fetchItems();
   };
 
@@ -83,11 +85,19 @@ const ItemsTable = () => {
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
+  const handleOpenModal = (uuid, item) => {
+    setSelectedItemName(item);
+    setSelectedUUIDItem(uuid);
+    setShowModal(true);
+  };
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <div>
       {notification && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-          {/* <strong className="font-bold">Success!</strong> */}
+        <div className={`${deleted ? "bg-rose-100 border border-rose-400 text-rose-700" : "bg-green-100 border border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <span className="block sm:inline">{notification}</span>
         </div>
       )}
@@ -101,8 +111,9 @@ const ItemsTable = () => {
               <ThData>Amount</ThData>
               <ThData>Status</ThData>
               <ThData>Year</ThData>
-              <ThData>Replacement Type</ThData>
+              <ThData>Tipe Penggantian</ThData>
               <ThData>Deskripsi</ThData>
+              <ThData>Batas Bawah</ThData>
               <ThData>Machine Name</ThData>
               {user && user.role === "admin" && <ThData>Actions</ThData>}
             </tr>
@@ -138,11 +149,12 @@ const ItemsTable = () => {
                 <TData>{item.year}</TData>
                 <TData>{item.replacementType}</TData>
                 <TData>{item.description}</TData>
+                <TData>{item.lowerLimit}</TData>
                 <TData>{highlightText(item.machine.machine_name, search)}</TData>
                 {user && user.role === "admin" && (
                   <TData>
                     <div className="flex gap-5 items-center">
-                      <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(item.uuid)} />
+                      <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(item.uuid, item.name)} />
                       <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
                     </div>
                   </TData>
@@ -151,8 +163,11 @@ const ItemsTable = () => {
             ))}
           </tbody>
         </table>
-        {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+
+        <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`}></DeleteConfirmModalBox>
       </div>
+
+      <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
   );
 };

@@ -86,8 +86,8 @@ const AddMachineForm = () => {
             ))}
           <option value="new">Enter New Section</option>
         </FormField>
-        {isNewSection && <FormField label="New Section Name" name="sectionName" value={formData.sectionName} onChange={handleChange} />}
-        <FormField label="Section Number" name="sectionNumber" value={formData.sectionNumber} onChange={handleChange} />
+        {isNewSection && <FormField label="New Section Room Name" name="sectionName" value={formData.sectionName} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />}
+        <FormField label="Section Room Number" name="sectionNumber" type="number" value={formData.sectionNumber} onChange={handleChange} placeholder={"Masukkan nomor ruangan"} />
         <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
           Add Machine
         </button>

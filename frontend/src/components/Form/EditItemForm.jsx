@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getItemById, updateItem } from "../../utils/items";
 import FormField from "../FormField";
+import { useDispatch, useSelector } from "react-redux";
+import { setNotification } from "../../features/notificationSlice";
 
 const EditItemForm = () => {
   const [formData, setFormData] = useState({
@@ -11,12 +13,14 @@ const EditItemForm = () => {
     year: "",
     replacementType: "",
     status: "Not Set",
-    lowerLimit: 0,
+    lowerLimit: "",
   });
   const { id } = useParams();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
-  const [notification, setNotification] = useState("");
+  const [notif, setNotif] = useState("");
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchItem();
@@ -33,10 +37,10 @@ const EditItemForm = () => {
         machine_number: data.machine?.machine_number || "",
       });
     } catch (error) {
-      setNotification(`Error: ${error.message}`);
-      setTimeout(() => setNotification(""), 3000);
+      setNotif(error.message);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -71,33 +75,29 @@ const EditItemForm = () => {
 
     try {
       await updateItem(id, formData);
-      setNotification("Item updated successfully!");
-      setTimeout(() => {
-        setNotification("");
-        navigate("/items");
-      }, 3000);
+      dispatch(setNotification(`Item ${formData.name} Updated`));
+      navigate("/items");
     } catch (error) {
-      setNotification(`Error: ${error.message}`);
-      setTimeout(() => setNotification(""), 3000);
+      setNotif(error.message);
     }
   };
 
   return (
     <div>
-      {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
+      {notif && <div className="mt-4 p-2 text-white bg-red-500 rounded">{notif}</div>}
       <form onSubmit={handleSubmit}>
-        <FormField label="Name" name="name" value={formData.name} onChange={handleChange} />
-        <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} />
-        <FormField label="Description" name="description" value={formData.description} onChange={handleChange} />
-        <FormField label="Year" name="year" value={formData.year} onChange={handleChange} />
-        <FormField label="Replacement Type" name="replacementType" type="select" value={formData.replacementType} onChange={handleChange}>
+        <FormField label="Name" name="name" value={formData.name || ""} onChange={handleChange} />
+        <FormField label="Amount" name="amount" type="number" value={formData.amount || ""} onChange={handleChange} error={errors.amount} />
+        <FormField label="Description" name="description" value={formData.description || ""} onChange={handleChange} />
+        <FormField label="Year" name="year" value={formData.year || ""} onChange={handleChange} />
+        <FormField label="Replacement Type" name="replacementType" type="select" value={formData.replacementType || ""} onChange={handleChange}>
           <option value="" disabled>
             Pilih tipe penggantian
           </option>
           <option value="Swap">Swap</option>
           <option value="Replace">Replace</option>
         </FormField>
-        <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
+        <FormField label="Status" name="status" type="select" value={formData.status || ""} onChange={handleChange}>
           <option value="Not Set" disabled>
             Not Set
           </option>
@@ -106,10 +106,11 @@ const EditItemForm = () => {
           <option value="Repair">Repair</option>
           <option value="Spare">Spare</option>
         </FormField>
-        <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} />
+        <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit || ""} onChange={handleChange} error={errors.lowerLimit} placeholder={"masukkan batas bawah"} />
         <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
           Save
         </button>
+        {notif && <div className={`mt-4 p-2 text-white ${notif ? "bg-red-500" : "bg-green-500"} rounded`}>{notif}</div>}
       </form>
     </div>
   );

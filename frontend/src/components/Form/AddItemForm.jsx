@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createItem } from "../../utils/items";
+import { createItem, getItems } from "../../utils/items";
 import FormField from "../FormField";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../../utils/getMachine";
@@ -10,8 +10,10 @@ import useNotification from "../../services/Notification";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
+  const [part, setPart] = useState([]);
   const [machines, setMachines] = useState([]);
   const [sections, setSections] = useState([]);
+  const [isNewPart, setIsNewPart] = useState(false);
   const [isNewMachine, setIsNewMachine] = useState(false);
   const [isNewSection, setIsNewSection] = useState(false);
   const [error, setError] = useState(false);
@@ -21,10 +23,10 @@ const AddItemForm = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    amount: 0,
+    amount: "",
     description: "",
     status: "Not Set",
-    lowerLimit: 0,
+    lowerLimit: "",
     machine_name: "",
     machine_number: "",
     section_name: "",
@@ -64,22 +66,26 @@ const AddItemForm = () => {
     if (formData.lowerLimit < 0) {
       newErrors.lowerLimit = "Nilai harus lebih dari 0";
     }
+    if (formData.year > new Date().getFullYear()) {
+      newErrors.year = "Tahun tidak bisa lebih dari tahun sekarang";
+    }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       return;
     }
 
     try {
-      const data = await createItem(formData);
+      console.log(formData);
+      await createItem(formData);
       // setNotification("Part created successfully!");
       dispatch(setNotification(`Part ${formData.name} Added`));
       navigate("/items");
       setFormData({
         name: "",
-        amount: 0,
+        amount: "",
         description: "",
         status: "Not Set",
-        lowerLimit: 0,
+        lowerLimit: "",
         machine_name: "",
         machine_number: "",
         section_name: "",
@@ -87,10 +93,28 @@ const AddItemForm = () => {
       });
     } catch (error) {
       setError(true);
-      // setNotification(`Error: ${error.message}`);
+      setNotification(`Error: ${error.message}`);
     }
   };
 
+  const handlePartChange = (e) => {
+    const { value } = e.target;
+    if (value === "new") {
+      setIsNewPart(true);
+      setFormData({ ...formData, name: "", amount: "", description: "" });
+    } else {
+      setIsNewPart(false);
+      const selectedPart = part.find((part) => part.name === value);
+      setFormData({
+        ...formData,
+        name: value,
+        year: selectedPart?.year || "",
+        lowerLimit: selectedPart?.lowerLimit || "",
+        machine_name: selectedPart?.machine?.machine_name || "",
+        machine_number: selectedPart?.machine?.machine_number || "",
+      });
+    }
+  };
   const handleMachineChange = (e) => {
     const { value } = e.target;
     if (value === "new") {
@@ -129,6 +153,11 @@ const AddItemForm = () => {
     setMachines(response);
   };
 
+  const fetchPart = async () => {
+    const response = await getItems();
+    setPart(response);
+  };
+
   const fetchSections = async () => {
     const response = await getSections();
     setSections(response);
@@ -137,33 +166,68 @@ const AddItemForm = () => {
   useEffect(() => {
     fetchMachines();
     fetchSections();
+    fetchPart();
   }, []);
 
   return (
     <div>
       {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
       <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
-        <FormField label="Name" name="name" value={formData.name} onChange={handleChange} />
-        <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} />
-        <FormField label="Description" name="description" value={formData.description} onChange={handleChange} />
-        <FormField label="Year" name="year" value={formData.year} onChange={handleChange} />
-        <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
+        {/* <FormField label="Part Name" name="name" type="select" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part"}>
           <option value="" disabled>
-            Select Type
+            Select Part
           </option>
-          <option value="Swap">Swap</option>
-          <option value="Replace">Replace</option>
-        </FormField>
-        <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
-          <option value="Not Set" disabled>
-            Not Set
+          {part &&
+            part.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+        </FormField> */}
+        <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
+          <option value="" disabled>
+            Pilih Part
           </option>
-          <option value="In Use">In Use</option>
-          <option value="Spare">Spare</option>
-          <option value="Repair">Repair</option>
-          <option value="Broken">Broken</option>
+          <option value="new">Enter New Part</option>
+          {part &&
+            part.map((data) => (
+              <option key={data.uuid} value={data.name}>
+                {data.name}
+              </option>
+            ))}
         </FormField>
-        <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} />
+        {isNewPart && (
+          <>
+            <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
+          </>
+        )}
+
+        <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
+        <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />
+        <FormField label="Description" name="description" value={formData.description} onChange={handleChange} placeholder={"Masukkan deskripsi"} />
+
+        {isNewPart && (
+          <>
+            <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
+              <option value="" disabled>
+                Select Type
+              </option>
+              <option value="Swap">Swap</option>
+              <option value="Replace">Replace</option>
+            </FormField>
+            <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
+              <option value="Not Set" disabled>
+                Not Set
+              </option>
+              <option value="In Use">In Use</option>
+              <option value="Spare">Spare</option>
+              <option value="Repair">Repair</option>
+              <option value="Broken">Broken</option>
+            </FormField>
+
+            <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} placeholder={"Masukkan batas minimum"} />
+          </>
+        )}
 
         <FormField label="Machine Name" name="machine_name" value={isNewMachine ? "new" : formData.machine_name} onChange={handleMachineChange} type="select">
           <option value="" disabled>
@@ -177,25 +241,32 @@ const AddItemForm = () => {
               </option>
             ))}
         </FormField>
-        {isNewMachine && <FormField label="New Machine Name" name="machine_name" value={formData.machine_name} onChange={handleChange} />}
+        {isNewMachine && (
+          <>
+            <FormField label="New Machine Name" name="machine_name" value={formData.machine_name} onChange={handleChange} placeholder={"Masukkan nama machine baru"} />
+            <FormField label="Machine Number" name="machine_number" value={formData.machine_number} onChange={handleChange} placeholder={"Masukkan nomor machine"} />
 
-        <FormField label="Machine Number" name="machine_number" value={formData.machine_number} onChange={handleChange} />
-
-        <FormField label="Section Name" name="section_name" value={isNewSection ? "new" : formData.section_name} onChange={handleSectionChange} type="select">
-          <option value="" disabled>
-            Pilih Section
-          </option>
-          <option value="new">Enter New Section</option>
-          {sections &&
-            sections.map((data) => (
-              <option key={data.uuid} value={data.section_name}>
-                {data.section_name}
+            <FormField label="Room Name" name="section_name" value={isNewSection ? "new" : formData.section_name} onChange={handleSectionChange} type="select">
+              <option value="" disabled>
+                Pilih Ruangan
               </option>
-            ))}
-        </FormField>
-        {isNewSection && <FormField label="New Section Name" name="section_name" value={formData.section_name} onChange={handleChange} />}
+              <option value="new">Enter New Section Room</option>
+              {sections &&
+                sections.map((data) => (
+                  <option key={data.uuid} value={data.section_name}>
+                    {data.section_name}
+                  </option>
+                ))}
+            </FormField>
+            {isNewSection && (
+              <>
+                <FormField label="New Room Name" name="section_name" value={formData.section_name} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />
 
-        <FormField label="Section Number" name="section_number" value={formData.section_number} onChange={handleChange} />
+                <FormField label="Room Number" name="section_number" value={formData.section_number} onChange={handleChange} placeholder={"Masukkan nomor ruangan"} />
+              </>
+            )}
+          </>
+        )}
         <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
           Add Item
         </button>

@@ -88,6 +88,9 @@ export const createItem = async (req, res) => {
   const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year } = req.body;
 
   try {
+    if (typeof amount !== "number" || typeof lowerLimit !== "number" || typeof year !== "number") {
+      return res.status(400).json({ message: "Invalid data type" });
+    }
     // Validate that amount is greater than 0
     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
 

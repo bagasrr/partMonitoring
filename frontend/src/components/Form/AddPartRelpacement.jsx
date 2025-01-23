@@ -1,4 +1,4 @@
-import { fetchItems } from "../../utils/items";
+import { getItems } from "../../utils/items";
 import FormField from "../FormField";
 
 import React, { useEffect, useState } from "react";
@@ -97,13 +97,13 @@ const ChangeItemForm = () => {
     }
   };
 
-  const getItem = async () => {
-    const data = await fetchItems();
+  const fetchItems = async () => {
+    const data = await getItems();
     setItems(data);
   };
 
   useEffect(() => {
-    getItem();
+    fetchItems();
   }, []);
 
   return (

@@ -4,12 +4,14 @@ import axios from "axios";
 import Pagination from "../components/Pagination";
 import SearchBar from "../components/SearchBar"; // Import SearchBar component
 import highlightText from "../element/highlightText"; // Import highlightText function
+import TablePagination from "../components/TablePagination";
+import { useSelector } from "react-redux";
 
 const History = () => {
   const [histories, setHistories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [search, setSearch] = useState("");
-  const itemsPerPage = 10;
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
   const [selectedUuid, setSelectedUuid] = useState(null);
 
   useEffect(() => {
@@ -96,7 +98,7 @@ const History = () => {
             <div className={`detail transition-max-height duration-300 ease-out ${selectedUuid === his.uuid ? "max-h-72" : "max-h-0"} overflow-hidden gap-3 flex`}>
               <div>
                 <p>Aktor </p>
-                <p>Entitas</p>
+                <p>Name</p>
                 <p>Tanggal Kejadian </p>
                 {his.category != null && <p>Categori </p>}
                 {his.prevStock != null && <p>Jumlah Sebelum </p>}
@@ -120,7 +122,9 @@ const History = () => {
           </div>
         ))}
       </div>
-      {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />}
+      {/* {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />} */}
+
+      <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </Layout>
   );
 };
