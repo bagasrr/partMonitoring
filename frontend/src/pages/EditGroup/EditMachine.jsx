@@ -4,8 +4,10 @@ import EditMachineForm from "../../components/Form/EditMachineForm";
 import Layout from "../Layout";
 import BackPrev from "../../element/BackPrev";
 import { adminArea } from "../../utils/adminArea";
+import scrollToTop from "../../utils/scrollToTop";
 
 const EditMachine = () => {
+  scrollToTop();
   adminArea();
   return (
     <Layout>

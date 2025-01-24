@@ -3,8 +3,10 @@ import Layout from "./Layout";
 import MachinesTable from "../components/MachinesTable";
 import Title from "../element/Title";
 import { Link } from "react-router-dom";
+import scrollToTop from "../utils/scrollToTop";
 
 const Machines = () => {
+  scrollToTop();
   return (
     <Layout>
       <Title>Machines</Title>

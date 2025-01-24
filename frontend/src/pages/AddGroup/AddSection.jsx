@@ -6,8 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
+import { adminArea } from "../../utils/adminArea";
 
 const AddSection = () => {
+  adminArea();
+  const [formData, setFormData] = useState({
+    sectionName: "",
+    sectionNumber: "",
+  });
   const [sectionName, setSectionName] = useState("");
   const [sectionNumber, setSectionNumber] = useState("");
   const navigate = useNavigate();

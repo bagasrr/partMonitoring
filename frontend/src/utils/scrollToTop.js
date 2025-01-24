@@ -1,9 +1,16 @@
 import React, { useEffect } from "react";
 
-const scrollToTop = () => {
+const ScrollToTop = () => {
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 100); // 1000 ms = 1 detik
+
+    // Bersihkan timer ketika komponen di-unmount
+    return () => clearTimeout(timer);
   }, []);
+
+  return null; // Komponen ini tidak perlu mengembalikan elemen DOM apa pun
 };
 
-export default scrollToTop;
+export default ScrollToTop;

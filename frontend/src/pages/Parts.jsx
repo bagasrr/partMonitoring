@@ -5,8 +5,10 @@ import ItemTable from "../components/ItemsTable";
 import Layout from "./Layout";
 import { Link } from "react-router-dom";
 import Title from "../element/Title";
+import scrollToTop from "../utils/scrollToTop";
 
 const Parts = () => {
+  scrollToTop();
   const [items, setItems] = useState([]);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);

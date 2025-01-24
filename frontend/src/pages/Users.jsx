@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import UsersTable from "../components/UsersTable";
 import Title from "../element/Title";
 import { adminArea } from "../utils/adminArea";
+import scrollToTop from "../utils/scrollToTop";
 
 const Users = () => {
+  scrollToTop();
   adminArea();
   return (
     <Layout>
