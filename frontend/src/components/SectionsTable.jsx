@@ -21,6 +21,8 @@ const SectionsTable = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = useSelector((state) => state.itemsPerPage);
+  const [deleted, setDeleted] = useState(false);
+  const [error, setError] = useState(null);
   const notification = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,10 +37,15 @@ const SectionsTable = () => {
   };
 
   const handleDelete = async () => {
-    await axios.delete(`http://localhost:4000/api/sections/${selectedSection}`);
-    dispatch(setNotification("Section Deleted"));
-    setShowModal(false);
-    fetchSections(); // Refresh data after deletion
+    try {
+      setShowModal(false);
+      setDeleted(true);
+      await axios.delete(`http://localhost:4000/api/sections/${selectedSection}`);
+      dispatch(setNotification("Section Deleted"));
+      fetchSections();
+    } catch (error) {
+      setError(error.response.data.message);
+    }
   };
 
   const handleOpenModal = (uuid, selected) => {
@@ -79,6 +86,7 @@ const SectionsTable = () => {
 
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search sections" />
       <div className="overflow-x-auto">
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">{error}</div>}
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -114,7 +122,7 @@ const SectionsTable = () => {
       </div>
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus Ruangan ini?">
         <p>
-          Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">selectedSectionName</span>} ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}
+          Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">{selectedSectionName}</span>} ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}
           <span className="text-red-500 text-2xl"> terhapus.</span>
         </p>
       </DeleteConfirmModalBox>

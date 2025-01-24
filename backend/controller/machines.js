@@ -55,7 +55,7 @@ export const addMachine = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: newMachine.machine_name,
-      changeType: "Create Machine",
+      changeType: "Create",
       username: req.name, // Use req.name for the username field
       description: "Machine created",
       category: "Machine",
@@ -184,7 +184,8 @@ export const updateMachine = async (req, res) => {
       // Create history record
       await historyModel.create({
         name: machine.machine_name,
-        changeType: "Update Machine",
+        changeType: "Update",
+        category: "Machine",
         username: req.name, // Use req.name for the username field
         description: "Machine updated",
       });
@@ -226,7 +227,8 @@ export const updateMachine = async (req, res) => {
       // Create history record
       await historyModel.create({
         name: machine.machine_name,
-        changeType: "Update Machine",
+        changeType: "Update",
+        category: "Machine",
         username: req.name, // Use req.name for the username field
         description: "Machine updated",
       });
@@ -257,7 +259,7 @@ export const deleteMachine = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: machine.machine_name,
-      changeType: "Delete Machine",
+      changeType: "Delete",
       category: "Machine",
       username: req.name, // Use req.name for the username field
       description: "Machine deleted",

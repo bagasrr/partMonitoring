@@ -111,8 +111,8 @@ export const createItem = async (req, res) => {
         // Create history record for section creation
         await historyModel.create({
           name: section.section_name,
-          changeType: "Create Section",
-          category: "Section",
+          changeType: "Create",
+          category: "Section Room",
           username: req.name,
           description: "Section created",
         });
@@ -134,7 +134,7 @@ export const createItem = async (req, res) => {
       // Create history record for machine creation
       await historyModel.create({
         name: machine.machine_name,
-        changeType: "Create Machine",
+        changeType: "Create",
         category: "Machine",
         username: req.name,
         description: "Machine created",
@@ -159,7 +159,7 @@ export const createItem = async (req, res) => {
       // Create history record
       await historyModel.create({
         name,
-        changeType: "Increase Item Amount",
+        changeType: "Add Amount",
         category: "Part",
         username: req.name,
         description,
@@ -196,7 +196,7 @@ export const createItem = async (req, res) => {
       // Create history record for new item creation
       await historyModel.create({
         name,
-        changeType: "Create New",
+        changeType: "Create",
         category: "Part",
         username: req.name,
         description,
@@ -250,7 +250,7 @@ export const updateItem = async (req, res) => {
       // Create history record for machine creation
       await historyModel.create({
         name: machine.machine_name,
-        changeType: "Create Machine",
+        changeType: "Create",
         category: "Machine",
         username: req.name,
         description: "Machine created during item update",
@@ -309,7 +309,7 @@ export const updateItem = async (req, res) => {
     // Create history record
     await historyModel.create({
       name,
-      changeType: "Update Part",
+      changeType: "Update",
       category: "Part",
       username: req.name,
       description,
@@ -339,7 +339,7 @@ export const updateItemStatus = async (req, res) => {
 
     await historyModel.create({
       name: item.name,
-      changeType: "Update Status",
+      changeType: "Update",
       category: "Part",
       username: req.name,
       description: `Status changed from ${prevStatus} to ${status}`,
@@ -377,7 +377,7 @@ export const deleteItem = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: item.name,
-      changeType: "Delete Part",
+      changeType: "Delete",
       category: "Part",
       username: req.name,
       description: "Part deleted",
@@ -513,7 +513,7 @@ export const changeItem = async (req, res) => {
         await historyModel.create({
           name: item.name,
           changeType: "Change Part",
-          category: "Swap",
+          category: "Part",
           username: req.name,
           description: `${itemName} - ${item.year} changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
         });

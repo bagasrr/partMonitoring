@@ -214,8 +214,9 @@ export const updateSection = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: section.section_name,
-      changeType: "Update Section",
+      changeType: "Update",
       userId: req.userId,
+      category: "Section Room",
       description: "Section updated",
     });
 
@@ -252,8 +253,8 @@ export const addSection = async (req, res) => {
     // Create history record
     await historyModel.create({
       name: newSection.section_name,
-      changeType: "Create Section Room",
-      category: "Ruangan",
+      changeType: "Create",
+      category: "Section Room",
       username: req.name, // Use req.name for the username field
       description: "Section room created",
     });
@@ -285,17 +286,12 @@ export const deleteSection = async (req, res) => {
       await itemModel.update({ deletedAt: new Date() }, { where: { machineId: machine.id } });
     }
 
-    // Update related history records
-    await historyModel.update(
-      { sectionId: null }, // Set to default value or handle accordingly
-      { where: { sectionId: section.id } }
-    );
-
     // Create history record
     await historyModel.create({
       name: section.section_name,
-      changeType: "Delete Section",
-      username: req.name, // Use req.name for the username field
+      changeType: "Delete",
+      username: req.name,
+      category: "Section Room",
       description: "Section deleted",
     });
 
