@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createItem, getItems } from "../../utils/items";
 import FormField from "../FormField";
 import { useNavigate } from "react-router-dom";
-import { getMachines } from "../../utils/getMachine";
+import { getMachines } from "../../utils/machines";
 import { getSections } from "../../utils/getSection";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
@@ -75,7 +75,6 @@ const AddItemForm = () => {
     }
 
     try {
-      console.log(formData);
       await createItem(formData);
       // setNotification("Part created successfully!");
       dispatch(setNotification(`Part ${formData.name} Added`));

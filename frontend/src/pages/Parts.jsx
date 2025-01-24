@@ -6,7 +6,7 @@ import Layout from "./Layout";
 import { Link } from "react-router-dom";
 import Title from "../element/Title";
 
-const App = () => {
+const Parts = () => {
   const [items, setItems] = useState([]);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -31,7 +31,7 @@ const App = () => {
       <Title className="text-2xl font-bold mb-4 text-center">Part List</Title>
       {/* {user && user.role === "admin" && ( */}
       <div className="mb-10">
-        <Link to="/items/add/new" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  w-fit">
+        <Link to="/parts/add" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  w-fit">
           Tambah Part Baru
         </Link>
       </div>
@@ -41,4 +41,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Parts;

@@ -107,7 +107,7 @@ const ItemsTable = () => {
           <thead>
             <tr>
               <ThData>No</ThData>
-              <ThData>Nama Item</ThData>
+              <ThData>Nama Part</ThData>
               <ThData>Amount</ThData>
               <ThData>Status</ThData>
               <ThData>Year</ThData>
@@ -155,7 +155,7 @@ const ItemsTable = () => {
                   <TData>
                     <div className="flex gap-5 items-center">
                       <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(item.uuid, item.name)} />
-                      <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/items/edit/${item.uuid}`)} />
+                      <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/parts/${item.uuid}/edit`)} />
                     </div>
                   </TData>
                 )}

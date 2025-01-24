@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../utils/getUser";
+import { getUsers } from "../utils/users";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import TablePagination from "./TablePagination"; // Import komponen TablePagination
 import highlightText from "../element/highlightText"; // Import fungsi highlightText

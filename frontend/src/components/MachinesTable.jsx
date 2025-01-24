@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getMachines } from "../utils/getMachine";
+import { getMachines } from "../utils/machines";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar";
 import highlightText from "../element/highlightText";
@@ -112,7 +112,7 @@ const MachinesTable = () => {
                 <TData>
                   <div className="flex gap-5 items-center justify-center">
                     <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(machine.uuid, machine.machine_name)} />
-                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/machines/edit/${machine.uuid}`)} />
+                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/machines/${machine.uuid}/edit`)} />
                   </div>
                 </TData>
               </TRow>

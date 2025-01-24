@@ -37,7 +37,7 @@ const Sidebar = () => {
             <>
               <li className="mb-2 flex items-center">
                 <FaBox className="mr-2" />
-                <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                <Link to="/parts" className="block px-4 py-2 hover:bg-gray-700 rounded">
                   List Part
                 </Link>
               </li>
@@ -76,19 +76,19 @@ const Sidebar = () => {
         <ul className="mb-8">
           <li className="mb-2 flex items-center">
             <IoMdListBox className="mr-2" />
-            <Link to="/items" className="block px-4 py-2 hover:bg-gray-700 rounded">
+            <Link to="/parts" className="block px-4 py-2 hover:bg-gray-700 rounded">
               List Part
             </Link>
           </li>
           <li className="mb-2 flex items-center">
             <MdCreateNewFolder className="mr-2" />
-            <Link to="/items/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
+            <Link to="/parts/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
               Part Masuk
             </Link>
           </li>
           <li className="mb-2 flex items-center">
             <PiNotePencilBold className="mr-2" />
-            <Link to="/items/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
+            <Link to="/parts/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
               Ganti Part
             </Link>
           </li>

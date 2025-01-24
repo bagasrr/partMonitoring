@@ -6,10 +6,12 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
+import { createMachines } from "../../utils/machines";
 
 const AddMachineForm = () => {
   const [sections, setSections] = useState([]);
   const [isNewSection, setIsNewSection] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     machineName: "",
     machineNumber: "",
@@ -19,7 +21,6 @@ const AddMachineForm = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const notification = useNotification();
 
   useEffect(() => {
     fetchSection();
@@ -61,30 +62,31 @@ const AddMachineForm = () => {
     };
 
     try {
-      await axios.post("http://localhost:4000/api/machines", data);
+      await createMachines(data);
       dispatch(setNotification(`Machine ${formData.machineName} Added`));
       navigate("/machines");
     } catch (error) {
       console.log(error.response);
-      dispatch(setNotification(error.response.data.message));
+      setError(error.response.data.message);
     }
   };
 
   return (
     <div>
-      {notification && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{notification}</p>}
+      {error && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} />
-        <FormField label="Machine Number" name="machineNumber" value={formData.machineNumber} onChange={handleChange} />
-        <FormField label="Section Name" name="sectionName" value={formData.sectionName} onChange={handleSectionChange} type="select">
+        <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} placeholder={"Masukkan nama mesin"} />
+        <FormField label="Machine Number" name="machineNumber" value={formData.machineNumber} onChange={handleChange} placeholder={"Masukkan nomor mesin"} />
+        <FormField label="Section Name" name="sectionName" value={isNewSection ? "new" : formData.sectionName} onChange={handleSectionChange} type="select">
           <option value="">Pilih Section</option>
+          <option value="new">Enter New Section Room</option>
+
           {sections &&
             sections.map((data) => (
               <option key={data.uuid} value={data.section_name}>
                 {data.section_name}
               </option>
             ))}
-          <option value="new">Enter New Section</option>
         </FormField>
         {isNewSection && <FormField label="New Section Room Name" name="sectionName" value={formData.sectionName} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />}
         <FormField label="Section Room Number" name="sectionNumber" type="number" value={formData.sectionNumber} onChange={handleChange} placeholder={"Masukkan nomor ruangan"} />

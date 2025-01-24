@@ -4,6 +4,8 @@ import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { adminArea } from "../utils/adminArea";
+import { createUser } from "../utils/users";
+import { useDispatch } from "react-redux";
 
 const AddUser = () => {
   adminArea();
@@ -13,17 +15,20 @@ const AddUser = () => {
   const [password, setPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      name: userName,
+      role: role,
+      password: password,
+      confPassword: confPassword,
+    };
     try {
-      await axios.post("http://localhost:4000/api/users", {
-        name: userName,
-        role: role,
-        password: password,
-        confPassword: confPassword,
-      });
+      await createUser(data);
       navigate("/users");
+      dispatch(setNotification("User Added"));
     } catch (error) {
       setError(error.response.data.message);
     }

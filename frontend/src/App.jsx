@@ -2,7 +2,6 @@ import React from "react";
 import Dashboard from "./pages/Dashboard";
 import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import Login from "./pages/Login";
-import Items from "./pages/Items";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
 import AddUser from "./pages/AddUser";
@@ -17,6 +16,7 @@ import EditItem from "./pages/EditGroup/EditItem";
 import AddMachineNew from "./pages/AddGroup/AddMachineNew";
 import AddPartReplacementPages from "./pages/AddGroup/AddPartReplacementPages";
 import ItemUsages from "./pages/ItemUsages";
+import Parts from "./pages/Parts";
 
 const router = createBrowserRouter([
   {
@@ -28,16 +28,20 @@ const router = createBrowserRouter([
     element: <Dashboard />,
   },
   {
-    path: "/items",
-    element: <Items />,
+    path: "/parts",
+    element: <Parts />,
   },
   {
-    path: "/items/add/new",
+    path: "/parts/add",
     element: <AddItemPages />,
   },
   {
-    path: "/items/edit/:id",
+    path: "/parts/:id/edit",
     element: <EditItem />,
+  },
+  {
+    path: "/parts/changepart",
+    element: <AddPartReplacementPages />,
   },
   {
     path: "/users",
@@ -52,10 +56,6 @@ const router = createBrowserRouter([
     element: <AddUser />,
   },
   {
-    path: "/items/changepart",
-    element: <AddPartReplacementPages />,
-  },
-  {
     path: "/history",
     element: <History />,
   },
@@ -68,7 +68,7 @@ const router = createBrowserRouter([
     element: <Machines />,
   },
   {
-    path: "/machines/edit/:id",
+    path: "/machines/:id/edit",
     element: <EditMachine />,
   },
   {

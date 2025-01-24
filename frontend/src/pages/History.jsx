@@ -122,7 +122,6 @@ const History = () => {
           </div>
         ))}
       </div>
-      {/* {pageCount > 0 && <Pagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />} */}
 
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </Layout>
