@@ -88,9 +88,9 @@ const AddAmountForm = () => {
             ))}
         </FormField>
 
-        <ReadOnlyForm label="Prev Amount" name="prevAmount" value={prevAmount} />
+        <ReadOnlyForm label="Prev Amount" name="prevAmount" value={prevAmount} placeholder={"Jumlah Item Sebelumnya"} />
 
-        <FormField label="Amount" name="amountToAdd" type="number" value={formData.amountToAdd} onChange={handleChange} error={errors.amount} placeholder="Masukkan jumlah part baru" />
+        <FormField label="Amount" name="amountToAdd" type="number" value={formData.amountToAdd} onChange={handleChange} error={errors.amount} placeholder="Masukkan jumlah stok part baru" />
         <FormField label="Description" name="description" type="textarea" value={formData.description} onChange={handleChange} placeholder="Masukkan deskripsi" />
 
         <Button type="submit" buttonName="Add Amount" />

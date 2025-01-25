@@ -18,7 +18,7 @@ const ChangePartPages = () => {
       <Title>Penggantian Part</Title>
       <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
         <option value="" disabled>
-          Select Change Type
+          Pilih tipe penggantian
         </option>
         <option value="replace">Replace</option>
         <option value="swap">Swap</option>

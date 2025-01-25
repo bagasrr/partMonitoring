@@ -58,6 +58,7 @@ const ItemsTable = () => {
   const handlePageClick = (selectedItem) => {
     const { selected } = selectedItem;
     setCurrentPage(selected);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSearchChange = (value) => {

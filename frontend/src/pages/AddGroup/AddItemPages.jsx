@@ -15,8 +15,8 @@ const AddItemPages = () => {
   return (
     <Layout>
       <BackPrev url="/parts" />
-      <Title>Tambah Part {render && render === "AddNew" ? "Baru" : ""}</Title>
-      <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
+      <Title> {render && render === "AddNew" ? "Tambah Part Baru" : render === "AddAmount" ? "Tambah Jumlah Part" : "Tambah Part"}</Title>
+      <FormField type="select" label="Add Type" onChange={handleChange} value={render ? render : ""}>
         <option value="" disabled>
           Select Add Type
         </option>
