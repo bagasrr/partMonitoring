@@ -65,7 +65,33 @@ export const getItemById = async (req, res) => {
   }
 };
 
-export const getItemSwap = async (req, res) => {
+export const getReplaceItem = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { replacementType: "Replace" } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSwapItem = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({
+      where: { replacementType: "Swap" },
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
+    });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSwapReplaceItem = async (req, res) => {
   const { machineName } = req.query;
 
   try {
