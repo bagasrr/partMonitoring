@@ -104,3 +104,12 @@ export const addItemAmount = async (data) => {
     throw new Error(error.response?.data?.message || "Error while Add Amount");
   }
 };
+
+export const updateItemStatusForm = async (data) => {
+  try {
+    const response = await axios.patch(`${host}/api/items/status`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error while Add Amount");
+  }
+};

@@ -1,5 +1,5 @@
 import express from "express";
-import { addItemAmount, createItem, deleteItem, getAllItems, getItemById, getReplaceItem, getSwapItem, getSwapReplaceItem, swapItem, updateItem, updateItemStatus } from "../controller/items.js";
+import { addItemAmount, createItem, deleteItem, getAllItems, getItemById, getReplaceItem, getSwapItem, getSwapReplaceItem, swapItem, updateItem, updateItemStatus, updateItemStatusForm } from "../controller/items.js";
 
 const itemRoute = express.Router();
 
@@ -15,6 +15,7 @@ itemRoute.get("/type-swap/machine", getSwapReplaceItem);
 
 itemRoute.patch("/change/swap", swapItem);
 itemRoute.patch("/add-amount", addItemAmount);
+itemRoute.patch("/status", updateItemStatusForm);
 
 itemRoute.post("/", createItem);
 

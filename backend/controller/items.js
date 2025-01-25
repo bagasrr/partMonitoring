@@ -351,6 +351,49 @@ export const updateItemStatus = async (req, res) => {
   }
 };
 
+export const updateItemStatusForm = async (req, res) => {
+  const { itemName, status, itemYear, reason } = req.body;
+  try {
+    if (!itemName || !status) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const item = await itemModel.findOne({
+      where: { name: itemName, year: itemYear, deletedAt: null },
+    });
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    const prevStatus = item.status; // Update the item status
+
+    // Validasi agar status sebelumnya tidak sama dengan status yang baru
+    if (prevStatus === status) {
+      return res.status(400).json({ message: `Cannot change status to '${status}' again` });
+    }
+
+    await itemModel.update(
+      { status },
+      {
+        where: { name: itemName, year: itemYear },
+      }
+    );
+
+    // Create history record
+    await historyModel.create({
+      name: item.name,
+      changeType: "Update",
+      category: "Part",
+      username: req.name,
+      description: reason,
+    });
+
+    // Log the update action in the audit logs
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+    res.status(200).json({ message: "Part status updated" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const deleteItem = async (req, res) => {
   try {
     const item = await itemModel.findOne({

@@ -14,9 +14,9 @@ import AddSection from "./pages/AddGroup/AddSection";
 import AddItemPages from "./pages/AddGroup/AddItemPages";
 import EditItem from "./pages/EditGroup/EditItem";
 import AddMachineNew from "./pages/AddGroup/AddMachineNew";
-import AddPartReplacementPages from "./pages/AddGroup/AddPartReplacementPages";
 import ItemUsages from "./pages/ItemUsages";
 import Parts from "./pages/Parts";
+import ChangePartPages from "./pages/AddGroup/ChangePart";
 
 const router = createBrowserRouter([
   {
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/parts/changepart",
-    element: <AddPartReplacementPages />,
+    element: <ChangePartPages />,
   },
   {
     path: "/users",
