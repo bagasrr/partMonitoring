@@ -5,6 +5,7 @@ import Title from "../../element/Title";
 import Layout from "../Layout";
 import SwapPartForm from "../../components/Form/SwapPartForm";
 import UpdateItemStatusForm from "../../components/Form/UpdateItemStaturForm";
+import ReplacePartForm from "../../components/Form/ReplacePartForm";
 
 const ChangePartPages = () => {
   const [render, setRender] = useState(null);
@@ -24,7 +25,7 @@ const ChangePartPages = () => {
         <option value="swap">Swap</option>
         <option value="status">Status</option>
       </FormField>
-      {render && render === "replace" ? <>tesreplace</> : render === "swap" ? <SwapPartForm /> : render === "status" ? <UpdateItemStatusForm /> : null}
+      {render && render === "replace" ? <ReplacePartForm /> : render === "swap" ? <SwapPartForm /> : render === "status" ? <UpdateItemStatusForm /> : null}
     </Layout>
   );
 };

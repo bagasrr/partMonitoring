@@ -1,5 +1,23 @@
 import express from "express";
-import { addItemAmount, createItem, deleteItem, getAllItems, getItemById, getReplaceItem, getSwapItem, getSwapReplaceItem, swapItem, updateItem, updateItemStatus, updateItemStatusForm } from "../controller/items.js";
+import {
+  addItemAmount,
+  createItem,
+  deleteItem,
+  getAllItems,
+  getBrokenItems,
+  getInUseItems,
+  getItemById,
+  getRepairItems,
+  getReplaceItem,
+  getSpareItems,
+  getSwapItem,
+  getSwapReplaceItem,
+  replaceItem,
+  swapItem,
+  updateItem,
+  updateItemStatus,
+  updateItemStatusForm,
+} from "../controller/items.js";
 
 const itemRoute = express.Router();
 
@@ -9,11 +27,18 @@ itemRoute.use((req, res, next) => {
 });
 
 itemRoute.get("/", getAllItems);
+
 itemRoute.get("/type-replace", getReplaceItem);
 itemRoute.get("/type-swap", getSwapItem);
 itemRoute.get("/type-swap/machine", getSwapReplaceItem);
 
+itemRoute.get("/spare", getSpareItems);
+itemRoute.get("/in-use", getInUseItems);
+itemRoute.get("/repair", getRepairItems);
+itemRoute.get("/broken", getBrokenItems);
+
 itemRoute.patch("/change/swap", swapItem);
+itemRoute.patch("/change/replace", replaceItem);
 itemRoute.patch("/add-amount", addItemAmount);
 itemRoute.patch("/status", updateItemStatusForm);
 

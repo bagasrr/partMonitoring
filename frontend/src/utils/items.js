@@ -21,6 +21,43 @@ export const getItems = async () => {
   }
 };
 
+export const getSpareItems = async () => {
+  try {
+    const response = await axios.get(`${host}/api/items/spare`);
+    console.log(response.length);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching Part");
+  }
+};
+
+export const getInUseItems = async () => {
+  try {
+    const response = await axios.get(`${host}/api/items/in-use`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching Part");
+  }
+};
+
+export const getRepairItems = async () => {
+  try {
+    const response = await axios.get(`${host}/api/items/repair`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching Part");
+  }
+};
+
+export const getBrokenItems = async () => {
+  try {
+    const response = await axios.get(`${host}/api/items/broken`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching Part");
+  }
+};
+
 // Update item status
 export const updateItemStatus = async (itemId, statusData) => {
   try {
@@ -63,6 +100,14 @@ export const updateItem = async (itemId, itemData) => {
 export const changeItem = async (data) => {
   try {
     const response = await axios.patch(`${host}/api/items/change/swap`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error Changing Part");
+  }
+};
+export const replaceItem = async (data) => {
+  try {
+    const response = await axios.patch(`${host}/api/items/change/replace`, data);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error Changing Part");

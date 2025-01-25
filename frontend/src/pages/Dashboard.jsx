@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../features/authSlice";
 import ChartComponent from "../components/ChartExample";
+import StatusInfo from "../components/StatusInfo";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const Dashboard = () => {
       <div>
         <ChartComponent />
       </div>
+      <StatusInfo />
     </Layout>
   );
 };

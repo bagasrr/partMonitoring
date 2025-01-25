@@ -562,7 +562,83 @@ export const swapItem = async (req, res) => {
       itemModel.update({ status: itemStatus }, { where: { id: item.id } });
       itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
     }
+
+    // Create history record
+    await historyModel.create({
+      name: item.name,
+      changeType: "Swap",
+      category: "Part",
+      username: req.name, // Use req.name for the username field
+      description: `Swap item ${item.name} with ${replacementItem.name}`,
+    });
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: item.status, newStatus: itemStatus });
+
     return res.status(200).json({ message: "Swap success" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const replaceItem = async (req, res) => {
+  const { itemName, itemYear, reason, useAmount } = req.body;
+  try {
+    const item = await itemModel.findOne({
+      where: { name: itemName, year: itemYear, deletedAt: null },
+    });
+    if (!item) return res.status(404).json({ message: "Item not found" });
+
+    if (useAmount > item.amount) return res.status(400).json({ message: "Your dont have enough amount" });
+
+    const newAmount = item.amount - useAmount;
+    await itemModel.update({ amount: newAmount }, { where: { id: item.id } });
+
+    // Create history record
+    await historyModel.create({
+      name: item.name,
+      changeType: "Replace",
+      category: "Part",
+      username: req.name,
+      description: reason,
+    });
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevAmount: item.amount, newAmount: newAmount });
+
+    return res.status(200).json({ message: "Replace success" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getInUseItems = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { status: "In Use", deletedAt: null } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSpareItems = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { status: "Spare", deletedAt: null } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getBrokenItems = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { status: "Broken", deletedAt: null } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getRepairItems = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { status: "Repair", deletedAt: null } });
+    res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
