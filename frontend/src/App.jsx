@@ -14,9 +14,9 @@ import AddSection from "./pages/AddGroup/AddSection";
 import AddItemPages from "./pages/AddGroup/AddItemPages";
 import EditItem from "./pages/EditGroup/EditItem";
 import AddMachineNew from "./pages/AddGroup/AddMachineNew";
-import ItemUsages from "./pages/ItemUsages";
 import Parts from "./pages/Parts";
 import ChangePartPages from "./pages/AddGroup/ChangePart";
+import ItemUseHistory from "./pages/ItemUseHistory";
 
 const router = createBrowserRouter([
   {
@@ -84,8 +84,8 @@ const router = createBrowserRouter([
     element: <YoureNotAdmin />,
   },
   {
-    path: "/itemusage",
-    element: <ItemUsages />,
+    path: "/itemusehistory",
+    element: <ItemUseHistory />,
   },
 ]);
 

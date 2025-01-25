@@ -53,7 +53,7 @@ itemModel.hasMany(itemUseHistoryModel, { foreignKey: "itemId" });
 itemUseHistoryModel.belongsTo(itemModel, { foreignKey: "itemId" });
 
 itemModel.hasMany(itemUseHistoryModel, { foreignKey: "replacementItemId" });
-itemUseHistoryModel.belongsTo(itemModel, { foreignKey: "replacementItemId" });
+itemUseHistoryModel.belongsTo(itemModel, { as: "replacementItem", foreignKey: "replacementItemId" });
 
 machineModel.hasMany(itemUseHistoryModel, { foreignKey: "machineId" });
 itemUseHistoryModel.belongsTo(machineModel, { foreignKey: "machineId" });

@@ -492,6 +492,11 @@ export const swapItem = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    // Validasi untuk memastikan itemEndUseDate tidak kurang dari itemStartUseDate
+    if (new Date(itemEndUseDate) < new Date(itemStartUseDate)) {
+      return res.status(400).json({ message: "End use date cannot be earlier than start use date" });
+    }
+
     const item = await itemModel.findOne({
       where: {
         name: itemName,
@@ -505,7 +510,7 @@ export const swapItem = async (req, res) => {
         },
       ],
     });
-    if (!item) return res.status(404).json({ message: `part not found` });
+    if (!item) return res.status(404).json({ message: `Part not found` });
 
     const replacementItem = await itemModel.findOne({
       where: {
@@ -533,13 +538,15 @@ export const swapItem = async (req, res) => {
     });
     if (!machine) return res.status(404).json({ message: "Machine not found" });
 
-    if (item.machine.machine_name !== replacementItem.machine.machine_name) return res.status(406).json({ message: "Two Part is for different" });
+    if (item.machine.machine_name !== replacementItem.machine.machine_name) return res.status(406).json({ message: "Two Part is for different machines" });
 
-    const itemUseHistory = await itemUseHistoryModel.findOne({
+    // Cari semua riwayat penggunaan item untuk menghitung useCount yang benar
+    const itemUseHistories = await itemUseHistoryModel.findAll({
       where: {
         itemId: item.id,
       },
     });
+    const totalUseCount = itemUseHistories.length;
 
     await itemUseHistoryModel.create({
       itemId: item.id,
@@ -547,20 +554,20 @@ export const swapItem = async (req, res) => {
       machineId: machine.id,
       itemStartUseDate,
       itemEndUseDate,
-      useCount: 1 || itemUseHistory.useCount + 1,
+      useCount: totalUseCount + 1, // Menggunakan total useCount dari semua riwayat penggunaan
       reason,
     });
 
     if (item.status === "Broken") {
-      itemModel.update({ status: "Broken" }, { where: { id: item.id } });
+      await itemModel.update({ status: "Broken" }, { where: { id: item.id } });
       // Kirim Email dibawah
       // **
       // kirim email dulu baru update status replace item
 
-      itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
+      await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
     } else {
-      itemModel.update({ status: itemStatus }, { where: { id: item.id } });
-      itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
+      await itemModel.update({ status: itemStatus }, { where: { id: item.id } });
+      await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
     }
 
     // Create history record

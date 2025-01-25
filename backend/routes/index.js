@@ -6,6 +6,7 @@ import machineRoute from "./machinesRoute.js";
 import { adminOnly, verifyUser } from "../middleware/Auth.js";
 import sectionRoute from "./sectionRoute.js";
 import historyRoute from "./historyRoute.js";
+import itemUseHistoryRoute from "./itemUseHistoryRoute.js";
 
 const routes = express.Router();
 
@@ -15,6 +16,8 @@ routes.use("/auth", authRoute);
 routes.use("/machines", verifyUser, machineRoute);
 routes.use("/sections", verifyUser, sectionRoute);
 routes.use("/history", verifyUser, historyRoute);
+routes.use("/item-use-histories", verifyUser, itemUseHistoryRoute);
+
 routes.get("/ping", (req, res) => {
   res.status(200).json({ message: "Server is kocak!" });
 });

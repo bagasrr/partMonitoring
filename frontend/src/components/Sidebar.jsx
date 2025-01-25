@@ -33,6 +33,12 @@ const Sidebar = () => {
               Histori
             </Link>
           </li>
+          <li className="mb-2 flex items-center">
+            <FaHistory className="mr-2" />
+            <Link to="/itemusehistory" className="block px-4 py-2 hover:bg-gray-700 rounded">
+              Use Histori
+            </Link>
+          </li>
           {user && user.role === "admin" && (
             <>
               <li className="mb-2 flex items-center">
