@@ -1,18 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AddItemForm from "../../components/Form/AddItemForm";
 import Title from "../../element/Title";
 import Layout from "../Layout";
 import BackPrev from "../../element/BackPrev";
+import FormField from "../../components/FormField";
+import AddAmountForm from "../../components/Form/AddAmountForm";
 
 const AddItemPages = () => {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  const [render, setRender] = useState(null);
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setRender(value);
+  };
   return (
     <Layout>
       <BackPrev url="/parts" />
-      <Title>Tambah Part Baru</Title>
-      <AddItemForm />
+      <Title>Tambah Part {render && render === "AddNew" ? "Baru" : ""}</Title>
+      <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
+        <option value="" disabled>
+          Select Add Type
+        </option>
+        <option value="AddNew">Add New</option>
+        <option value="AddAmount">Add Amount</option>
+      </FormField>
+      {render && render === "AddNew" ? <AddItemForm /> : render === "AddAmount" ? <AddAmountForm /> : null}
     </Layout>
   );
 };

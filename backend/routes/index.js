@@ -10,7 +10,7 @@ import historyRoute from "./historyRoute.js";
 const routes = express.Router();
 
 routes.use("/users", verifyUser, adminOnly, userRoute);
-routes.use("/items", itemRoute);
+routes.use("/items", verifyUser, itemRoute);
 routes.use("/auth", authRoute);
 routes.use("/machines", verifyUser, machineRoute);
 routes.use("/sections", verifyUser, sectionRoute);

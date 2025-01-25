@@ -34,3 +34,12 @@ const FormField = ({ label, name, value, onChange, type = "text", error, childre
 };
 
 export default FormField;
+
+export const ReadOnlyForm = ({ label, name, value }) => {
+  return (
+    <div className="mb-4">
+      <label className="block font-bold text-gray-700 mb-2">{label}:</label>
+      <input name={name} value={value || ""} className="mt-1 block w-full p-3 border border-gray-300 bg-gray-100 text-gray-800 rounded-md focus:outline-none  cursor-not-allowed" readOnly />
+    </div>
+  );
+};

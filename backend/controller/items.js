@@ -126,6 +126,9 @@ export const createItem = async (req, res) => {
     // Validate that amount is greater than 0
     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
 
+    const item = await itemModel.findOne({ where: { name } });
+    if (item) return res.status(400).json({ message: "PartName Already Exist, Please use different Name" });
+
     // Find or create machine
     let machine = await machineModel.findOne({ where: { machine_name } });
 
@@ -179,77 +182,42 @@ export const createItem = async (req, res) => {
         section_name: section.section_name,
       });
     }
-
-    // Check if item already exists
-    const prevItem = await itemModel.findOne({
-      where: { name, machineId: machine.id, year },
+    const newItem = await itemModel.create({
+      name,
+      amount,
+      description,
+      status,
+      lowerLimit,
+      userId: req.userId,
+      machineId: machine.id,
+      replacementType,
+      year,
     });
 
-    if (prevItem) {
-      await itemModel.update({ amount: prevItem.amount + amount }, { where: { id: prevItem.id } });
+    // Create history record for new item creation
+    await historyModel.create({
+      name,
+      changeType: "Create",
+      category: "Part",
+      username: req.name,
+      description,
+      newStock: amount,
+      afterStock: amount,
+    });
 
-      // Create history record
-      await historyModel.create({
-        name,
-        changeType: "Add Amount",
-        category: "Part",
-        username: req.name,
-        description,
-        prevStock: prevItem.amount,
-        newStock: amount,
-        afterStock: prevItem.amount + amount,
-      });
+    // Log the create action in the audit logs
+    await logAuditEvent("Part", newItem.id, "create", {
+      name: newItem.name,
+      amount: newItem.amount,
+      description,
+      status,
+      lowerLimit,
+    });
 
-      // Log the update action in the audit logs
-      await logAuditEvent("Item", prevItem.id, "update", {
-        name: prevItem.name,
-        prevAmount: prevItem.amount,
-        newAmount: prevItem.amount + amount,
-        description,
-      });
+    // Check stock levels
+    await checkStockLevels();
 
-      // Check stock levels
-      await checkStockLevels();
-
-      return res.status(200).json({ message: "Item amount updated" });
-    } else {
-      const newItem = await itemModel.create({
-        name,
-        amount,
-        description,
-        status,
-        lowerLimit,
-        userId: req.userId,
-        machineId: machine.id,
-        replacementType,
-        year,
-      });
-
-      // Create history record for new item creation
-      await historyModel.create({
-        name,
-        changeType: "Create",
-        category: "Part",
-        username: req.name,
-        description,
-        newStock: amount,
-        afterStock: amount,
-      });
-
-      // Log the create action in the audit logs
-      await logAuditEvent("Part", newItem.id, "create", {
-        name: newItem.name,
-        amount: newItem.amount,
-        description,
-        status,
-        lowerLimit,
-      });
-
-      // Check stock levels
-      await checkStockLevels();
-
-      return res.status(201).json({ message: "Part created", data: newItem });
-    }
+    return res.status(201).json({ message: "Part created", data: newItem });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -428,6 +396,9 @@ export const addItemAmount = async (req, res) => {
   const { name, amountToAdd, description } = req.body;
 
   try {
+    if (typeof amountToAdd !== "number") {
+      return res.status(400).json({ message: "Invalid data type" });
+    }
     // Validate that amountToAdd is greater than 0
     if (amountToAdd <= 0) return res.status(400).json({ message: "Amount to add must be greater than 0" });
 
@@ -435,6 +406,7 @@ export const addItemAmount = async (req, res) => {
     const item = await itemModel.findOne({
       where: {
         name,
+        replacementType: "Replace",
         deletedAt: null, // Exclude soft-deleted items
       },
     });

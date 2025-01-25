@@ -7,6 +7,7 @@ import { getSections } from "../../utils/getSection";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
+import Button from "../../element/Button";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const AddItemForm = () => {
     const { name, value } = e.target;
 
     // Convert amount and lowerLimit to numbers
-    const newValue = name === "amount" || name === "lowerLimit" ? Number(value) : value;
+    const newValue = name === "amount" || name === "lowerLimit" || name === "year" ? Number(value) : value;
 
     setFormData({ ...formData, [name]: newValue });
 
@@ -75,6 +76,7 @@ const AddItemForm = () => {
     }
 
     try {
+      console.log(formData);
       await createItem(formData);
       formData.replacementType === "Replace" ? dispatch(setNotification(`Part ${formData.name} Added ${formData.amount} ea`)) : dispatch(setNotification(`Part ${formData.name} Added`));
       navigate("/parts");
@@ -172,18 +174,7 @@ const AddItemForm = () => {
     <div>
       {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
       <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
-        {/* <FormField label="Part Name" name="name" type="select" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part"}>
-          <option value="" disabled>
-            Select Part
-          </option>
-          {part &&
-            part.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-        </FormField> */}
-        <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
+        {/* <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
           <option value="" disabled>
             Pilih Part
           </option>
@@ -196,37 +187,37 @@ const AddItemForm = () => {
             ))}
         </FormField>
         {isNewPart && (
-          <>
-            <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
-          </>
-        )}
+          <> */}
+        <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
+        {/* </>
+        )} */}
 
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
         <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} placeholder={"Masukkan deskripsi"} />
 
-        {isNewPart && (
-          <>
-            <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
-              <option value="" disabled>
-                Select Type
-              </option>
-              <option value="Swap">Swap</option>
-              <option value="Replace">Replace</option>
-            </FormField>
-            <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
-              <option value="Not Set" disabled>
-                Not Set
-              </option>
-              <option value="In Use">In Use</option>
-              <option value="Spare">Spare</option>
-              <option value="Repair">Repair</option>
-              <option value="Broken">Broken</option>
-            </FormField>
+        {/* {isNewPart && (
+          <> */}
+        <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
+          <option value="" disabled>
+            Select Type
+          </option>
+          <option value="Swap">Swap</option>
+          <option value="Replace">Replace</option>
+        </FormField>
+        <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
+          <option value="Not Set" disabled>
+            Not Set
+          </option>
+          <option value="In Use">In Use</option>
+          <option value="Spare">Spare</option>
+          <option value="Repair">Repair</option>
+          <option value="Broken">Broken</option>
+        </FormField>
 
-            <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} placeholder={"Masukkan batas minimum"} />
-          </>
-        )}
+        <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} placeholder={"Masukkan batas minimum"} />
+        {/* </>
+        )} */}
 
         <FormField label="Machine Name" name="machine_name" value={isNewMachine ? "new" : formData.machine_name} onChange={handleMachineChange} type="select">
           <option value="" disabled>
@@ -266,9 +257,7 @@ const AddItemForm = () => {
             )}
           </>
         )}
-        <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
-          Add Item
-        </button>
+        <Button type="submit" buttonName="Add Part" />
       </form>
     </div>
   );

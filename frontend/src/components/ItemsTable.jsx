@@ -3,7 +3,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { getItems, updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setNotification } from "../features/notificationSlice";
+import { setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
@@ -40,6 +40,8 @@ const ItemsTable = () => {
     dispatch(setNotification("Items Deleted"));
     setShowModal(false);
     setDeleted(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     fetchItems();
   };
 

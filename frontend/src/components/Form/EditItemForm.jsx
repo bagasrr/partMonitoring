@@ -4,6 +4,7 @@ import { getItemById, updateItem } from "../../utils/items";
 import FormField from "../FormField";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
+import Button from "../../element/Button";
 
 const EditItemForm = () => {
   const [formData, setFormData] = useState({
@@ -107,9 +108,8 @@ const EditItemForm = () => {
           <option value="Spare">Spare</option>
         </FormField>
         <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit || ""} onChange={handleChange} error={errors.lowerLimit} placeholder={"masukkan batas bawah"} />
-        <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
-          Save
-        </button>
+        <Button type="submit" buttonName="Save" />
+
         {notif && <div className={`mt-4 p-2 text-white ${notif ? "bg-red-500" : "bg-green-500"} rounded`}>{notif}</div>}
       </form>
     </div>

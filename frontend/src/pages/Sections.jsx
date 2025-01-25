@@ -3,8 +3,10 @@ import Layout from "./Layout";
 import SectionsTable from "../components/SectionsTable";
 import Title from "../element/Title";
 import { Link } from "react-router-dom";
+import ScrollToTop from "../utils/scrollToTop";
 
 const Sections = () => {
+  ScrollToTop();
   return (
     <Layout>
       <Title>Ruangan</Title>

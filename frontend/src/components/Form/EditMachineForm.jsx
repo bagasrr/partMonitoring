@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { getMachineById, updateMachines } from "../../utils/machines";
 import FormField from "../FormField";
 import { setNotification } from "../../features/notificationSlice";
+import Button from "../../element/Button";
 
 const EditMachineForm = () => {
   const [formData, setFormData] = useState({
@@ -63,9 +64,9 @@ const EditMachineForm = () => {
         <FormField label="Machine Number" name="machine_number" type="text" value={formData.machine_number || ""} onChange={handleChange} />
         <FormField label="Section Name" name="section_name" value={formData.section_name || ""} onChange={handleChange} />
         <FormField label="Section Number" name="section_number" type="text" value={formData.section_number || ""} onChange={handleChange} />
-        <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
-          Save
-        </button>
+
+        <Button type="submit" buttonName="Save" />
+
         {notif && <div className={`mt-4 p-2 text-white ${notif ? "bg-red-500" : "bg-green-500"} rounded`}>{notif}</div>}
       </form>
     </div>

@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import FormField from "../FormField";
 import { getSections } from "../../utils/getSection";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
-import useNotification from "../../services/Notification";
 import { createMachines } from "../../utils/machines";
+import Button from "../../element/Button";
 
 const AddMachineForm = () => {
   const [sections, setSections] = useState([]);
@@ -90,9 +89,7 @@ const AddMachineForm = () => {
         </FormField>
         {isNewSection && <FormField label="New Section Room Name" name="sectionName" value={formData.sectionName} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />}
         <FormField label="Section Room Number" name="sectionNumber" type="number" value={formData.sectionNumber} onChange={handleChange} placeholder={"Masukkan nomor ruangan"} />
-        <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
-          Add Machine
-        </button>
+        <Button type="submit" buttonName="Add Machine" />
       </form>
     </div>
   );

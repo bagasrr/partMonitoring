@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
+import Button from "../../element/Button";
 
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
@@ -233,9 +234,7 @@ const SwapPartForm = () => {
 
         {selectedItem && selectedItem.replacementType === "Replace" && <FormField label="Use Amount" name="useAmount" value={formData.useAmount} onChange={handleChange} type="number" placeholder="Masukkan jumlah penggunaan" />}
 
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">
-          Ganti Part
-        </button>
+        <Button type="submit" buttonName="Ganti Part" />
       </form>
     </div>
   );
