@@ -58,20 +58,26 @@ export const getItemById = async (req, res) => {
         },
       ],
     });
-    if (!item) return res.status(404).json({ message: "Item not found" });
+    if (!item) return res.status(404).json({ message: "Item1 not found" });
     res.status(200).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get items based on machine ID
-export const getItemsByMachineId = async (req, res) => {
-  const { machine_id } = req.query;
+export const getItemSwap = async (req, res) => {
+  const { machineName } = req.query;
 
   try {
+    const machine = await machineModel.findOne({ where: { machine_name: machineName } });
+    if (!machine) return res.status(404).json({ message: "Machine Not found" });
+
     const items = await itemModel.findAll({
-      where: { machineId: machine_id },
+      where: {
+        replacementType: "Swap",
+        status: { [Op.ne]: "In Use" }, // Menggunakan Op.ne untuk status yang bukan "In Use"
+        machineId: machine.id,
+      },
     });
 
     if (!items.length) {
@@ -438,160 +444,84 @@ export const addItemAmount = async (req, res) => {
   }
 };
 
-export const changeItem = async (req, res) => {
-  const { itemName, replaceItemName, itemStartUseDate, itemEndUseDate, machineName, reason, itemYear, replaceItemYear, itemStatus, useAmount } = req.body;
-
-  // Validate required fields
-  if (!itemName || !itemYear || !reason) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
+export const swapItem = async (req, res) => {
+  const { itemName, replaceItemName, itemYear, replaceItemYear, itemStartUseDate, itemEndUseDate, machineName, reason, itemStatus } = req.body;
   try {
-    // Find the item by name
+    if (!itemName || !itemYear || !reason) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const item = await itemModel.findOne({
       where: {
         name: itemName,
         year: itemYear,
         deletedAt: null, // Exclude soft-deleted items
       },
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+      ],
     });
     if (!item) return res.status(404).json({ message: `part not found` });
 
-    // Check if amount is enough
-    if (item.amount < useAmount) {
-      return res.status(400).json({ message: `Amount not enough` });
+    const replacementItem = await itemModel.findOne({
+      where: {
+        name: replaceItemName,
+        year: replaceItemYear,
+        deletedAt: null, // Exclude soft-deleted items
+      },
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+      ],
+    });
+    if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
+    if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken can't replace" });
+
+    if (replacementItem.replacementType !== "Swap") return res.status(404).json({ message: "Replacement part is not Swap type" });
+
+    const machine = await machineModel.findOne({
+      where: {
+        machine_name: machineName,
+        deletedAt: null, // Exclude soft-deleted items
+      },
+    });
+    if (!machine) return res.status(404).json({ message: "Machine not found" });
+
+    if (item.machine.machine_name !== replacementItem.machine.machine_name) return res.status(406).json({ message: "Two Part is for different" });
+
+    const itemUseHistory = await itemUseHistoryModel.findOne({
+      where: {
+        itemId: item.id,
+      },
+    });
+
+    await itemUseHistoryModel.create({
+      itemId: item.id,
+      replacementItemId: replacementItem.id,
+      machineId: machine.id,
+      itemStartUseDate,
+      itemEndUseDate,
+      useCount: 1 || itemUseHistory.useCount + 1,
+      reason,
+    });
+
+    if (item.status === "Broken") {
+      itemModel.update({ status: "Broken" }, { where: { id: item.id } });
+      // Kirim Email dibawah
+      // **
+      // kirim email dulu baru update status replace item
+
+      itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
+    } else {
+      itemModel.update({ status: itemStatus }, { where: { id: item.id } });
+      itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
     }
-    let newAmount = item.amount - useAmount;
-
-    // Update the amount uf the item is a replacement
-    if (item.replacementType === "Replace") {
-      await itemModel.update({ amount: newAmount }, { where: { id: item.id } });
-
-      // Create history record
-      await historyModel.create({
-        name: item.name,
-        changeType: "Change Part",
-        category: "Part",
-        username: req.name,
-        prevStock: item.amount,
-        usedStock: useAmount,
-        afterStock: newAmount,
-        description: `Replace ${useAmount} ea ${itemName}`,
-      });
-
-      // Log the update action in the audit logs
-      await logAuditEvent("part", item.id, "update", {
-        name: item.name,
-        prevAmount: item.amount,
-        newAmount: item.amount - useAmount,
-        description: `Replace ${useAmount} ea ${itemName}`,
-      });
-    }
-    //if item is swap
-    else {
-      if (replaceItemName === "NA") {
-        if (itemStatus == "Broken") {
-          await itemModel.update({ status: "Broken" }, { where: { id: item.id } });
-          //masukin email otomatis ke user
-        } else {
-          await itemModel.update({
-            status: itemStatus,
-          });
-        }
-
-        itemUseHistoryModel.create({
-          itemId: item.id,
-          replacementItemId: null,
-          machineId: null,
-          itemStartUseDate,
-          itemEndUseDate,
-          useCount: 1,
-          reason,
-        });
-
-        // Create history record
-        await historyModel.create({
-          name: item.name,
-          changeType: "Change Part",
-          category: "Part",
-          username: req.name,
-          description: `${itemName} - ${item.year} changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
-        });
-
-        // Log the update action in the audit logs
-        await logAuditEvent("Item", item.id, "update", {
-          name: item.name,
-          prevStatus: item.status,
-          newStatus: "Broken",
-          description: `${itemName} - ${item.year} changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
-        });
-      } else {
-        // Find the replacement item
-        const replacementItem = await itemModel.findOne({
-          where: {
-            name: replaceItemName,
-            year: replaceItemYear,
-            deletedAt: null, // Exclude soft-deleted items
-          },
-        });
-
-        if (!replacementItem) return res.status(404).json({ message: "Replacement item not found" });
-
-        const machine = await machineModel.findOne({
-          where: {
-            machine_name: machineName,
-            deletedAt: null, // Exclude soft-deleted items
-          },
-        });
-        if (!machine) return res.status(404).json({ message: "Machine not found" });
-
-        const itemUseHistory = await itemUseHistoryModel.findOne({
-          where: {
-            itemId: item.id,
-          },
-        });
-
-        await itemUseHistoryModel.create({
-          itemId: item.id,
-          replacementItemId: replacementItem.id,
-          machineId: machine.id,
-          itemStartUseDate,
-          itemEndUseDate,
-          useCount: 1 || itemUseHistory.useCount + 1,
-          reason,
-        });
-
-        //ganti status Replace item
-        await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
-
-        // ganti status item
-        if (itemStatus === "Broken") {
-          await itemModel.update({ status: "Broken" }, { where: { id: item.id } });
-          res.status(200).json({ message: "Part Update With Status : Broken" });
-          //masukin email otomatis ke user
-        } else {
-          await itemModel.update({ status: itemStatus }, { where: { id: item.id } });
-        }
-
-        // Create history record
-        await historyModel.create({
-          name: item.name,
-          changeType: "Change Part",
-          category: "Part",
-          username: req.name,
-          description: ` ${itemName} - ${item.year} changed to ${replaceItemName} - ${replacementItem.year} With reason : ${reason}`,
-        });
-
-        // Log the update action in the audit logs
-        await logAuditEvent("Item", item.id, "update", {
-          name: item.name,
-          prevStatus: item.status,
-          newStatus: "In Use",
-          description: `${itemName} changed to ${replaceItemName} With reason : ${reason}`,
-        });
-      }
-    }
-    res.status(200).json({ message: "Part updated" });
+    return res.status(200).json({ message: "Swap success" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

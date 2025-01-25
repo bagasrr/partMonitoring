@@ -10,10 +10,13 @@ import historyRoute from "./historyRoute.js";
 const routes = express.Router();
 
 routes.use("/users", verifyUser, adminOnly, userRoute);
-routes.use("/items", verifyUser, itemRoute);
+routes.use("/items", itemRoute);
 routes.use("/auth", authRoute);
 routes.use("/machines", verifyUser, machineRoute);
 routes.use("/sections", verifyUser, sectionRoute);
 routes.use("/history", verifyUser, historyRoute);
+routes.get("/ping", (req, res) => {
+  res.status(200).json({ message: "Server is kocak!" });
+});
 
 export default routes;

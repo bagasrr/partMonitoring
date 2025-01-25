@@ -4,9 +4,11 @@ import Title from "../../element/Title";
 import Layout from "../Layout";
 import BackPrev from "../../element/BackPrev";
 import { adminArea } from "../../utils/adminArea";
+import scrollToTop from "../../utils/scrollToTop";
 
 const EditItem = () => {
   adminArea();
+  scrollToTop();
   return (
     <Layout>
       <BackPrev url="/parts" />

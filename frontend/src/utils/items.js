@@ -58,3 +58,12 @@ export const updateItem = async (itemId, itemData) => {
     throw new Error(error.response?.data?.message || "Error updating item");
   }
 };
+
+export const changeItem = async (data) => {
+  try {
+    const response = await axios.patch("http://localhost:4000/api/items/change/swap", data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error Changing item");
+  }
+};

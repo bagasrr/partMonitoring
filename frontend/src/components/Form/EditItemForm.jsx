@@ -76,7 +76,7 @@ const EditItemForm = () => {
     try {
       await updateItem(id, formData);
       dispatch(setNotification(`Item ${formData.name} Updated`));
-      navigate("/items");
+      navigate("/parts");
     } catch (error) {
       setNotif(error.message);
     }

@@ -76,9 +76,8 @@ const AddItemForm = () => {
 
     try {
       await createItem(formData);
-      // setNotification("Part created successfully!");
-      dispatch(setNotification(`Part ${formData.name} Added`));
-      navigate("/items");
+      formData.replacementType === "Replace" ? dispatch(setNotification(`Part ${formData.name} Added ${formData.amount} ea`)) : dispatch(setNotification(`Part ${formData.name} Added`));
+      navigate("/parts");
       setFormData({
         name: "",
         amount: "",
@@ -109,6 +108,7 @@ const AddItemForm = () => {
         name: value,
         year: selectedPart?.year || "",
         lowerLimit: selectedPart?.lowerLimit || "",
+        replacementType: selectedPart?.replacementType || "",
         machine_name: selectedPart?.machine?.machine_name || "",
         machine_number: selectedPart?.machine?.machine_number || "",
       });
