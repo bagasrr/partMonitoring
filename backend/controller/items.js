@@ -5,6 +5,7 @@ import { createPDF, sendEmail } from "../services/sendEmail.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { createPDFWithTable } from "../services/pdfCreate.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -378,6 +379,73 @@ export const updateItemStatus = async (req, res) => {
   }
 };
 
+// export const updateItemStatusForm = async (req, res) => {
+//   const { itemName, status, itemYear, reason } = req.body;
+//   try {
+//     if (!itemName || !status) {
+//       return res.status(400).json({ message: "Missing required fields" });
+//     }
+//     const item = await itemModel.findOne({
+//       where: { name: itemName, year: itemYear, deletedAt: null },
+//       include: [
+//         {
+//           model: machineModel,
+//           attributes: ["uuid", "machine_name", "machine_number"],
+//         },
+//       ],
+//     });
+//     if (!item) return res.status(404).json({ message: "Item not found" });
+
+//     const prevStatus = item.status;
+
+//     if (prevStatus === status) {
+//       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
+//     }
+
+//     // Membuat deskripsi item dan PDF buffer
+//     const itemDescription = `
+//       Part Name: ${item.name}
+//       Part Year: ${item.year}
+//       Machine Name: ${item.machine.machine_name}
+//       Reason: ${reason}
+//     `;
+
+//     createPDF(itemDescription, async (pdfBuffer) => {
+//       if (status === "Broken") {
+//         try {
+//           await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
+//         } catch (error) {
+//           console.log(`Email failed to send: ${error}`);
+//           return res.status(500).json({ message: "Email failed to send." });
+//         }
+//       }
+
+//       itemModel.update(
+//         { status },
+//         {
+//           where: { name: itemName, year: itemYear },
+//         }
+//       );
+//       // Buat catatan riwayat
+//       historyModel.create({
+//         name: item.name,
+//         changeType: "Update",
+//         category: "Part",
+//         username: req.name,
+//         description: reason,
+//       });
+
+//       // Log the update action in the audit logs
+//       logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+//       res.status(200).json({ message: "Part status updated" });
+//     });
+//   } catch (error) {
+//     console.log(`Error: ${error.message}`);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const updateItemStatusForm = async (req, res) => {
   const { itemName, status, itemYear, reason } = req.body;
   try {
@@ -401,15 +469,12 @@ export const updateItemStatusForm = async (req, res) => {
       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
     }
 
-    // Membuat deskripsi item dan PDF buffer
-    const itemDescription = `
-      Part Name: ${item.name}
-      Part Year: ${item.year}
-      Machine Name: ${item.machine.machine_name}
-      Reason: ${reason}
-    `;
+    // Membuat deskripsi item dan data tabel
+    const title = "Item Status Report";
+    const headers = ["Part Name", "Part Year", "Machine Name", "Reason"];
+    const rows = [[item.name, item.year.toString(), item.machine.machine_name, reason]];
 
-    createPDF(itemDescription, async (pdfBuffer) => {
+    createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (status === "Broken") {
         try {
           await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
@@ -419,14 +484,15 @@ export const updateItemStatusForm = async (req, res) => {
         }
       }
 
-      itemModel.update(
+      await itemModel.update(
         { status },
         {
           where: { name: itemName, year: itemYear },
         }
       );
+
       // Buat catatan riwayat
-      historyModel.create({
+      await historyModel.create({
         name: item.name,
         changeType: "Update",
         category: "Part",
@@ -435,7 +501,7 @@ export const updateItemStatusForm = async (req, res) => {
       });
 
       // Log the update action in the audit logs
-      logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+      await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
 
       res.status(200).json({ message: "Part status updated" });
     });
