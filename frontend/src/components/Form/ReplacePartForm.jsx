@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import Button from "../../element/Button";
 import FormField, { ReadOnlyForm } from "../FormField";
 import { getTypeReplaceitem, replaceItem } from "../../utils/items";
+import LoadingAnimate from "../LoadingAnimate";
 
 const ReplacePartForm = () => {
   const [parts, setParts] = useState([]);
   const [amount, setAmount] = useState(null);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     itemName: "",
     itemYear: null,
@@ -45,6 +47,7 @@ const ReplacePartForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       await replaceItem(formData);
     } catch (error) {
       setErrors(error);
@@ -54,6 +57,7 @@ const ReplacePartForm = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Replacing Part...</LoadingAnimate>}
       <form onSubmit={handleSubmit}>
         <FormField type="select" label="Select Part" value={formData.itemName} onChange={handlePartChange}>
           <option value="" disabled>

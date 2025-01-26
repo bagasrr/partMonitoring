@@ -12,11 +12,16 @@ const AddAmountForm = () => {
   const [errors, setErrors] = useState({});
   const [prevAmount, setPrevAmount] = useState("");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     itemName: "",
     amountToAdd: null,
     description: "",
   });
+
+  useEffect(() => {
+    fetchPart();
+  }, []);
 
   const fetchPart = async () => {
     const response = await getTypeReplaceitem();
@@ -62,19 +67,18 @@ const AddAmountForm = () => {
     };
 
     try {
+      setIsLoading(true);
       await addItemAmount(data);
       dispatch(setNotification(`${formData.itemName} add amount ${formData.amountToAdd} ea`));
       navigate("/parts");
-    } catch (error) {}
-    console.log(formData);
+    } catch (error) {
+      setErrors({ submit: error.message || "Error while Add Amount" });
+    }
   };
-
-  useEffect(() => {
-    fetchPart();
-  }, []);
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Part Amount...</LoadingAnimate>}
       <form onSubmit={handleSubmit}>
         <FormField label="Part Name" name="itemName" value={formData.itemName} onChange={handlePartChange} type="select">
           <option value="" disabled>
@@ -94,6 +98,7 @@ const AddAmountForm = () => {
         <FormField label="Description" name="description" type="textarea" value={formData.description} onChange={handleChange} placeholder="Masukkan deskripsi" />
 
         <Button type="submit" buttonName="Add Amount" />
+        {errors.submit && <p className="text-red-500 text-xs font-bold mt-1 ml-1 text-center">{errors}</p>}
       </form>
     </div>
   );

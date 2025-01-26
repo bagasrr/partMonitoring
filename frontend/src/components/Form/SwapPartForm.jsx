@@ -1,11 +1,12 @@
 import { changeItem, getTypeReplaceitem, getTypeSwapItem, getTypeSwapReplaceItem } from "../../utils/items";
-import FormField from "../FormField";
+import FormField, { ReadOnlyForm } from "../FormField";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
@@ -16,6 +17,7 @@ const SwapPartForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     itemName: "",
     replaceItemName: "",
@@ -82,6 +84,7 @@ const SwapPartForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       await changeItem(formData);
       dispatch(setNotification(`${formData.itemName} - ${formData.itemYear} Swap to ${formData.replaceItemName} - ${formData.replaceItemYear} Sucess with ${formData.itemName} status : ${formData.itemStatus}`));
       navigate("/parts");
@@ -105,7 +108,8 @@ const SwapPartForm = () => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="mx-auto p-4 bg-white shadow-md rounded-lg">
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Swapping Part ...</LoadingAnimate>}
+      <form onSubmit={handleSubmit} className="mx-auto p-4 bg-white shadow-md rounded-lg overflow-x-hidden">
         <FormField label="Part yang ingin diganti" name="itemName" value={formData.itemName ? `${formData.itemName} - ${formData.itemYear}` : ""} onChange={handleItemChange} type="select">
           <option value="" disabled>
             Select Item
@@ -117,7 +121,8 @@ const SwapPartForm = () => {
           ))}
         </FormField>
 
-        <FormField label="Tahun" name="itemYear" value={formData.itemYear} onChange={handleChange} type="number" placeholder="Masukkan tahun" />
+        <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} placeholder={"Tahun Part"} />
+        {/* <FormField label="Tahun" name="itemYear" value={formData.itemYear} onChange={handleChange} type="number" placeholder="Masukkan tahun" /> */}
 
         <FormField label="Status Part Sekarang" name="itemStatus" value={formData.itemStatus} onChange={handleChange} type="select">
           <option value="" disabled>
@@ -127,10 +132,11 @@ const SwapPartForm = () => {
           <option value="Broken">Broken</option>
           <option value="Repair">Repair</option>
         </FormField>
+        <div className="flex gap-5 w-full ">
+          <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
 
-        <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" />
-
-        <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" />
+          <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+        </div>
 
         <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />
 

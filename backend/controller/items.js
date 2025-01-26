@@ -1,6 +1,10 @@
 import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel } from "../models/index.js";
 import { Op, where } from "sequelize";
 import { checkStockLevels } from "../services/mailsent.js"; // Import stock alert utility
+import { createPDF, sendEmail } from "../services/sendEmail.js";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -351,6 +355,78 @@ export const updateItemStatus = async (req, res) => {
   }
 };
 
+// export const updateItemStatusForm = async (req, res) => {
+//   const { itemName, status, itemYear, reason } = req.body;
+//   try {
+//     if (!itemName || !status) {
+//       return res.status(400).json({ message: "Missing required fields" });
+//     }
+//     const item = await itemModel.findOne({
+//       where: { name: itemName, year: itemYear, deletedAt: null },
+//       include: [
+//         {
+//           model: machineModel,
+//           attributes: ["uuid", "machine_name", "machine_number"],
+//         },
+//       ],
+//     });
+//     if (!item) return res.status(404).json({ message: "Item not found" });
+
+//     const prevStatus = item.status; // Update the item status
+
+//     // Validasi agar status sebelumnya tidak sama dengan status yang baru
+//     if (prevStatus === status) {
+//       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
+//     }
+
+//     // Mendapatkan direktori saat ini
+//     const __filename = fileURLToPath(import.meta.url);
+//     const __dirname = path.dirname(__filename);
+//     // Membuat direktori 'pdfs' jika belum ada
+//     const pdfDir = path.join(__dirname, "../pdfs");
+//     if (!fs.existsSync(pdfDir)) {
+//       fs.mkdirSync(pdfDir);
+//     }
+
+//     // Membuat PDF
+//     const itemDescription = `
+//       Part Name: ${item.name}
+//       Part Year: ${item.year}
+//       Machine Name: ${item.machine.machine_name}
+//       Reason: ${reason}
+//     `;
+//     const pdfPath = path.join(pdfDir, "item-details.pdf");
+//     createPDF(itemDescription, pdfPath);
+
+//     if (status === "Broken") {
+//       sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken `, `Part ${item.name} is now ${status}.`, pdfPath);
+//     }
+
+//     await itemModel.update(
+//       { status },
+//       {
+//         where: { name: itemName, year: itemYear },
+//       }
+//     );
+
+//     // Create history record
+//     await historyModel.create({
+//       name: item.name,
+//       changeType: "Update",
+//       category: "Part",
+//       username: req.name,
+//       description: reason,
+//     });
+
+//     // Log the update action in the audit logs
+//     await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+//     res.status(200).json({ message: "Part status updated" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const updateItemStatusForm = async (req, res) => {
   const { itemName, status, itemYear, reason } = req.body;
   try {
@@ -359,37 +435,61 @@ export const updateItemStatusForm = async (req, res) => {
     }
     const item = await itemModel.findOne({
       where: { name: itemName, year: itemYear, deletedAt: null },
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+      ],
     });
     if (!item) return res.status(404).json({ message: "Item not found" });
 
-    const prevStatus = item.status; // Update the item status
+    const prevStatus = item.status;
 
-    // Validasi agar status sebelumnya tidak sama dengan status yang baru
     if (prevStatus === status) {
       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
     }
 
-    await itemModel.update(
-      { status },
-      {
-        where: { name: itemName, year: itemYear },
+    // Membuat deskripsi item dan PDF buffer
+    const itemDescription = `
+      Part Name: ${item.name}
+      Part Year: ${item.year}
+      Machine Name: ${item.machine.machine_name}
+      Reason: ${reason}
+    `;
+
+    createPDF(itemDescription, async (pdfBuffer) => {
+      if (status === "Broken") {
+        try {
+          await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
+        } catch (error) {
+          console.log(`Email failed to send: ${error}`);
+          return res.status(500).json({ message: "Email failed to send." });
+        }
       }
-    );
 
-    // Create history record
-    await historyModel.create({
-      name: item.name,
-      changeType: "Update",
-      category: "Part",
-      username: req.name,
-      description: reason,
+      itemModel.update(
+        { status },
+        {
+          where: { name: itemName, year: itemYear },
+        }
+      );
+      // Buat catatan riwayat
+      historyModel.create({
+        name: item.name,
+        changeType: "Update",
+        category: "Part",
+        username: req.name,
+        description: reason,
+      });
+
+      // Log the update action in the audit logs
+      logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+      res.status(200).json({ message: "Part status updated" });
     });
-
-    // Log the update action in the audit logs
-    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
-
-    res.status(200).json({ message: "Part status updated" });
   } catch (error) {
+    console.log(`Error: ${error.message}`);
     res.status(500).json({ message: error.message });
   }
 };
@@ -561,7 +661,7 @@ export const swapItem = async (req, res) => {
     if (item.status === "Broken") {
       await itemModel.update({ status: "Broken" }, { where: { id: item.id } });
       // Kirim Email dibawah
-      // **
+      sendEmail("monitoringbybarra.adhan@gmail.com", `${item.name} is Broken `, `The item ${item.name} is now broken.`);
       // kirim email dulu baru update status replace item
 
       await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });

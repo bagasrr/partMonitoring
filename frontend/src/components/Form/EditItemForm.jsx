@@ -20,6 +20,7 @@ const EditItemForm = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [notif, setNotif] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -75,6 +76,7 @@ const EditItemForm = () => {
     }
 
     try {
+      setIsLoading(true);
       await updateItem(id, formData);
       dispatch(setNotification(`Item ${formData.name} Updated`));
       navigate("/parts");
@@ -85,6 +87,7 @@ const EditItemForm = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Editing Part...</LoadingAnimate>}
       {notif && <div className="mt-4 p-2 text-white bg-red-500 rounded">{notif}</div>}
       <form onSubmit={handleSubmit}>
         <FormField label="Name" name="name" value={formData.name || ""} onChange={handleChange} />

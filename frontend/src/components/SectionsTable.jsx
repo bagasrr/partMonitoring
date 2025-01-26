@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearNotification, setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getSections } from "../utils/getSection";
+import { getSections } from "../utils/section";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import highlightText from "../element/highlightText"; // Import fungsi highlightText

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FormField from "../FormField";
-import { getSections } from "../../utils/getSection";
+import { getSections } from "../../utils/section";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
@@ -11,6 +11,7 @@ const AddMachineForm = () => {
   const [sections, setSections] = useState([]);
   const [isNewSection, setIsNewSection] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     machineName: "",
     machineNumber: "",
@@ -61,6 +62,7 @@ const AddMachineForm = () => {
     };
 
     try {
+      setIsLoading(true);
       await createMachines(data);
       dispatch(setNotification(`Machine ${formData.machineName} Added`));
       navigate("/machines");
@@ -72,6 +74,7 @@ const AddMachineForm = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Machine...</LoadingAnimate>}
       {error && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
         <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} placeholder={"Masukkan nama mesin"} />

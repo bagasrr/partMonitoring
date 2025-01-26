@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
 import { adminArea } from "../../utils/adminArea";
+import { createSection } from "../../utils/section";
+import LoadingAnimate from "../../components/LoadingAnimate";
 
 const AddSection = () => {
   adminArea();
@@ -16,17 +18,20 @@ const AddSection = () => {
   });
   const [sectionName, setSectionName] = useState("");
   const [sectionNumber, setSectionNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const notification = useNotification();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      section_name: sectionName,
+      section_number: sectionNumber,
+    };
     try {
-      await axios.post("http://localhost:4000/api/sections", {
-        section_name: sectionName,
-        section_number: sectionNumber,
-      });
+      setIsLoading(true);
+      await createSection(data);
       navigate("/sections");
       dispatch(setNotification(`Section ${sectionName} Added`));
     } catch (error) {
@@ -35,6 +40,7 @@ const AddSection = () => {
   };
   return (
     <>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Section Room...</LoadingAnimate>}
       <FormLayout formTitle={"Tambah Ruangan"} onSubmit={handleSubmit}>
         {notification && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{notification}</p>}
 

@@ -3,7 +3,7 @@ import { createItem, getItems } from "../../utils/items";
 import FormField from "../FormField";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../../utils/machines";
-import { getSections } from "../../utils/getSection";
+import { getSections } from "../../utils/section";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
@@ -20,6 +20,7 @@ const AddItemForm = () => {
   const [error, setError] = useState(false);
   const [errors, setErrors] = useState({});
   const notification = useNotification();
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
@@ -76,7 +77,7 @@ const AddItemForm = () => {
     }
 
     try {
-      console.log(formData);
+      setIsLoading(true);
       await createItem(formData);
       formData.replacementType === "Replace" ? dispatch(setNotification(`Part ${formData.name} Added ${formData.amount} ea`)) : dispatch(setNotification(`Part ${formData.name} Added`));
       navigate("/parts");
@@ -172,6 +173,7 @@ const AddItemForm = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Part...</LoadingAnimate>}
       {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
       <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
         {/* <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">

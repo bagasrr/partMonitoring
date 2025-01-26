@@ -5,6 +5,7 @@ import { getMachineById, updateMachines } from "../../utils/machines";
 import FormField from "../FormField";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const EditMachineForm = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const EditMachineForm = () => {
   const navigate = useNavigate();
   const [notif, setNotif] = useState("");
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchMachine();
@@ -48,6 +50,7 @@ const EditMachineForm = () => {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
       await updateMachines(id, formData);
       dispatch(setNotification(`Machine ${formData.machine_name} Updated`));
       navigate("/machines");
@@ -58,6 +61,7 @@ const EditMachineForm = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Editing Machine...</LoadingAnimate>}
       {notif && <div className="mt-4 p-2 text-white bg-red-500 rounded">{notif}</div>}
       <form onSubmit={handleSubmit}>
         <FormField label="Machine Name" name="machine_name" value={formData.machine_name || ""} onChange={handleChange} />

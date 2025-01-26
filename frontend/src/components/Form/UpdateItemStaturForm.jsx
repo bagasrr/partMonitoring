@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const UpdateItemStatusForm = () => {
   const [items, setItems] = useState([]);
@@ -18,14 +19,19 @@ const UpdateItemStatusForm = () => {
     reason: "",
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchItems();
   }, []);
 
   const fetchItems = async () => {
-    const response = await getItems();
-    setItems(response);
+    try {
+      const response = await getItems();
+      setItems(response);
+    } catch (error) {
+      setErrors({ getPart: error.message || "Error fetching Part" });
+    }
   };
 
   const handleItemChange = (e) => {
@@ -74,20 +80,22 @@ const UpdateItemStatusForm = () => {
         setErrors({ submit: `Cannot change status to '${formData.status}' again` });
         return;
       }
+      setIsLoading(true);
       await updateItemStatusForm({ itemName: formData.itemName, status: formData.status, itemYear: formData.itemYear, reason: formData.reason });
       dispatch(setNotification(`Item ${formData.itemName} - ${formData.itemYear} status updated to ${formData.status}`));
       navigate("/parts");
     } catch (error) {
       console.error("Error updating item status:", error);
-      setErrors({ submit: "Error updating item status" });
+      setErrors(error || { submit: "Error updating item status" });
     }
   };
 
   return (
     <div>
-      {errors.submit && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{errors.submit}</p>}
+      {isLoading && formData.status === "Broken" && <LoadingAnimate isOpen={isLoading}>Wait for Update & Send Mail...</LoadingAnimate>}
+      {isLoading && formData.status !== "Broken" && <LoadingAnimate isOpen={isLoading}>Wait for Update...</LoadingAnimate>}
       <form onSubmit={handleSubmit}>
-        <FormField label="Select Parts" name="itemName" value={formData.itemName ? `${formData.itemName} - ${formData.itemYear}` : ""} onChange={handleItemChange} type="select">
+        <FormField label="Select Parts" name="itemName" value={formData.itemName ? `${formData.itemName} - ${formData.itemYear}` : ""} onChange={handleItemChange} type="select" error={errors.getPart}>
           <option value="" disabled>
             Select Item
           </option>
@@ -113,6 +121,7 @@ const UpdateItemStatusForm = () => {
         <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} type="text" />
 
         <Button type="submit" buttonName={"Save"} />
+        {errors.submit && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{errors.submit}</p>}
       </form>
     </div>
   );
