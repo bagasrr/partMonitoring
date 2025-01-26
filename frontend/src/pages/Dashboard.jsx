@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { getMe } from "../features/authSlice";
 import ChartComponent from "../components/ChartExample";
 import StatusInfo from "../components/StatusInfo";
+import Title from "../element/Title";
+import ItemsTable from "../components/ItemsTable";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -30,6 +32,10 @@ const Dashboard = () => {
         <ChartComponent />
       </div>
       <StatusInfo />
+      <div className="mt-5">
+        <Title>Part List</Title>
+        <ItemsTable />
+      </div>
     </Layout>
   );
 };

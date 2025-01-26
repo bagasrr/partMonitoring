@@ -343,108 +343,50 @@ export const updateItemStatus = async (req, res) => {
     if (!item) return res.status(404).json({ message: "Part not found" });
     const prevStatus = item.status; // Update the item status
 
-    // Membuat deskripsi item dan PDF buffer
-    const itemDescription = `
-      Part Name: ${item.name}
-      Part Year: ${item.year}
-      Machine Name: ${item.machine.machine_name}
-      Reason: "Status changed from ${prevStatus} to ${status} by ${req.name}"
-    `;
+    // Membuat deskripsi item dan data tabel
+    const title = "Parts Broken Report";
+    const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+    const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    const rows = [[currentDate, item.name, status, item.amount, `Status changed from ${prevStatus} to ${status}.`, item.machine.machine_name, req.name]];
 
-    createPDF(itemDescription, async (pdfBuffer) => {
+    const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+
+    // Membuat PDF
+    createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (status === "Broken") {
         try {
-          await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
+          await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });
         }
       }
+
+      await itemModel.update(
+        { status },
+        {
+          where: { id: item.id },
+        }
+      );
+
+      // Buat catatan riwayat
+      await historyModel.create({
+        name: item.name,
+        changeType: "Update",
+        category: "Part",
+        username: req.name,
+        description: `Status changed from ${prevStatus} to ${status}`,
+      });
+
+      // Log the update action in the audit logs
+      await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+      res.status(200).json({ message: "Part status updated" });
     });
-
-    await itemModel.update({ status }, { where: { uuid: req.params.id } });
-
-    // Create history record
-    await historyModel.create({
-      name: item.name,
-      changeType: "Update",
-      category: "Part",
-      username: req.name,
-      description: `Status changed from ${prevStatus} to ${status}`,
-    }); // Log the update action in the audit logs
-    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
-    res.status(200).json({ message: "Part status updated" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-// export const updateItemStatusForm = async (req, res) => {
-//   const { itemName, status, itemYear, reason } = req.body;
-//   try {
-//     if (!itemName || !status) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
-//     const item = await itemModel.findOne({
-//       where: { name: itemName, year: itemYear, deletedAt: null },
-//       include: [
-//         {
-//           model: machineModel,
-//           attributes: ["uuid", "machine_name", "machine_number"],
-//         },
-//       ],
-//     });
-//     if (!item) return res.status(404).json({ message: "Item not found" });
-
-//     const prevStatus = item.status;
-
-//     if (prevStatus === status) {
-//       return res.status(400).json({ message: `Cannot change status to '${status}' again` });
-//     }
-
-//     // Membuat deskripsi item dan PDF buffer
-//     const itemDescription = `
-//       Part Name: ${item.name}
-//       Part Year: ${item.year}
-//       Machine Name: ${item.machine.machine_name}
-//       Reason: ${reason}
-//     `;
-
-//     createPDF(itemDescription, async (pdfBuffer) => {
-//       if (status === "Broken") {
-//         try {
-//           await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
-//         } catch (error) {
-//           console.log(`Email failed to send: ${error}`);
-//           return res.status(500).json({ message: "Email failed to send." });
-//         }
-//       }
-
-//       itemModel.update(
-//         { status },
-//         {
-//           where: { name: itemName, year: itemYear },
-//         }
-//       );
-//       // Buat catatan riwayat
-//       historyModel.create({
-//         name: item.name,
-//         changeType: "Update",
-//         category: "Part",
-//         username: req.name,
-//         description: reason,
-//       });
-
-//       // Log the update action in the audit logs
-//       logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
-
-//       res.status(200).json({ message: "Part status updated" });
-//     });
-//   } catch (error) {
-//     console.log(`Error: ${error.message}`);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 export const updateItemStatusForm = async (req, res) => {
   const { itemName, status, itemYear, reason } = req.body;
@@ -470,14 +412,18 @@ export const updateItemStatusForm = async (req, res) => {
     }
 
     // Membuat deskripsi item dan data tabel
-    const title = "Item Status Report";
-    const headers = ["Part Name", "Part Year", "Machine Name", "Reason"];
-    const rows = [[item.name, item.year.toString(), item.machine.machine_name, reason]];
+    const title = "Parts Broken Report";
+    const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+    const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    const rows = [[currentDate, item.name, status, item.amount, reason, item.machine.machine_name, req.name]];
 
+    const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+
+    // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (status === "Broken") {
         try {
-          await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, pdfBuffer);
+          await sendEmail("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });

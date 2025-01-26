@@ -11,6 +11,7 @@ import SearchBar from "./SearchBar";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import TablePagination from "./TablePagination";
 import useNotification from "../services/Notification"; // Importe useNotification
+import LoadingAnimate from "./LoadingAnimate";
 
 const ItemsTable = () => {
   const [data, setData] = useState([]);
@@ -25,6 +26,7 @@ const ItemsTable = () => {
   const [selectedUUIDItem, setSelectedUUIDItem] = useState(null);
   const [selectedItemName, setSelectedItemName] = useState(null);
   const [deleted, setDeleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchItems();
@@ -48,8 +50,10 @@ const ItemsTable = () => {
   const handleStatusChange = async (e, itemId) => {
     const newStatus = e.target.value;
     try {
+      setIsLoading(true);
       await updateItemStatus(itemId, { status: newStatus });
       fetchItems(); // Refresh items after update
+      setIsLoading(false);
     } catch (error) {
       console.error("Error updating item status:", error);
     }
@@ -99,12 +103,13 @@ const ItemsTable = () => {
 
   return (
     <div>
+      {isLoading && <LoadingAnimate isOpen={isLoading}>Please Wait Changing Status...</LoadingAnimate>}
       {notification && (
         <div className={`${deleted ? "bg-rose-100 border border-rose-400 text-rose-700" : "bg-green-100 border border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <span className="block sm:inline">{notification}</span>
         </div>
       )}
-      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search items or machines name" />
+      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search parts or machines name" />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white overflow-x-auto">
           <thead>

@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = (to, subject, text, pdfBuffer) => {
+export const sendEmail = (to, subject, text, filename, pdfBuffer) => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: "monitoringbybarra.adhan@gmail.com",
@@ -36,7 +36,7 @@ export const sendEmail = (to, subject, text, pdfBuffer) => {
       text,
       attachments: [
         {
-          filename: "item-details.pdf",
+          filename,
           content: pdfBuffer,
         },
       ],
