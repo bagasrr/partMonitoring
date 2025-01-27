@@ -55,6 +55,7 @@ const ItemsTable = () => {
       fetchItems(); // Refresh items after update
       setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.error("Error updating item status:", error);
     }
   };

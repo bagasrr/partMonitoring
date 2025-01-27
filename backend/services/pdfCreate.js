@@ -4,7 +4,8 @@ import { Buffer } from "buffer";
 export const createPDFWithTable = (title, headers, rows, callback) => {
   const doc = new PDFDocument({
     margin: 50,
-    size: "A4", // Mengatur ukuran kertas menjadi A4
+    size: "A4",
+    layout: "landscape", // Mengatur orientasi halaman menjadi landscape
   });
   const buffers = [];
 
@@ -14,9 +15,30 @@ export const createPDFWithTable = (title, headers, rows, callback) => {
     callback(pdfBuffer);
   });
 
+  // Menghitung lebar kolom berdasarkan teks terpanjang
+  const columnWidths = headers.map((header, i) => {
+    const maxCellLength = Math.max(...rows.map((row) => row[i].toString().length), header.length);
+    return maxCellLength * 8; // Mengatur faktor skala berdasarkan panjang teks
+  });
+
+  // Menentukan total lebar kolom
+  const totalWidth = columnWidths.reduce((acc, width) => acc + width, 0);
+  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+  // Jika total lebar kolom melebihi lebar halaman, atur ulang skala kolom
+  if (totalWidth > pageWidth) {
+    const scaleFactor = pageWidth / totalWidth;
+    columnWidths.forEach((_, i) => {
+      columnWidths[i] = columnWidths[i] * scaleFactor;
+    });
+  }
+
+  // Menghitung posisi kiri tabel untuk menengahkannya
+  const leftMargin = (pageWidth - totalWidth) / 2 + doc.page.margins.left;
+
   // Judul Laporan
   doc
-    .font("Helvetica-Bold") // Mengatur font header
+    .font("Courier-Bold") // Mengatur font header
     .fontSize(16)
     .text(title, {
       align: "center",
@@ -25,63 +47,79 @@ export const createPDFWithTable = (title, headers, rows, callback) => {
 
   // Membuat Tabel
   const tableTop = 150;
-  const itemLeft = doc.page.margins.left;
-  const itemWidth = (doc.page.width - doc.page.margins.left - doc.page.margins.right) / headers.length;
   const cellHeight = 30;
   let rowBottomY = tableTop;
 
   // Header Tabel
   doc.font("Courier-Bold").fontSize(12); // Mengatur font header tabel
+  let currentX = leftMargin; // Variabel sementara untuk posisi horizontal
   headers.forEach((header, i) => {
     doc
-      .text(header, itemLeft + i * itemWidth, tableTop + 7.5, {
+      .text(header, currentX, tableTop + 7.5, {
         // Vertikal centering
-        width: itemWidth,
+        width: columnWidths[i],
         align: "center",
       })
-      .rect(itemLeft + i * itemWidth, tableTop, itemWidth, cellHeight)
+      .rect(currentX, tableTop, columnWidths[i], cellHeight)
       .stroke();
+    currentX += columnWidths[i];
   });
 
   rowBottomY += cellHeight;
 
   // Baris Tabel
-  doc.font("Courier").fontSize(12); // Mengatur font body tabel
   rows.forEach((row, rowIndex) => {
-    const y = tableTop + cellHeight + rowIndex * cellHeight;
+    let maxHeight = cellHeight; // Menyimpan tinggi maksimum dari semua sel di baris saat ini
+    currentX = leftMargin; // Reset posisi horizontal untuk setiap baris
 
-    if (y + cellHeight > doc.page.height - doc.page.margins.bottom - 100) {
+    // Hitung tinggi maksimum dari semua sel di baris ini
+    row.forEach((text, i) => {
+      const { height } = doc.heightOfString(text, {
+        width: columnWidths[i],
+        align: "center",
+      });
+      if (height + 15 > maxHeight) {
+        maxHeight = height + 15; // Sesuaikan tinggi maksimum jika teks di dalam sel lebih tinggi dari cellHeight
+      }
+    });
+
+    if (rowBottomY + maxHeight > doc.page.height - doc.page.margins.bottom - 50) {
       doc.addPage();
       rowBottomY = tableTop;
+      currentX = leftMargin;
       headers.forEach((header, i) => {
         doc
-          .text(header, itemLeft + i * itemWidth, tableTop + 7.5, {
+          .text(header, currentX, tableTop + 7.5, {
             // Vertikal centering
-            width: itemWidth,
+            width: columnWidths[i],
             align: "center",
           })
-          .rect(itemLeft + i * itemWidth, tableTop, itemWidth, cellHeight)
+          .rect(currentX, tableTop, columnWidths[i], cellHeight)
           .stroke();
+        currentX += columnWidths[i];
       });
       rowBottomY += cellHeight;
     }
 
+    // Gambar teks dan rect untuk setiap sel di baris
     row.forEach((text, i) => {
       doc
-        .text(text, itemLeft + i * itemWidth, rowBottomY + 7.5, {
+        .text(text, currentX, rowBottomY + 7.5, {
           // Vertikal centering
-          width: itemWidth,
+          width: columnWidths[i],
           align: "center",
         })
-        .rect(itemLeft + i * itemWidth, rowBottomY, itemWidth, cellHeight)
+        .rect(currentX, rowBottomY, columnWidths[i], maxHeight)
         .stroke();
+      currentX += columnWidths[i];
     });
-    rowBottomY += cellHeight;
+
+    rowBottomY += maxHeight;
   });
 
   // Tanggal Laporan
   const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString("en-GB", {
+  const formattedDate = currentDate.toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -92,16 +130,15 @@ export const createPDFWithTable = (title, headers, rows, callback) => {
   });
 
   // Keterangan di bawah tabel
-  rowBottomY += cellHeight * 3; // Menambahkan gap sekitar tiga kali enter dari tabel
+  rowBottomY += cellHeight * 2; // Menambahkan gap sekitar dua kali enter dari tabel
   doc
-    .font("Times-Roman")
+    .font("Courier")
     .fontSize(12)
-    .text(`Created by Part Monitoring Sistem by barra.adhan`, itemLeft, rowBottomY, {
+    .text(`Created by Part Monitoring Sistem by barra.adhan`, leftMargin, rowBottomY, {
       // Sejajar dengan sisi kiri tabel
       align: "left",
-      continued: true,
     })
-    .text(`\n${formattedDate} `, itemLeft, rowBottomY + 15, {
+    .text(`${formattedDate}`, leftMargin, rowBottomY + 15, {
       // Sejajar dengan sisi kiri tabel
       align: "left",
     });

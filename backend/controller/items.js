@@ -347,7 +347,7 @@ export const updateItemStatus = async (req, res) => {
     const title = "Parts Broken Report";
     const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
     const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-    const rows = [[currentDate, item.name, status, item.amount, `Status changed from ${prevStatus} to ${status}.`, item.machine.machine_name, req.name]];
+    const rows = [[currentDate, item.name, status, item.amount, `Status changed to ${status}.`, item.machine.machine_name, req.name]];
 
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
