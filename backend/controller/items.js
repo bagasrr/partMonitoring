@@ -707,7 +707,7 @@ export const swapItem = async (req, res) => {
     });
     if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
     if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken can't replace" });
-    if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is on repair can't replace" });
+    if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is on (Repair) cant replace" });
 
     if (replacementItem.replacementType !== "Swap") return res.status(404).json({ message: "Replacement part is not Swap type" });
 

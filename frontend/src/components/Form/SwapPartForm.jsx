@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
+import ErrorText from "../ErrorText";
 
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
@@ -162,7 +163,7 @@ const SwapPartForm = () => {
         {selectedItem && selectedItem.replacementType === "Replace" && <FormField label="Use Amount" name="useAmount" value={formData.useAmount} onChange={handleChange} type="number" placeholder="Masukkan jumlah penggunaan" />}
 
         <Button type="submit" buttonName="Ganti Part" />
-        {errors && <p className="text-red-500">{errors.message}</p>}
+        {errors && <ErrorText message={errors.message} />}
       </form>
     </div>
   );

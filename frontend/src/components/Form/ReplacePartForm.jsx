@@ -85,7 +85,7 @@ const ReplacePartForm = () => {
         <FormField label="Alasan" type="textarea" name="reason" onChange={handleChange} value={formData.reason} placeholder="Alasan" />
 
         <Button buttonName={"Save"} type="submit" />
-        {errors && <p className="text-red-500 text-center mt-4 font-bold text-xs">{errors.message}</p>}
+        {errors && <ErrorText message={errors.message} />}
       </form>
     </div>
   );
