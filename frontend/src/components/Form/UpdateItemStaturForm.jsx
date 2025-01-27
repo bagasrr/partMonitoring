@@ -84,6 +84,7 @@ const UpdateItemStatusForm = () => {
       await updateItemStatusForm({ itemName: formData.itemName, status: formData.status, itemYear: formData.itemYear, reason: formData.reason });
       dispatch(setNotification(`Item ${formData.itemName} - ${formData.itemYear} status updated to ${formData.status}`));
       navigate("/parts");
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.error("Error updating item status:", error);

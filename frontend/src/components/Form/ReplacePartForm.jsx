@@ -3,12 +3,17 @@ import Button from "../../element/Button";
 import FormField, { ReadOnlyForm } from "../FormField";
 import { getTypeReplaceitem, replaceItem } from "../../utils/items";
 import LoadingAnimate from "../LoadingAnimate";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setNotification } from "../../features/notificationSlice";
 
 const ReplacePartForm = () => {
   const [parts, setParts] = useState([]);
   const [amount, setAmount] = useState(null);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     itemName: "",
     itemYear: null,
@@ -49,7 +54,11 @@ const ReplacePartForm = () => {
     try {
       setIsLoading(true);
       await replaceItem(formData);
+      dispatch(setNotification(`${formData.itemName} Replace ${formData.useAmount} ea Success`));
+      navigate("/parts");
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       setErrors(error);
       console.log(error);
     }

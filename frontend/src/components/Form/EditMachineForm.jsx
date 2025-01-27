@@ -54,7 +54,9 @@ const EditMachineForm = () => {
       await updateMachines(id, formData);
       dispatch(setNotification(`Machine ${formData.machine_name} Updated`));
       navigate("/machines");
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       setNotif(error.message);
     }
   };

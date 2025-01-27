@@ -66,7 +66,9 @@ const AddMachineForm = () => {
       await createMachines(data);
       dispatch(setNotification(`Machine ${formData.machineName} Added`));
       navigate("/machines");
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.log(error.response);
       setError(error.response.data.message);
     }

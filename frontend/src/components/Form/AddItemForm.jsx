@@ -92,7 +92,9 @@ const AddItemForm = () => {
         section_name: "",
         section_number: "",
       });
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       setError(true);
       setNotification(`Error: ${error.message}`);
     }

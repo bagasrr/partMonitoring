@@ -15,7 +15,7 @@ const ChangePartPages = () => {
   };
   return (
     <Layout>
-      <BackPrev url="parts" />
+      <BackPrev url="/parts" />
       <Title>Penggantian Part</Title>
       <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
         <option value="" disabled>

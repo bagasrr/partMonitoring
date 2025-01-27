@@ -88,7 +88,9 @@ const SwapPartForm = () => {
       await changeItem(formData);
       dispatch(setNotification(`${formData.itemName} - ${formData.itemYear} Swap to ${formData.replaceItemName} - ${formData.replaceItemYear} Sucess with ${formData.itemName} status : ${formData.itemStatus}`));
       navigate("/parts");
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       setErrors(error);
       // alert("Error updating item");
     }
