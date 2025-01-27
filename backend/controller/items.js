@@ -1,7 +1,7 @@
 import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel } from "../models/index.js";
 import { Op, where } from "sequelize";
 import { checkStockLevels } from "../services/mailsent.js"; // Import stock alert utility
-import { sendEmailWithPDF } from "../services/sendEmail.js";
+import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
@@ -20,7 +20,7 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
 export const getAllItems = async (req, res) => {
   try {
     const response = await itemModel.findAll({
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       where: {
         deletedAt: null, // Exclude soft-deleted items
       },
@@ -48,7 +48,7 @@ export const getItemById = async (req, res) => {
         uuid: req.params.id,
         deletedAt: null, // Exclude soft-deleted items
       },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: userModel,
@@ -69,7 +69,10 @@ export const getItemById = async (req, res) => {
 
 export const getReplaceItem = async (req, res) => {
   try {
-    const items = await itemModel.findAll({ where: { replacementType: "Replace" } });
+    const items = await itemModel.findAll({
+      where: { replacementType: "Replace" },
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -80,6 +83,7 @@ export const getSwapItem = async (req, res) => {
   try {
     const items = await itemModel.findAll({
       where: { replacementType: "Swap" },
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: machineModel,
@@ -106,6 +110,7 @@ export const getSwapReplaceItem = async (req, res) => {
         status: { [Op.ne]: "In Use" }, // Menggunakan Op.ne untuk status yang bukan "In Use"
         machineId: machine.id,
       },
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
     });
 
     if (!items.length) {
@@ -542,141 +547,19 @@ export const addItemAmount = async (req, res) => {
   }
 };
 
-// export const swapItem = async (req, res) => {
-//   const { itemName, replaceItemName, itemYear, replaceItemYear, itemStartUseDate, itemEndUseDate, machineName, reason, itemStatus } = req.body;
-//   try {
-//     if (!itemName || !itemYear || !reason) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
-
-//     // Validasi untuk memastikan itemEndUseDate tidak kurang dari itemStartUseDate
-//     if (new Date(itemEndUseDate) < new Date(itemStartUseDate)) {
-//       return res.status(400).json({ message: "End use date cannot be earlier than start use date" });
-//     }
-
-//     const item = await itemModel.findOne({
-//       where: {
-//         name: itemName,
-//         year: itemYear,
-//         deletedAt: null, // Exclude soft-deleted items
-//       },
-//       include: [
-//         {
-//           model: machineModel,
-//           attributes: ["uuid", "machine_name", "machine_number"],
-//         },
-//       ],
-//     });
-//     if (!item) return res.status(404).json({ message: `Part not found` });
-
-//     const replacementItem = await itemModel.findOne({
-//       where: {
-//         name: replaceItemName,
-//         year: replaceItemYear,
-//         deletedAt: null, // Exclude soft-deleted items
-//       },
-//       include: [
-//         {
-//           model: machineModel,
-//           attributes: ["uuid", "machine_name", "machine_number"],
-//         },
-//       ],
-//     });
-//     if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
-//     if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken can't replace" });
-
-//     if (replacementItem.replacementType !== "Swap") return res.status(404).json({ message: "Replacement part is not Swap type" });
-
-//     const machine = await machineModel.findOne({
-//       where: {
-//         machine_name: machineName,
-//         deletedAt: null, // Exclude soft-deleted items
-//       },
-//     });
-//     if (!machine) return res.status(404).json({ message: "Machine not found" });
-
-//     if (item.machine.machine_name !== replacementItem.machine.machine_name) return res.status(406).json({ message: "Two Part is for different machines" });
-
-//     if (itemStatus !== "Broken") {
-//       // Membuat deskripsi item dan data tabel
-//       const title = "Parts Broken Report";
-//       const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
-//       const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-//       const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
-
-//       const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
-
-//       // Membuat PDF
-//       createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
-//         try {
-//           await sendEmailWithPDF("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
-//         } catch (error) {
-//           console.log(`Email failed to send: ${error}`);
-//           return res.status(500).json({ message: "Email failed to send." });
-//         }
-//       });
-//     }
-//     // Cari semua riwayat penggunaan item untuk menghitung useCount yang benar
-//     const itemUseHistories = await itemUseHistoryModel.findAll({
-//       where: {
-//         itemId: item.id,
-//       },
-//     });
-//     const totalUseCount = itemUseHistories.length;
-
-//     await itemUseHistoryModel.create({
-//       itemId: item.id,
-//       replacementItemId: replacementItem.id,
-//       machineId: machine.id,
-//       itemStartUseDate,
-//       itemEndUseDate,
-//       useCount: totalUseCount + 1, // Menggunakan total useCount dari semua riwayat penggunaan
-//       reason,
-//     });
-
-//     await itemModel.update({ status: itemStatus }, { where: { id: item.id } });
-//     await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
-
-//     // if (item.status === "Broken") {
-//     //   await itemModel.update({ status: "Broken" }, { where: { id: item.id } });
-//     //   // Kirim Email dibawah
-//     //   sendEmailWithPDF("monitoringbybarra.adhan@gmail.com", `${item.name} is Broken `, `The item ${item.name} is now broken.`);
-//     //   // kirim email dulu baru update status replace item
-
-//     //   await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
-//     // } else {
-//     //   await itemModel.update({ status: itemStatus }, { where: { id: item.id } });
-//     //   await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
-//     // }
-
-//     // Create history record
-//     await historyModel.create({
-//       name: item.name,
-//       changeType: "Swap",
-//       category: "Part",
-//       username: req.name, // Use req.name for the username field
-//       description: `Swap item ${item.name} with ${replacementItem.name}`,
-//     });
-//     await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: item.status, newStatus: itemStatus });
-
-//     return res.status(200).json({ message: "Swap success" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 export const swapItem = async (req, res) => {
-  const { itemName, replaceItemName, itemYear, replaceItemYear, itemStartUseDate, itemEndUseDate, machineName, reason, itemStatus } = req.body;
+  const { itemName, itemYear, replaceItemName, replaceItemYear, itemStartUseDate, itemEndUseDate, reason, itemStatus } = req.body;
   try {
     if (!itemName || !itemYear || !reason) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Validasi untuk memastikan itemEndUseDate tidak kurang dari itemStartUseDate
+    // Validate to ensure itemEndUseDate is not before itemStartUseDate
     if (new Date(itemEndUseDate) < new Date(itemStartUseDate)) {
       return res.status(400).json({ message: "End use date cannot be earlier than start use date" });
     }
 
+    //cari item berdasarkan nama, tahun
     const item = await itemModel.findOne({
       where: {
         name: itemName,
@@ -686,49 +569,33 @@ export const swapItem = async (req, res) => {
       include: [
         {
           model: machineModel,
-          attributes: ["uuid", "machine_name", "machine_number"],
+          attributes: ["machine_name"],
         },
       ],
     });
-    if (!item) return res.status(404).json({ message: `Part not found` });
+    if (!item) return res.status(404).json({ message: "Item not found" });
 
+    //cari replace item berdasarkan nama, tahun
     const replacementItem = await itemModel.findOne({
       where: {
         name: replaceItemName,
         year: replaceItemYear,
         deletedAt: null, // Exclude soft-deleted items
       },
-      include: [
-        {
-          model: machineModel,
-          attributes: ["uuid", "machine_name", "machine_number"],
-        },
-      ],
     });
     if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
-    if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken can't replace" });
-    if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is on (Repair) cant replace" });
+    if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken and can't be replaced" });
+    if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is under repair and can't be replaced" });
 
-    if (replacementItem.replacementType !== "Swap") return res.status(404).json({ message: "Replacement part is not Swap type" });
+    //cek apakah mesinnya sama
+    if (item.machineId !== replacementItem.machineId) return res.status(403).json({ message: "Parts must be in the same machine" });
 
-    const machine = await machineModel.findOne({
-      where: {
-        machine_name: machineName,
-        deletedAt: null, // Exclude soft-deleted items
-      },
-    });
-    if (!machine) return res.status(404).json({ message: "Machine not found" });
-
-    if (item.machine.machine_name !== replacementItem.machine.machine_name) return res.status(406).json({ message: "Two Part is for different machines" });
-
-    // Membuat deskripsi item dan data tabel
+    //membuat data tabel pdf
     const title = "Parts Broken Report";
     const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
     const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
     const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
-
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
-
     // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (itemStatus === "Broken") {
@@ -739,23 +606,40 @@ export const swapItem = async (req, res) => {
           return res.status(500).json({ message: "Email failed to send." });
         }
       }
-
-      // Update the statuses after PDF is created and email is sent
-      await itemModel.update({ status: itemStatus }, { where: { id: item.id } });
-      await itemModel.update({ status: "In Use" }, { where: { id: replacementItem.id } });
-
-      // Create history record
-      await historyModel.create({
-        name: item.name,
-        changeType: "Swap",
-        category: "Part",
-        username: req.name, // Use req.name for the username field
-        description: `Swap item ${item.name} with ${replacementItem.name}`,
-      });
-      await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: item.status, newStatus: itemStatus });
-
-      return res.status(200).json({ message: "Swap success" });
     });
+
+    const itemUseHistories = await itemUseHistoryModel.findAll({
+      where: { itemId: item.id },
+    });
+    const totalUseCount = itemUseHistories.length;
+    const dayUsed = Math.ceil((new Date(itemEndUseDate) - new Date(itemStartUseDate)) / (1000 * 60 * 60 * 24)); // Calculate the difference in days
+
+    await itemUseHistoryModel.create({
+      itemId: item.id,
+      replacementItemId: replacementItem.id,
+      itemStartUseDate: itemStartUseDate,
+      itemEndUseDate: itemEndUseDate,
+      useAmount: totalUseCount + 1,
+      reason,
+      dayUsed,
+    });
+    const totalDayUsed = item.dayUsed + dayUsed;
+
+    // Update item status
+    await itemModel.update({ status: itemStatus, dayUsed: totalDayUsed }, { where: { id: item.id } });
+    //update item replacement status
+    await itemModel.update({ status: "In Use", replacementDate: itemEndUseDate }, { where: { id: replacementItem.id } });
+
+    //history
+    await historyModel.create({
+      name: item.name,
+      changeType: "Swap",
+      category: "Part",
+      username: req.name, // Use req.name for the username field
+      description: `Swap item ${item.name} with ${replacementItem.name}`,
+    });
+
+    res.status(200).json({ message: "Item replaced successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -783,9 +667,9 @@ export const replaceItem = async (req, res) => {
     // Check stock levels
     // await checkStockLevels(item.uuid);
     if (newAmount <= item.lowerLimit) {
-      await sendEmailWithPDF(
+      await sendLowerLimitEmail(
         "kuliah.bagass@gmail.com",
-        `${item.name + "(" + item.year + ")"} is Low Stock`,
+        `${item.name + " ( " + item.machine.machine_name + " ) "} is Low Stock`,
         `Part ${item.name} is now hit the Lower limit.\nDetail: \nPart Name : ${item.name} \nPart Year : ${item.year} \nMachine Name : ${item.machine.machine_name} \nCurrent Amount: ${newAmount} \nLower Limit: ${item.lowerLimit}`
       );
     }

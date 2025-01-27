@@ -8,6 +8,7 @@ import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
 import ErrorText from "../ErrorText";
+import { format } from "date-fns";
 
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
@@ -43,6 +44,10 @@ const SwapPartForm = () => {
       ...formData,
       [name]: value,
     });
+    console.log(name + " : " + value);
+  };
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "yyyy-MM-dd");
   };
 
   const handleItemChange = (e) => {
@@ -55,6 +60,7 @@ const SwapPartForm = () => {
         ...formData,
         itemName: item.name,
         itemYear: item.year,
+        itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
       });
       console.log("Item selected: ", item); // Add this line
       console.log("machine selected: ", item.machine.machine_name); // Add this line
@@ -68,17 +74,51 @@ const SwapPartForm = () => {
     }
   };
 
+  // const handleReplaceItemChange = (e) => {
+  //   const value = e.target.value;
+  //   const [name, year] = value.split(" - ");
+  //   const replaceItem = items.find((item) => item.name === name && item.year.toString() === year);
+  //   if (replaceItem) {
+  //     setSelectedReplaceItem(replaceItem);
+  //     setFormData({ ...formData, replaceItemName: replaceItem.name, replaceItemYear: replaceItem.year, machineName: replaceItem.machine.machine_name });
+  //     console.log("Replace item selected: ", replaceItem); // Add this line
+  //   } else {
+  //     setSelectedReplaceItem(null);
+  //     setFormData({ ...formData, replaceItemName: "", replaceItemYear: "" });
+  //   }
+  // };
+
   const handleReplaceItemChange = (e) => {
     const value = e.target.value;
-    const [name, year] = value.split(" - ");
-    const replaceItem = items.find((item) => item.name === name && item.year.toString() === year);
-    if (replaceItem) {
-      setSelectedReplaceItem(replaceItem);
-      setFormData({ ...formData, replaceItemName: replaceItem.name, replaceItemYear: replaceItem.year, machineName: replaceItem.machine.machine_name });
-      console.log("Replace item selected: ", replaceItem); // Add this line
-    } else {
+
+    if (value === "NA") {
       setSelectedReplaceItem(null);
-      setFormData({ ...formData, replaceItemName: "", replaceItemYear: "" });
+      setFormData({
+        ...formData,
+        replaceItemName: "NA",
+        replaceItemYear: "",
+        machineName: "",
+      });
+    } else {
+      const [name, year] = value.split(" - ");
+      const replaceItem = items.find((item) => item.name === name && item.year.toString() === year);
+      if (replaceItem) {
+        setSelectedReplaceItem(replaceItem);
+        setFormData({
+          ...formData,
+          replaceItemName: replaceItem.name,
+          replaceItemYear: replaceItem.year,
+          machineName: replaceItem.machine.machine_name,
+        });
+      } else {
+        setSelectedReplaceItem(null);
+        setFormData({
+          ...formData,
+          replaceItemName: "",
+          replaceItemYear: "",
+          machineName: "",
+        });
+      }
     }
   };
 
@@ -155,10 +195,10 @@ const SwapPartForm = () => {
               </option>
             ))}
         </FormField>
-
+        {/* 
         <FormField label="Tahun Part Pengganti" name="replaceItemYear" value={formData.replaceItemYear} onChange={handleChange} type="number" placeholder="Masukkan tahun part pengganti" />
 
-        <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} placeholder="Masukkan nama mesin" />
+        <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} placeholder="Masukkan nama mesin" /> */}
 
         {selectedItem && selectedItem.replacementType === "Replace" && <FormField label="Use Amount" name="useAmount" value={formData.useAmount} onChange={handleChange} type="number" placeholder="Masukkan jumlah penggunaan" />}
 

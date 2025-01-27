@@ -47,4 +47,8 @@ export const ItemUseHistory = {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  dayUsed: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 };

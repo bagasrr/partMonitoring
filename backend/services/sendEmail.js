@@ -54,24 +54,22 @@ export const sendEmailWithPDF = (to, subject, text, filename, pdfBuffer) => {
   });
 };
 
-// // Fungsi untuk membuat PDF dalam memori dan mengirim buffer melalui callback
-// export const createPDF = (itemDescription, callback) => {
-//   const doc = new PDFDocument();
-//   const buffers = [];
-
-//   doc.on("data", buffers.push.bind(buffers));
-//   doc.on("end", () => {
-//     const pdfBuffer = Buffer.concat(buffers);
-//     callback(pdfBuffer);
-//   });
-
-//   doc.fontSize(25).text("Item Details", { align: "center" }).moveDown();
-//   doc.fontSize(14).text(itemDescription, {
-//     align: "left",
-//     indent: 30,
-//     height: 300,
-//     ellipsis: true,
-//   });
-
-//   doc.end();
-// };
+export const sendLowerLimitEmail = (to, subject, text) => {
+  return new Promise((resolve, reject) => {
+    const mailOptions = {
+      from: "monitoringbybarra.adhan@gmail.com",
+      to,
+      subject,
+      text,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(`Error: ${error}`);
+        reject(error);
+      } else {
+        resolve(info);
+        console.log(`Email sent: ${info.response}`);
+      }
+    });
+  });
+};

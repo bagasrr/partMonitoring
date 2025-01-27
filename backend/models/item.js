@@ -68,4 +68,12 @@ export const item = {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  replacementDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  dayUsed: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 };

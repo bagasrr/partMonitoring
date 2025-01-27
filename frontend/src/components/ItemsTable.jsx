@@ -34,6 +34,7 @@ const ItemsTable = () => {
 
   const fetchItems = async () => {
     const response = await getItems();
+    console.log(response);
     setData(response);
   };
 
@@ -121,6 +122,7 @@ const ItemsTable = () => {
               <ThData>Status</ThData>
               <ThData>Year</ThData>
               <ThData>Tipe Penggantian</ThData>
+              <ThData>Total Pemakaian (Hari)</ThData>
               <ThData>Deskripsi</ThData>
               <ThData>Batas Bawah</ThData>
               <ThData>Machine Name</ThData>
@@ -157,6 +159,7 @@ const ItemsTable = () => {
                 </TData>
                 <TData>{item.year}</TData>
                 <TData>{item.replacementType}</TData>
+                <TData>{item.dayUsed !== null ? item.dayUsed : "-"}</TData>
                 <TData>{item.description}</TData>
                 <TData>{item.lowerLimit}</TData>
                 <TData>{highlightText(item.machine.machine_name, search)}</TData>

@@ -70,12 +70,13 @@ const ItemUseHistoryTable = () => {
               <ThData>Reason</ThData>
             </tr>
           </thead>
+
           <tbody>
             {currentItems.length === 0 && (
               <tr>
-                <TData colSpan="8" className="text-center py-4">
+                <td colSpan="8" className="text-center py-4">
                   No data found
-                </TData>
+                </td>
               </tr>
             )}
             {currentItems.map((history, index) => (
@@ -88,7 +89,13 @@ const ItemUseHistoryTable = () => {
                 <TData>{history.itemEndUseDate ? formatDate(history.itemEndUseDate) : "-"}</TData>
                 <TData>{calculateTotalDays(history.itemStartUseDate, history.itemEndUseDate)}</TData>
                 <TData>
-                  {history.replacementItem.name} ({history.replacementItem.year})
+                  {history.replacementItem !== null ? (
+                    <>
+                      {history.replacementItem.name} ({history.replacementItem.year})
+                    </>
+                  ) : (
+                    "Na"
+                  )}
                 </TData>
                 <TData>{history.useCount}</TData>
                 <TData>{history.reason || "-"}</TData>
