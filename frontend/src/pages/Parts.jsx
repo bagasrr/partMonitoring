@@ -1,44 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getItems } from "../utils/items";
-import ItemTable from "../components/ItemsTable";
-import Layout from "./Layout";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { FiPlusCircle } from "react-icons/fi";
+import Layout from "./Layout";
 import Title from "../element/Title";
 import scrollToTop from "../utils/scrollToTop";
+import ItemsReplace from "../components/ItemsReplace";
+import ItemsSwap from "../components/ItemsSwap";
+import HeaderPages from "../components/headerPages";
 
 const Parts = () => {
   scrollToTop();
-  const [items, setItems] = useState([]);
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const data = await getItems();
-        setItems(data);
-        // Dispatch an action to store items in the Redux store, if needed
-        dispatch({ type: "SET_ITEMS", payload: data });
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      }
-    };
-
-    fetchItems();
-  }, [dispatch]);
+  const [view, setView] = useState("swap");
 
   return (
     <Layout>
-      <Title className="text-2xl font-bold mb-4 text-center">Part List</Title>
-      {/* {user && user.role === "admin" && ( */}
-      <div className="mb-10">
-        <Link to="/parts/add" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  w-fit">
-          Tambah Part Baru
-        </Link>
+      <div className="flex flex-col items-center w-full">
+        {/* <Title className="text-4xl font-bold mb-4 text-center text-gradient">Part List</Title>
+        <div className="flex gap-5 mb-10">
+          <button className={`px-6 py-3 rounded-lg font-semibold ${view === "swap" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => setView("swap")}>
+            Swap
+          </button>
+          <button className={`px-6 py-3 rounded-lg font-semibold ${view === "replace" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => setView("replace")}>
+            Replace
+          </button>
+        </div>
+
+        <div className="mb-10 flex justify-center w-full">
+          <Link to="/parts/add" className="flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105">
+            <FiPlusCircle size={24} />
+            Tambah Part Baru
+          </Link>
+        </div> */}
+        <HeaderPages title="Part List" linkAdd="parts" add="part">
+          <div className="flex gap-5 mb-10">
+            <button className={`px-6 py-3 rounded-lg font-semibold ${view === "swap" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => setView("swap")}>
+              Swap
+            </button>
+            <button className={`px-6 py-3 rounded-lg font-semibold ${view === "replace" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => setView("replace")}>
+              Replace
+            </button>
+          </div>
+        </HeaderPages>
+
+        <div className="w-full">
+          {view === "replace" && <ItemsReplace />}
+          {view === "swap" && <ItemsSwap />}
+        </div>
       </div>
-      {/* )} */}
-      <ItemTable items={items} />
     </Layout>
   );
 };

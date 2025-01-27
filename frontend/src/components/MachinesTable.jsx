@@ -83,9 +83,9 @@ const MachinesTable = () => {
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search machines or sections" />
-      <div className="overflow-x-auto">
+      <div className="overflow-auto max-h-96 lg:max-h-[calc(100vh-150px)] ">
         <table className="min-w-full bg-white">
-          <thead>
+          <thead className="sticky top-0 z-10">
             <tr>
               <ThData>No</ThData>
               <ThData>Nama Mesin</ThData>

@@ -72,6 +72,12 @@ export const getReplaceItem = async (req, res) => {
     const items = await itemModel.findAll({
       where: { replacementType: "Replace" },
       attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
     });
     res.status(200).json(items);
   } catch (error) {

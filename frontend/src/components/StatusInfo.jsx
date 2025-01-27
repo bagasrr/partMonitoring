@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Title from "../element/Title";
 import { getBrokenItems, getInUseItems, getRepairItems, getSpareItems } from "../utils/items";
+import InfoBox from "./InfoBox"; // Import komponen InfoBox
 
 const StatusInfo = () => {
   const [spare, setSpare] = useState([]);
@@ -37,26 +38,15 @@ const StatusInfo = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div onClick={() => openModal(spare, "Spares")} className="bg-white shadow rounded-lg p-6 cursor-pointer">
-        <h2 className="text-xl font-bold mb-4">Spares</h2>
-        <div className="text-2xl font-semibold text-green-500">{spare && spare.length}</div>
-      </div>
-      <div onClick={() => openModal(broken, "Broken")} className="bg-white shadow rounded-lg p-6 cursor-pointer">
-        <h2 className="text-xl font-bold mb-4">Broken</h2>
-        <div className="text-2xl font-semibold text-red-500">{broken && broken.length}</div>
-      </div>
-      <div onClick={() => openModal(inUse, "In Use")} className="bg-white shadow rounded-lg p-6 cursor-pointer">
-        <h2 className="text-xl font-bold mb-4">In Use</h2>
-        <div className="text-2xl font-semibold text-blue-500">{inUse && inUse.length}</div>
-      </div>
-      <div onClick={() => openModal(repair, "Repair")} className="bg-white shadow rounded-lg p-6 cursor-pointer">
-        <h2 className="text-xl font-bold mb-4">Repair</h2>
-        <div className="text-2xl font-semibold text-yellow-500">{repair && repair.length}</div>
-      </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Menggunakan komponen InfoBox */}
+      <InfoBox title="Spares" count={spare.length} color="text-green-500" onClick={() => openModal(spare, "Spares")} />
+      <InfoBox title="Broken" count={broken.length} color="text-red-500" onClick={() => openModal(broken, "Broken")} />
+      <InfoBox title="In Use" count={inUse.length} color="text-blue-500" onClick={() => openModal(inUse, "In Use")} />
+      <InfoBox title="Repair" count={repair.length} color="text-yellow-500" onClick={() => openModal(repair, "Repair")} />
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">{modalTitle}</h3>
