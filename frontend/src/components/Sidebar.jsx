@@ -1,5 +1,6 @@
 import React from "react";
-import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory, FaTimes, FaInstagram } from "react-icons/fa";
+import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
+import { MdOutlineManageHistory } from "react-icons/md";
 import { PiEngineFill, PiNotePencilBold } from "react-icons/pi";
 import { IoMdListBox } from "react-icons/io";
 import { MdCreateNewFolder, MdMeetingRoom } from "react-icons/md";
@@ -42,7 +43,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </Link>
             </li>
             <li className="mb-2 flex items-center">
-              <FaHistory className="mr-2" />
+              <MdOutlineManageHistory className="mr-2" size={20} />
               <Link to="/itemusehistory" className="block px-4 py-2 hover:bg-gray-700 rounded">
                 Use Histori
               </Link>

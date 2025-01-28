@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { getMe } from "../features/authSlice";
 import StatusInfo from "../components/StatusInfo";
 import Title from "../element/Title";
-import ItemsTable from "../components/ItemsReplace";
 import DayUsedChart from "../components/DayUsedChart";
 import { getTypeReplaceitem, getTypeSwapItem } from "../utils/items";
 import AmountLimitChart from "../components/AmountLimitChart";
+import ButtonTypeParts from "../components/ButtonTypeParts";
+import ItemsReplace from "../components/ItemsReplace";
+import ItemsSwap from "../components/ItemsSwap";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -18,6 +20,7 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("");
   const [swapPart, setSwapPart] = useState([]);
   const [replacePart, setReplacePart] = useState([]);
+  const [view, setView] = useState("swap");
 
   useEffect(() => {
     getSwap();
@@ -46,7 +49,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <h1 className="text-xl font-bold">Welcome - {user && user.name}</h1>
+      <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className=" p-4 bg-white shadow rounded-lg">
           <DayUsedChart data={swapPart} />
@@ -60,10 +63,78 @@ const Dashboard = () => {
       </div>
       <div className="mt-5">
         <Title>Part List</Title>
-        <ItemsTable />
+        <div className="flex gap-2 mb-5">
+          <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+            {view === "swap" ? "Swap" : "S"}
+          </ButtonTypeParts>
+          <ButtonTypeParts view={view} setView={setView} partType="replace" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+            {view === "replace" ? "Replace" : "R"}
+          </ButtonTypeParts>
+        </div>
+        <div className="w-full">
+          {view === "replace" && <ItemsReplace />}
+          {view === "swap" && <ItemsSwap />}
+        </div>
       </div>
     </Layout>
   );
 };
 
 export default Dashboard;
+
+export const AnimatedBox = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <div onClick={() => setIsExpanded(!isExpanded)} className={`bg-blue-500 h-10 cursor-pointer transition-all duration-500 ease-in-out ${isExpanded ? "w-40" : "w-10"}`}></div>
+    </div>
+  );
+};
+
+// import React, { useState } from "react";
+// import Layout from "./Layout";
+// import StatusInfo from "../components/StatusInfo";
+// import Title from "../element/Title";
+// import DayUsedChart from "../components/DayUsedChart";
+// import AmountLimitChart from "../components/AmountLimitChart";
+// import ButtonTypeParts from "../components/ButtonTypeParts";
+
+// const Dashboard = () => {
+//   const [view, setView] = useState("swap");
+
+//   return (
+//     <Layout>
+//       <h1 className="text-xl font-bold mb-6">Welcome</h1>
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+//         <div className="p-4 bg-white shadow rounded-lg">
+//           <DayUsedChart data={[]} />
+//         </div>
+//         <div className="p-4 bg-white shadow rounded-lg">
+//           <AmountLimitChart data={[]} />
+//         </div>
+//       </div>
+//       <div className="mt-5">
+//         <StatusInfo />
+//       </div>
+//       <div className="mt-5">
+//         <Title>Part List</Title>
+//         <div className="flex gap-2">
+//           <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+//             {view === "swap" ? "Swap" : "S"}
+//           </ButtonTypeParts>
+//           <ButtonTypeParts view={view} setView={setView} partType="replace" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+//             {view === "replace" ? "Replace" : "R"}
+//           </ButtonTypeParts>
+//         </div>
+//         <div className="w-full">
+//           {view === "replace" && <ItemsReplace />}
+//           {view === "swap" && <ItemsSwap />}
+//         </div>
+
+//       </div>
+//     </Layout>
+//   );
+// };
+
+// export default Dashboard;
