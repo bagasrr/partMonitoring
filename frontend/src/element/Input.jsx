@@ -21,6 +21,25 @@ export const NormalInput = ({ value, type, id, onChange, label, autoComplete = "
     </div>
   );
 };
+export const PasswordInput = ({ value, type, id, onChange, label, autoComplete = "off", maxLength = 500, placeholder, className, isError }) => {
+  return (
+    <div className="mb-4 w-full">
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
+        {label}
+      </label>
+      <input
+        type={type}
+        id={id}
+        value={value}
+        onChange={onChange}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${isError ? "border-red-500" : ""} ${className}`}
+        autoComplete={autoComplete}
+        maxLength={maxLength}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+};
 
 export const StokInput = ({ setStock, name, label = "Stock" }) => {
   const [Validate, setValidate] = useState(false);
@@ -118,7 +137,7 @@ export const Label = ({ children, htmlFor }) => {
 
 export const Button = ({ children, onClick, type }) => {
   return (
-    <button type={type} onClick={onClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ">
+    <button type={type} onClick={onClick} className="w-fit bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ">
       {children}
     </button>
   );

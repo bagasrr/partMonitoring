@@ -35,4 +35,8 @@ export const user = {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 };

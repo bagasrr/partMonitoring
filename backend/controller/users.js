@@ -4,7 +4,7 @@ import argon2, { hash } from "argon2";
 export const getAllUser = async (req, res) => {
   try {
     const response = await userModel.findAll({
-      attributes: ["uuid", "name", "role"],
+      attributes: ["uuid", "name", "role", "email"],
     });
     res.status(200).json(response);
   } catch (error) {
@@ -15,7 +15,7 @@ export const getAllUser = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const response = await userModel.findOne({
-      attributes: ["uuid", "name", "role"],
+      attributes: ["uuid", "name", "role", "email"],
       where: {
         uuid: req.params.id,
       },
@@ -61,7 +61,7 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const { name, password, confPassword, role } = req.body;
+    const { name, password, confPassword, role, email } = req.body;
 
     // Use existing values if new ones are not provided
     const updatedName = name || user.name;
@@ -84,6 +84,7 @@ export const updateUser = async (req, res) => {
         name: updatedName,
         password: hashPassword,
         role: updatedRole,
+        email,
       },
       {
         where: {
@@ -118,5 +119,22 @@ export const deleteUser = async (req, res) => {
     res.status(200).json({ message: "user deleted" });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getUserAdminEmail = async (req, res) => {
+  try {
+    const response = await userModel.findAll({
+      where: {
+        role: "Admin",
+      },
+      attributes: ["email"],
+    });
+    const adminEmails = response.map((user) => user.email);
+    return adminEmails;
+  } catch (error) {
+    console.error("Gagal mengambil email admin:", error);
+    res.status(500).json({ message: error.message });
+    return [];
   }
 };

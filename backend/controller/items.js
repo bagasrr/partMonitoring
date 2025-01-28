@@ -2,6 +2,7 @@ import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLo
 import { Op, where } from "sequelize";
 import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
+import { getUserAdminEmail } from "./users.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -352,11 +353,16 @@ export const updateItemStatus = async (req, res) => {
 
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
+    const adminEmails = await getUserAdminEmail();
+    if (adminEmails.length === 0) {
+      return res.status(404).json({ message: "Tidak ada admin yang ditemukan" });
+    }
+
     // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (status === "Broken") {
         try {
-          await sendEmailWithPDF("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
+          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });
@@ -666,12 +672,24 @@ export const replaceItem = async (req, res) => {
     const newAmount = item.amount - useAmount;
     await itemModel.update({ amount: newAmount }, { where: { id: item.id } });
 
+    const adminEmails = await getUserAdminEmail();
+
+    if (adminEmails.length === 0) {
+      return res.status(404).json({ message: "Tidak ada admin yang ditemukan" });
+    }
+
     if (newAmount <= item.lowerLimit) {
-      await sendLowerLimitEmail(
-        "kuliah.bagass@gmail.com",
-        `${item.name + " ( " + item.machine.machine_name + " ) "} is Low Stock`,
-        `Part ${item.name} is now hit the Lower limit.\nDetail: \nPart Name : ${item.name} \nPart Year : ${item.year} \nMachine Name : ${item.machine.machine_name} \nCurrent Amount: ${newAmount} \nLower Limit: ${item.lowerLimit}`
-      );
+      try {
+        const subject = `${item.name + " ( " + item.machine.machine_name + " ) "} is Low Stock`;
+        const text = `Part ${item.name} is now hit the Lower limit.\nDetail: \nPart Name : ${item.name} \nPart Year : ${item.year} \nMachine Name : ${item.machine.machine_name} \nCurrent Amount: ${newAmount} \nLower Limit: ${item.lowerLimit}`;
+
+        // Memanggil fungsi sendLowerLimitEmail
+        const info = await sendLowerLimitEmail(adminEmails, subject, text);
+        console.log(`Email sent: ${info.response}`);
+      } catch (error) {
+        console.error(`Error sending email: ${error}`);
+        return res.status(500).json({ message: "Gagal mengirim email" });
+      }
     }
 
     // Create history record

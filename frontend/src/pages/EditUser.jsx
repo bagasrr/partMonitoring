@@ -5,8 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
-import { Button, NormalInput } from "../element/Input";
+import { Button, NormalInput, PasswordInput } from "../element/Input";
 import { adminArea } from "../utils/adminArea";
+import BackPrev from "../element/BackPrev";
 
 const EditUser = () => {
   adminArea();
@@ -14,6 +15,7 @@ const EditUser = () => {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -27,6 +29,7 @@ const EditUser = () => {
     const User = await getUserById(id); // Mendapatkan detail User berdasarkan id
     setName(User.name);
     setRole(User.role);
+    setEmail(User.email);
   };
 
   const handleSubmit = async (e) => {
@@ -37,6 +40,7 @@ const EditUser = () => {
         role: role,
         password: password,
         confPassword: confirmPassword,
+        email,
       });
       dispatch(setNotification("User Edit Success"));
       navigate("/users");
@@ -78,13 +82,17 @@ const EditUser = () => {
               )}
             </select>
           </div>
+          <NormalInput value={email} type="email" id="email" onChange={(e) => setEmail(e.target.value)} label="Email" placeholder="Email" />
 
-          <NormalInput value={password} type="password" id="password" onChange={(e) => setPassword(e.target.value)} label="New Password" placeholder={"*********"} />
+          <PasswordInput value={password} type="password" id="password" onChange={(e) => setPassword(e.target.value)} label="New Password" placeholder={"*********"} />
 
-          <NormalInput value={confirmPassword} type="password" id="confirmPassword" onChange={(e) => setConfirmPassword(e.target.value)} label="Confirm Password" placeholder={"*********"} />
+          <PasswordInput value={confirmPassword} type="password" id="confirmPassword" onChange={(e) => setConfirmPassword(e.target.value)} label="Confirm Password" placeholder={"*********"} />
 
           {error && <p className="text-red-500 font-bold text-center text-sm my-2">{error}</p>}
-          <Button type="submit">Save</Button>
+          <div className="flex flex-col gap-4">
+            <Button type="submit">Save</Button>
+            <BackPrev url="/users" />
+          </div>
         </form>
       </div>
     </Layout>

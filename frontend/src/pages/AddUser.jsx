@@ -6,6 +6,7 @@ import axios from "axios";
 import { adminArea } from "../utils/adminArea";
 import { createUser } from "../utils/users";
 import { useDispatch } from "react-redux";
+import BackPrev from "../element/BackPrev";
 
 const AddUser = () => {
   adminArea();
@@ -14,6 +15,7 @@ const AddUser = () => {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
@@ -21,9 +23,10 @@ const AddUser = () => {
     e.preventDefault();
     const data = {
       name: userName,
-      role: role,
-      password: password,
-      confPassword: confPassword,
+      role,
+      password,
+      confPassword,
+      email,
     };
     try {
       await createUser(data);
@@ -54,14 +57,16 @@ const AddUser = () => {
               </option>
               <option value="admin">Admin</option>
               <option value="user">User</option>
-              <option value="pjl">PJL</option>
             </select>
           </div>
+          {role === "admin" && <NormalInput label="Email" id="email" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Masukkan Email" />}
           <NormalInput label="Password" id="password" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="***********" />
           <NormalInput label="Confirm Password" id="confPassword" type="password" onChange={(e) => setConfPassword(e.target.value)} placeholder="***********" isError={error} />
           {error && <p className="text-red-500 mt-4 text-sm font-bold text-center mb-4">{error}</p>}
-
-          <Button type="submit">Add User</Button>
+          <div className="flex flex-col gap-4 ">
+            <Button type="submit">Add User</Button>
+            <BackPrev url="/users" />
+          </div>
         </form>
       </div>
     </Layout>

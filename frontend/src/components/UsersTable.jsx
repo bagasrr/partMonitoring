@@ -72,6 +72,7 @@ const UsersTable = () => {
               <ThData>No</ThData>
               <ThData>Nama</ThData>
               <ThData>Role</ThData>
+              <ThData>Email</ThData>
               <ThData>Action</ThData>
             </tr>
           </thead>
@@ -88,6 +89,7 @@ const UsersTable = () => {
                 <TData>{indexOfFirstItem + index + 1}</TData>
                 <TData>{highlightText(user.name, search)}</TData>
                 <TData>{highlightText(user.role, search)}</TData>
+                <TData>{user.email || "NA"}</TData>
                 <TData>
                   <div className="flex gap-5 items-center justify-center">
                     <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(user.uuid)} />

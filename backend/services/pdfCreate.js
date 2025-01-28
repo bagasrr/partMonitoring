@@ -134,7 +134,7 @@ export const createPDFWithTable = (title, headers, rows, callback) => {
   doc
     .font("Courier")
     .fontSize(12)
-    .text(`Created by Part Monitoring Sistem by barra.adhan`, leftMargin, rowBottomY, {
+    .text(`Created by Part Monitoring Sistem by Bagas Ramadhan Rusnadi`, leftMargin, rowBottomY, {
       // Sejajar dengan sisi kiri tabel
       align: "left",
     })

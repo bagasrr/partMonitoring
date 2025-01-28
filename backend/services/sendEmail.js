@@ -1,8 +1,4 @@
 // import nodemailer from "nodemailer";
-// import PDFDocument from "pdfkit";
-// import fs from "fs";
-
-// import { Buffer } from "buffer";
 
 // const transporter = nodemailer.createTransport({
 //   service: "Gmail", // Atau penyedia email lain yang Anda gunakan
@@ -16,9 +12,6 @@
 //   },
 // });
 import nodemailer from "nodemailer";
-import PDFDocument from "pdfkit";
-import { Buffer } from "buffer"; // Pastikan Buffer diimpor dari modul buffer
-
 const transporter = nodemailer.createTransport({
   service: "Gmail", // Atau penyedia email lain yang Anda gunakan
   auth: {
@@ -31,7 +24,7 @@ export const sendEmailWithPDF = (to, subject, text, filename, pdfBuffer) => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: "monitoringbybarra.adhan@gmail.com",
-      to,
+      to: to.join(", "),
       subject,
       text,
       attachments: [
@@ -58,10 +51,11 @@ export const sendLowerLimitEmail = (to, subject, text) => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: "monitoringbybarra.adhan@gmail.com",
-      to,
+      to: to.join(", "), // Menggabungkan array email dengan koma
       subject,
       text,
     };
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(`Error: ${error}`);
