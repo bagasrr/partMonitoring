@@ -1,6 +1,5 @@
 import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel } from "../models/index.js";
 import { Op, where } from "sequelize";
-import { checkStockLevels } from "../services/mailsent.js"; // Import stock alert utility
 import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
 
@@ -326,9 +325,6 @@ export const updateItem = async (req, res) => {
       prevStock: item.amount,
       afterStock: amount,
     });
-
-    // Check stock levels
-    await checkStockLevels();
 
     res.status(200).json({ message: "Part updated" });
   } catch (error) {
@@ -670,8 +666,6 @@ export const replaceItem = async (req, res) => {
     const newAmount = item.amount - useAmount;
     await itemModel.update({ amount: newAmount }, { where: { id: item.id } });
 
-    // Check stock levels
-    // await checkStockLevels(item.uuid);
     if (newAmount <= item.lowerLimit) {
       await sendLowerLimitEmail(
         "kuliah.bagass@gmail.com",
