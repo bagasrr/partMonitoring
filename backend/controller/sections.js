@@ -1,8 +1,8 @@
 import { Op } from "sequelize";
-import { historyModel, sectionModel, machineModel, itemModel, userModel, AuditLogModel } from "../models/index.js"; // Adjust the paths as necessary
+import { historyModel, sectionModel, machineModel, itemModel, userModel, AuditLogModel, vendorModel } from "../models/index.js"; // Adjust the paths as necessary
 
 // Function to log audit events
-const logAuditEvent = async (entityType, entityId, action, details) => {
+export const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
     await AuditLogModel.create({
       entityType,
@@ -40,9 +40,10 @@ export const getAllSections = async (req, res) => {
 // Mendapatkan section berdasarkan ID
 export const getSectionById = async (req, res) => {
   try {
+    const id = req.params.id;
     const response = await sectionModel.findOne({
       where: {
-        uuid: req.params.id,
+        uuid: id,
         deletedAt: null, // Exclude soft-deleted sections
       },
       attributes: ["uuid", "section_name", "section_number"],
@@ -191,6 +192,38 @@ export const deleteSection = async (req, res) => {
     } else {
       res.status(403).json({ message: "You are not allowed to delete this section" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getItemsBySection = async (req, res) => {
+  try {
+    const { sectionId } = req.params;
+
+    const section = await sectionModel.findOne({
+      where: {
+        uuid: sectionId,
+      },
+    });
+    if (!section) return res.status(404).json({ message: "Section not found" });
+    const items = await itemModel.findAll({
+      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          where: {
+            sectionId: section.id,
+          },
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
+        },
+      ],
+    });
+    res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

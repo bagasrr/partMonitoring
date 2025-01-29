@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Button, Label, NormalInput } from "../element/Input";
-import Layout from "./Layout";
+import Layout from "./layout";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { adminArea } from "../utils/adminArea";
 import { createUser } from "../utils/users";
 import { useDispatch } from "react-redux";

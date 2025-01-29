@@ -7,6 +7,7 @@ import {
   getBrokenItems,
   getInUseItems,
   getItemById,
+  getItemwithVendor,
   getRepairItems,
   getReplaceItem,
   getSpareItems,
@@ -27,6 +28,7 @@ itemRoute.use((req, res, next) => {
 });
 
 itemRoute.get("/", getAllItems);
+itemRoute.get("/vendor", getItemwithVendor);
 
 itemRoute.get("/type-replace", getReplaceItem);
 itemRoute.get("/type-swap", getSwapItem);

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getMe } from "../features/authSlice";
 import StatusInfo from "../components/StatusInfo";
 import Title from "../element/Title";
 import DayUsedChart from "../components/DayUsedChart";
@@ -11,6 +9,8 @@ import AmountLimitChart from "../components/AmountLimitChart";
 import ButtonTypeParts from "../components/ButtonTypeParts";
 import ItemsReplace from "../components/ItemsReplace";
 import ItemsSwap from "../components/ItemsSwap";
+import Layout from "./layout";
+import { getMe } from "../features/authSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();

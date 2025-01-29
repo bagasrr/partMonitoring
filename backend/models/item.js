@@ -9,6 +9,13 @@ export const item = {
       notEmpty: true,
     },
   },
+  item_number: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -73,6 +80,10 @@ export const item = {
     allowNull: true,
   },
   dayUsed: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  vendorId: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },

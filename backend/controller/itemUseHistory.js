@@ -7,11 +7,13 @@ export const getAllItemUseHistories = async (req, res) => {
         {
           model: itemModel,
           as: "item", // Alias untuk item yang digunakan
+          where: { deletedAt: null },
           attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
         },
         {
           model: itemModel,
           as: "replacementItem", // Alias untuk item pengganti
+          where: { deletedAt: null },
           attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
         },
       ],

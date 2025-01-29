@@ -1,5 +1,9 @@
-export const TRow = ({ children }) => {
-  return <tr className="bg-white border-b hover:bg-gray-100 ">{children}</tr>;
+export const TRow = ({ children, onClick }) => {
+  return (
+    <tr className="bg-white border-b hover:bg-gray-100 cursor-pointer" onClick={onClick}>
+      {children}
+    </tr>
+  );
 };
 
 export const ThData = ({ children }) => {

@@ -9,6 +9,7 @@ import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
+import { getVendors } from "../../utils/vendor";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
@@ -18,6 +19,14 @@ const AddItemForm = () => {
   const [isNewPart, setIsNewPart] = useState(false);
   const [isNewMachine, setIsNewMachine] = useState(false);
   const [isNewSection, setIsNewSection] = useState(false);
+  const [isNew, setIsNew] = useState({
+    vendor: false,
+  });
+  const [list, setList] = useState({
+    vendor: [],
+    machine: [],
+    section: [],
+  });
   const [error, setError] = useState(false);
   const [errors, setErrors] = useState({});
   const notification = useNotification();
@@ -28,6 +37,7 @@ const AddItemForm = () => {
     name: "",
     amount: "",
     description: "",
+    item_number: "",
     status: "Not Set",
     lowerLimit: "",
     machine_name: "",
@@ -36,6 +46,7 @@ const AddItemForm = () => {
     section_number: "",
     replacementType: "",
     year: "",
+    vendor_name: "",
   });
 
   const handleChange = (e) => {
@@ -78,9 +89,10 @@ const AddItemForm = () => {
     }
 
     try {
+      console.log(formData);
       setIsLoading(true);
       await createItem(formData);
-      formData.replacementType === "Replace" ? dispatch(setNotification(`Part ${formData.name} Added ${formData.amount} ea`)) : dispatch(setNotification(`Part ${formData.name} Added`));
+      dispatch(setNotification(`Part ${formData.name} Added`));
       navigate("/parts");
       setFormData({
         name: "",
@@ -153,6 +165,22 @@ const AddItemForm = () => {
     }
   };
 
+  const handleVendorChange = (e) => {
+    const { value } = e.target;
+    console.log(value);
+    if (value === "new") {
+      setIsNew({
+        vendor: true,
+      });
+      setFormData({ ...formData, vendor_name: "" });
+    } else {
+      setIsNew({
+        vendor: false,
+      });
+      setFormData({ ...formData, vendor_name: value });
+    }
+  };
+
   const fetchMachines = async () => {
     const response = await getMachines();
     setMachines(response);
@@ -167,11 +195,16 @@ const AddItemForm = () => {
     const response = await getSections();
     setSections(response);
   };
+  const fetchVendor = async () => {
+    const res = await getVendors();
+    setList({ vendor: res });
+  };
 
   useEffect(() => {
     fetchMachines();
     fetchSections();
     fetchPart();
+    fetchVendor();
   }, []);
 
   return (
@@ -179,7 +212,8 @@ const AddItemForm = () => {
       {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Part...</LoadingAnimate>}
       {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
       <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
-        {/* <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
+        <FormField label="Part Number" name={"item_number"} value={formData.item_number} onChange={handleChange} placeholder={"Masukkan nomor part"} />
+        <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
           <option value="" disabled>
             Pilih Part
           </option>
@@ -192,11 +226,11 @@ const AddItemForm = () => {
             ))}
         </FormField>
         {isNewPart && (
-          <> */}
-        {/* <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} /> */}
-        {/* </>
-        )} */}
-        <FormField type="select" label={"Part Name"} name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange}>
+          <>
+            <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
+          </>
+        )}
+        {/* <FormField type="select" label={"Part Name"} name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange}>
           <option value="" disabled>
             Pilih Part
           </option>
@@ -207,11 +241,25 @@ const AddItemForm = () => {
                 {data.name}
               </option>
             ))}
-        </FormField>
+        </FormField> */}
 
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
         <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} placeholder={"Masukkan deskripsi"} />
+
+        <FormField label="Vendor" name="vendor_name" type="select" value={isNew.vendor ? "new" : formData.vendor_name} onChange={handleVendorChange} placeholder={"Masukkan vendor"}>
+          <option value="" disabled>
+            Pilih Vendor
+          </option>
+          <option value="new">Enter New Vendor</option>
+          {list.vendor &&
+            list.vendor.map((data) => (
+              <option key={data.uuid} value={data.vendor_name}>
+                {data.vendor_name}
+              </option>
+            ))}
+        </FormField>
+        {isNew.vendor && <FormField label="New Vendor" name="vendor_name" value={formData.vendor_name} onChange={handleChange} placeholder={"Masukkan vendor baru"} />}
 
         {/* {isNewPart && (
           <> */}

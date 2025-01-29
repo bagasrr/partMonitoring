@@ -7,6 +7,7 @@ import { machine } from "./Machine.js";
 import { section } from "./section.js";
 import { user } from "./user.js";
 import { ItemUseHistory } from "./itemUseHistory.js";
+import { vendor } from "./vendor.js";
 
 export const userModel = db.define("user", user);
 export const itemModel = db.define("item", item, { paranoid: true });
@@ -14,6 +15,7 @@ export const itemModel = db.define("item", item, { paranoid: true });
 export const machineModel = db.define("machine", machine, { paranoid: true });
 export const sectionModel = db.define("section", section, { paranoid: true });
 export const historyModel = db.define("history", history, { paranoid: true });
+export const vendorModel = db.define("vendor", vendor, { paranoid: true });
 export const AuditLogModel = db.define("audit_log", AuditLog);
 export const itemUseHistoryModel = db.define("itemUseHistory", ItemUseHistory);
 
@@ -42,13 +44,6 @@ itemModel.belongsTo(machineModel, {
   foreignKey: "machineId",
 });
 
-// itemModel.hasMany(itemUsageModel, {
-//   foreignKey: "itemId",
-// });
-// itemUsageModel.belongsTo(itemModel, {
-//   foreignKey: "itemId",
-// });
-
 itemModel.hasMany(itemUseHistoryModel, { foreignKey: "itemId" });
 itemUseHistoryModel.belongsTo(itemModel, { foreignKey: "itemId" });
 
@@ -58,16 +53,12 @@ itemUseHistoryModel.belongsTo(itemModel, { as: "replacementItem", foreignKey: "r
 machineModel.hasMany(itemUseHistoryModel, { foreignKey: "machineId" });
 itemUseHistoryModel.belongsTo(machineModel, { foreignKey: "machineId" });
 
-// itemModel.hasMany(historyModel);
-// historyModel.belongsTo(itemModel, {
-//   foreignKey: "itemId",
-// });
-// machineModel.hasMany(historyModel);
-// historyModel.belongsTo(machineModel, {
-//   foreignKey: "machineId",
-// });
+userModel.hasMany(vendorModel);
+vendorModel.belongsTo(userModel, {
+  foreignKey: "userId",
+});
 
-// userModel.hasMany(historyModel);
-// historyModel.belongsTo(userModel, {
-//   foreignKey: "userId",
-// });
+vendorModel.hasMany(itemModel);
+itemModel.belongsTo(vendorModel, {
+  foreignKey: "vendorId",
+});

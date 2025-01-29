@@ -17,6 +17,7 @@ import AddMachineNew from "./pages/AddGroup/AddMachineNew";
 import Parts from "./pages/Parts";
 import ChangePartPages from "./pages/AddGroup/ChangePart";
 import ItemUseHistory from "./pages/ItemUseHistory";
+import Details from "./pages/Details";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/parts",
     element: <Parts />,
+  },
+  {
+    path: "/parts/:uuid/details",
+    element: <Details />,
   },
   {
     path: "/parts/add",

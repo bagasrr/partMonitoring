@@ -1,4 +1,4 @@
-import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel } from "../models/index.js";
+import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel, vendorModel } from "../models/index.js";
 import { Op, where } from "sequelize";
 import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
@@ -20,7 +20,7 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
 export const getAllItems = async (req, res) => {
   try {
     const response = await itemModel.findAll({
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      attributes: ["uuid", "name", "item_number", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       where: {
         deletedAt: null, // Exclude soft-deleted items
       },
@@ -32,6 +32,10 @@ export const getAllItems = async (req, res) => {
         {
           model: machineModel,
           attributes: ["uuid", "machine_name", "machine_number"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
         },
       ],
     });
@@ -48,7 +52,7 @@ export const getItemById = async (req, res) => {
         uuid: req.params.id,
         deletedAt: null, // Exclude soft-deleted items
       },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      attributes: ["uuid", "name", "item_number", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: userModel,
@@ -57,6 +61,10 @@ export const getItemById = async (req, res) => {
         {
           model: machineModel,
           attributes: ["uuid", "machine_name", "machine_number"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
         },
       ],
     });
@@ -71,11 +79,15 @@ export const getReplaceItem = async (req, res) => {
   try {
     const items = await itemModel.findAll({
       where: { replacementType: "Replace" },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      attributes: ["uuid", "name", "item_number", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: machineModel,
           attributes: ["uuid", "machine_name"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
         },
       ],
     });
@@ -89,11 +101,15 @@ export const getSwapItem = async (req, res) => {
   try {
     const items = await itemModel.findAll({
       where: { replacementType: "Swap" },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: machineModel,
           attributes: ["uuid", "machine_name"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
         },
       ],
     });
@@ -130,7 +146,7 @@ export const getSwapReplaceItem = async (req, res) => {
 };
 
 export const createItem = async (req, res) => {
-  const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year } = req.body;
+  const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year, item_number, vendor_name } = req.body;
 
   try {
     if (typeof amount !== "number" || typeof lowerLimit !== "number" || typeof year !== "number") {
@@ -139,8 +155,8 @@ export const createItem = async (req, res) => {
     // Validate that amount is greater than 0
     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
 
-    const item = await itemModel.findOne({ where: { name } });
-    if (item) return res.status(400).json({ message: "PartName Already Exist, Please use different Name" });
+    const item = await itemModel.findOne({ where: { item_number } });
+    if (item) return res.status(400).json({ message: "PartNumber Already Exist, Please use different Name" });
 
     // Find or create machine
     let machine = await machineModel.findOne({ where: { machine_name } });
@@ -195,6 +211,22 @@ export const createItem = async (req, res) => {
         section_name: section.section_name,
       });
     }
+    const vendor = await vendorModel.findOne({ where: { vendor_name } });
+    if (!vendor) {
+      await vendorModel.create({
+        vendor_name,
+        userId: req.userId,
+      });
+      await historyModel.create({
+        name: vendor_name,
+        changeType: "Create",
+        category: "Vendor",
+        username: req.name,
+        description: "Vendor created during part creation",
+      });
+      await logAuditEvent("Vendor", vendor.id, "create", { vendor_name: vendor.vendor_name });
+    }
+
     const newItem = await itemModel.create({
       name,
       amount,
@@ -205,6 +237,8 @@ export const createItem = async (req, res) => {
       machineId: machine.id,
       replacementType,
       year,
+      item_number,
+      vendorId: vendor.id,
     });
 
     // Create history record for new item creation
@@ -736,6 +770,15 @@ export const getBrokenItems = async (req, res) => {
 export const getRepairItems = async (req, res) => {
   try {
     const items = await itemModel.findAll({ where: { status: "Repair", deletedAt: null } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getItemwithVendor = async (req, res) => {
+  try {
+    const items = await itemModel.findAll({ where: { deletedAt: null }, include: [{ model: vendorModel }] });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });

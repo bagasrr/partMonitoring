@@ -1,11 +1,8 @@
 import React from "react";
-import Layout from "./Layout";
 import MachinesTable from "../components/MachinesTable";
-import Title from "../element/Title";
-import { Link } from "react-router-dom";
 import scrollToTop from "../utils/scrollToTop";
-import { FiPlusCircle } from "react-icons/fi";
 import HeaderPages from "../components/headerPages";
+import Layout from "./layout";
 
 const Machines = () => {
   scrollToTop();

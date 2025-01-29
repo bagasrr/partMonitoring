@@ -1,10 +1,10 @@
 import React from "react";
-import Layout from "./Layout";
 import SectionsTable from "../components/SectionsTable";
 import Title from "../element/Title";
 import { Link } from "react-router-dom";
 import ScrollToTop from "../utils/scrollToTop";
 import { FiPlusCircle } from "react-icons/fi";
+import Layout from "./layout";
 
 const Sections = () => {
   ScrollToTop();

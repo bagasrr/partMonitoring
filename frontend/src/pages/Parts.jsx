@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiPlusCircle } from "react-icons/fi";
-import Layout from "./Layout";
-import Title from "../element/Title";
 import scrollToTop from "../utils/scrollToTop";
 import ItemsReplace from "../components/ItemsReplace";
 import ItemsSwap from "../components/ItemsSwap";
 import HeaderPages from "../components/headerPages";
 import ButtonTypeParts from "../components/ButtonTypeParts";
+import Layout from "./layout";
 
 const Parts = () => {
   scrollToTop();
