@@ -64,10 +64,10 @@ const Dashboard = () => {
       <div className="mt-5">
         <Title>Part List</Title>
         <div className="flex gap-2 mb-5">
-          <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+          <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
             {view === "swap" ? "Swap" : "S"}
           </ButtonTypeParts>
-          <ButtonTypeParts view={view} setView={setView} partType="replace" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
+          <ButtonTypeParts view={view} setView={setView} partType="replace" className={`px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out`}>
             {view === "replace" ? "Replace" : "R"}
           </ButtonTypeParts>
         </div>

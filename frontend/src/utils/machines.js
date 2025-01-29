@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const host = "http://localhost:4000";
+import { host } from "../features/AuthSlice";
 
 export const getMachines = async () => {
   try {

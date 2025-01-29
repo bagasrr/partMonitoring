@@ -28,7 +28,7 @@ export const getUserById = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-  const { name, password, confPassword, role } = req.body;
+  const { name, password, confPassword, role, email } = req.body;
 
   if (password !== confPassword) {
     return res.status(400).json({
@@ -41,7 +41,8 @@ export const createUser = async (req, res) => {
     const data = await userModel.create({
       name: name,
       password: hashPassword,
-      role: role,
+      role,
+      email,
     });
     res.status(201).json({ message: "user created", data });
   } catch (error) {
@@ -131,6 +132,9 @@ export const getUserAdminEmail = async (req, res) => {
       attributes: ["email"],
     });
     const adminEmails = response.map((user) => user.email);
+    if (adminEmails.length === 0) {
+      throw new Error("Tidak ada admin yang ditemukan");
+    }
     return adminEmails;
   } catch (error) {
     console.error("Gagal mengambil email admin:", error);

@@ -1,6 +1,7 @@
 import axios from "axios";
+import { host } from "../features/AuthSlice";
 
-const host = "http://localhost:4000";
+// const host = import.meta.env.VITE_BACKEND_URL;
 // Create a new item
 export const createItem = async (itemData) => {
   try {

@@ -5,7 +5,8 @@ import session from "express-session";
 import SequelizeSession from "connect-session-sequelize";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config();
+
+dotenv.config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
@@ -22,13 +23,13 @@ const store = new sessionStore({
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Gunakan environment variable untuk origin
   })
 );
 
 app.use(
   session({
-    secret: process.env.SESS_SECRET,
+    secret: process.env.SESS_SECRET, // Gunakan environment variable untuk secret
     resave: false,
     saveUninitialized: true,
     store,
@@ -42,9 +43,8 @@ app.use(
 
 app.use("/api", routes);
 
-// store.sync();
 app.listen(process.env.PORT, () => {
-  console.log("Server Up and Running..");
+  console.log(`Server running on port ${process.env.PORT}`);
 });
 
 try {

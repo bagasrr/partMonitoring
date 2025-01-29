@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
@@ -192,9 +193,21 @@ const AddItemForm = () => {
         </FormField>
         {isNewPart && (
           <> */}
-        <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
+        {/* <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} /> */}
         {/* </>
         )} */}
+        <FormField type="select" label={"Part Name"} name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange}>
+          <option value="" disabled>
+            Pilih Part
+          </option>
+          <option value="new">Enter New Part</option>
+          {part &&
+            part.map((data) => (
+              <option key={data.uuid} value={data.name}>
+                {data.name}
+              </option>
+            ))}
+        </FormField>
 
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
         <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />

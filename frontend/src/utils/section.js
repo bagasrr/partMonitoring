@@ -1,6 +1,6 @@
 import axios from "axios";
+import { host } from "../features/AuthSlice";
 
-const host = "http://localhost:4000";
 export const getSections = async () => {
   const response = await axios.get(`${host}/api/sections`);
   return response.data;

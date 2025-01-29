@@ -28,6 +28,7 @@ const AddUser = () => {
       confPassword,
       email,
     };
+    console.log(data);
     try {
       await createUser(data);
       navigate("/users");
@@ -59,7 +60,7 @@ const AddUser = () => {
               <option value="user">User</option>
             </select>
           </div>
-          {role === "admin" && <NormalInput label="Email" id="email" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Masukkan Email" />}
+          {role === "admin" && <NormalInput label="Email" id="email" type="email" onChange={(e) => console.log(e.target.value)} placeholder="Masukkan Email" />}
           <NormalInput label="Password" id="password" type="password" onChange={(e) => setPassword(e.target.value)} placeholder="***********" />
           <NormalInput label="Confirm Password" id="confPassword" type="password" onChange={(e) => setConfPassword(e.target.value)} placeholder="***********" isError={error} />
           {error && <p className="text-red-500 mt-4 text-sm font-bold text-center mb-4">{error}</p>}

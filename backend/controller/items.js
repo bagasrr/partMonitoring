@@ -354,9 +354,6 @@ export const updateItemStatus = async (req, res) => {
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
     const adminEmails = await getUserAdminEmail();
-    if (adminEmails.length === 0) {
-      return res.status(404).json({ message: "Tidak ada admin yang ditemukan" });
-    }
 
     // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
@@ -426,11 +423,13 @@ export const updateItemStatusForm = async (req, res) => {
 
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
+    const adminEmails = await getUserAdminEmail();
+
     // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (status === "Broken") {
         try {
-          await sendEmailWithPDF("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
+          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });
@@ -604,11 +603,14 @@ export const swapItem = async (req, res) => {
     const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
     const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
     const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+
+    const adminEmails = await getUserAdminEmail();
+
     // Membuat PDF
     createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
       if (itemStatus === "Broken") {
         try {
-          await sendEmailWithPDF("kuliah.bagass@gmail.com", `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
+          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });
@@ -673,10 +675,6 @@ export const replaceItem = async (req, res) => {
     await itemModel.update({ amount: newAmount }, { where: { id: item.id } });
 
     const adminEmails = await getUserAdminEmail();
-
-    if (adminEmails.length === 0) {
-      return res.status(404).json({ message: "Tidak ada admin yang ditemukan" });
-    }
 
     if (newAmount <= item.lowerLimit) {
       try {

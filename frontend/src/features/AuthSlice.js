@@ -9,9 +9,11 @@ const initialState = {
   message: "",
 };
 
+export const host = import.meta.env.VITE_BACKEND_URL;
+
 export const LoginUser = createAsyncThunk("auth/loginUser", async (user, thunkAPI) => {
   try {
-    const response = await axios.post("http://localhost:4000/api/auth/login", {
+    const response = await axios.post(`${host}/api/auth/login`, {
       name: user.username,
       password: user.password,
     });
@@ -26,7 +28,7 @@ export const LoginUser = createAsyncThunk("auth/loginUser", async (user, thunkAP
 
 export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
   try {
-    const response = await axios.get("http://localhost:4000/api/auth/me");
+    const response = await axios.get(`${host}/api/auth/me`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -37,7 +39,7 @@ export const getMe = createAsyncThunk("auth/getMe", async (_, thunkAPI) => {
 });
 
 export const Logout = createAsyncThunk("auth/logout", async () => {
-  await axios.delete("http://localhost:4000/api/auth/logout");
+  await axios.delete(`${host}/api/auth/logout`);
 });
 
 export const authSlice = createSlice({
