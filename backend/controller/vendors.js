@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import { historyModel, userModel, vendorModel } from "../models/index.js";
 import { logAuditEvent } from "./sections.js";
 
@@ -23,7 +24,7 @@ export const createVendor = async (req, res) => {
 
 export const getVendors = async (req, res) => {
   try {
-    const vendors = await vendorModel.findAll({ where: { deletedAt: null }, attributes: ["uuid", "vendor_name"], include: [{ model: userModel, attributes: ["name", "role"] }] });
+    const vendors = await vendorModel.findAll({ where: { deletedAt: null }, attributes: ["uuid", "vendor_name", "deletedAt"], include: [{ model: userModel, attributes: ["name", "role"] }] });
     res.status(200).json(vendors);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -77,9 +78,9 @@ export const softDeleteVendor = async (req, res) => {
     if (!vendor) {
       return res.status(404).json({ message: "Vendor not found" });
     }
-    await vendor.update({ deletedAt: new Date() });
+    await vendorModel.update({ deletedAt: new Date() }, { where: { id: vendor.id } });
 
-    historyModel.create({
+    await historyModel.create({
       name: vendor.vendor_name,
       changeType: "Delete",
       category: "Vendor",

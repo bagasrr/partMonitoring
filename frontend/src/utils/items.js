@@ -1,5 +1,5 @@
 import axios from "axios";
-import { host } from "../features/AuthSlice";
+import { host } from "../features/authSlice";
 
 // const host = import.meta.env.VITE_BACKEND_URL;
 // Create a new item

@@ -11,7 +11,7 @@ const useNotification = () => {
     if (notification) {
       const timer = setTimeout(() => {
         dispatch(clearNotification());
-      }, 3000); // Adjust the time as needed
+      }, 6000); // Adjust the time as needed
       return () => clearTimeout(timer); // Cleanup the timer on unmount or when notification changes
     }
   }, [notification, dispatch]);

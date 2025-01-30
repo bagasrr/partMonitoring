@@ -5,14 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { getMachines } from "../../utils/machines";
 import { getSections } from "../../utils/section";
 import { useDispatch, useSelector } from "react-redux";
-import { setNotification } from "../../features/notificationSlice";
+import { setDeleted, setNotification } from "../../features/notificationSlice";
 import useNotification from "../../services/Notification";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
 import { getVendors } from "../../utils/vendor";
+import Notification from "../Notification";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   const [isNew, setIsNew] = useState({
     part: false,
     machine: false,
@@ -29,6 +31,7 @@ const AddItemForm = () => {
   const [error, setError] = useState(false);
   const [errors, setErrors] = useState({});
   const notification = useNotification();
+  const deleted = useSelector((state) => state.notification.deleted);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
@@ -36,7 +39,7 @@ const AddItemForm = () => {
     name: "",
     amount: "",
     description: "",
-    item_number: "",
+    item_number: null,
     status: "Not Set",
     lowerLimit: "",
     machine_name: "",
@@ -44,10 +47,11 @@ const AddItemForm = () => {
     section_name: "",
     section_number: "",
     replacementType: "",
-    year: "",
-    vendor_name: "",
+    year: null,
+    vendor_name: null,
   });
 
+  console.log(isNew.replaceType);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -56,9 +60,16 @@ const AddItemForm = () => {
       setIsNew((prev) => ({ ...prev, replaceType: true }));
     } else {
       setIsNew((prev) => ({ ...prev, replaceType: false }));
+      console.log("Aneh Ngentot");
     }
-
-    const newValue = name === "amount" || name === "lowerLimit" || name === "year" ? Number(value) : value;
+    let newValue;
+    if (name === "amount" || name === "lowerLimit") {
+      newValue = Number(value);
+    } else if (name === "year") {
+      newValue = value === "" ? null : Number(value); // Ubah string kosong jadi null
+    } else {
+      newValue = value;
+    }
     setFormData({ ...formData, [name]: newValue });
 
     if (name === "amount" || name === "lowerLimit") {
@@ -83,10 +94,16 @@ const AddItemForm = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
+    const cleanedFormData = { ...formData };
+    if (!cleanedFormData.year) {
+      cleanedFormData.year = null;
+    }
+
+    createItem(cleanedFormData);
     try {
-      console.log(formData);
+      console.log("formData: ", formData);
       setIsLoading(true);
-      await createItem(formData);
+      await createItem(cleanedFormData);
       dispatch(setNotification(`Part ${formData.name} Added`));
       navigate("/parts");
       setFormData({
@@ -99,10 +116,14 @@ const AddItemForm = () => {
         machine_number: "",
         section_name: "",
         section_number: "",
+        year: null,
+        item_number: null,
       });
     } catch (error) {
       setError(true);
       dispatch(setNotification(`Error: ${error.message}`));
+      dispatch(setDeleted(true));
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -212,7 +233,8 @@ const AddItemForm = () => {
           <option value="" disabled>
             Pilih Part
           </option>
-          <option value="new">Enter New Part</option>
+          {/* admin can add new part dan user can add to if replaceType = false */}
+          {(!isNew.replaceType || user.role === "admin") && <option value="new">Enter New Part</option>}
           {uniqueParts.map((data) => (
             <option key={data.uuid} value={data.name}>
               {data.name}
@@ -223,21 +245,37 @@ const AddItemForm = () => {
         {isNew.part && <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder="Masukkan nama part baru" />}
 
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
-        {isNew.replaceType && <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />}
+
+        {isNew.replaceType && (
+          <FormField
+            label="Year"
+            name="year"
+            type="number"
+            error={errors.year}
+            value={formData.year ?? ""} // Tampilkan string kosong jika null
+            onChange={handleChange}
+            placeholder={"Masukkan tahun"}
+          />
+        )}
+
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} placeholder={"Masukkan deskripsi"} />
 
-        <FormField label="Vendor" name="vendor_name" type="select" value={isNew.vendor ? "new" : formData.vendor_name} onChange={handleVendorChange} placeholder={"Masukkan vendor"}>
-          <option value="" disabled>
-            Pilih Vendor
-          </option>
-          <option value="new">Enter New Vendor</option>
-          {list.vendor &&
-            list.vendor.map((data) => (
-              <option key={data.uuid} value={data.vendor_name}>
-                {data.vendor_name}
-              </option>
-            ))}
-        </FormField>
+        {isNew.replaceType && (
+          <FormField label="Vendor" name="vendor_name" type="select" value={isNew.vendor ? "new" : formData.vendor_name} onChange={handleVendorChange} placeholder={"Masukkan vendor"}>
+            <option value="" disabled>
+              Pilih Vendor
+            </option>
+            {/* <option value={null}>NA</option> */}
+            {user.role === "admin" && <option value="new">Enter New Vendor</option>}
+            {list.vendor &&
+              list.vendor.map((data) => (
+                <option key={data.uuid} value={data.vendor_name}>
+                  {data.vendor_name}
+                </option>
+              ))}
+          </FormField>
+        )}
+
         {isNew.vendor && <FormField label="New Vendor" name="vendor_name" value={formData.vendor_name} onChange={handleChange} placeholder={"Masukkan vendor baru"} />}
 
         {/* {isNewPart && (
@@ -261,11 +299,11 @@ const AddItemForm = () => {
           <option value="" disabled>
             Pilih Machine
           </option>
-          <option value="new">Enter New Machine</option>
+          {user.role === "admin" && <option value="new">Enter New Machine</option>}
           {list.machine &&
             list.machine.map((data) => (
               <option key={data.uuid} value={data.machine_name}>
-                {data.machine_name}
+                {data.machine_name} ({data.machine_number})
               </option>
             ))}
         </FormField>
@@ -295,7 +333,7 @@ const AddItemForm = () => {
             )}
           </>
         )}
-
+        {notification && <Notification message={notification} deleted={deleted} />}
         <Button type="submit" buttonName="Add Part" />
       </form>
     </div>

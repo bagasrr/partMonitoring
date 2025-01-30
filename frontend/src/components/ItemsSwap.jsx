@@ -182,7 +182,7 @@ const ItemsSwap = () => {
             ))}
           </tbody>
         </table>
-        <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`}></DeleteConfirmModalBox>
+        <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`} />
       </div>
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
       {isOpen && (

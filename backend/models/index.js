@@ -8,9 +8,11 @@ import { section } from "./section.js";
 import { user } from "./user.js";
 import { ItemUseHistory } from "./itemUseHistory.js";
 import { vendor } from "./vendor.js";
+import { itemHistory } from "./itemHistory.js";
 
 export const userModel = db.define("user", user);
 export const itemModel = db.define("item", item, { paranoid: true });
+export const itemHistoryModel = db.define("itemHistory", itemHistory, { paranoid: true });
 // export const imagesModel = db.define("images", images);
 export const machineModel = db.define("machine", machine, { paranoid: true });
 export const sectionModel = db.define("section", section, { paranoid: true });
@@ -61,4 +63,14 @@ vendorModel.belongsTo(userModel, {
 vendorModel.hasMany(itemModel);
 itemModel.belongsTo(vendorModel, {
   foreignKey: "vendorId",
+});
+
+userModel.hasMany(itemHistoryModel);
+itemHistoryModel.belongsTo(userModel, {
+  foreignKey: "userId",
+});
+
+itemModel.hasMany(itemHistoryModel);
+itemHistoryModel.belongsTo(itemModel, {
+  foreignKey: "itemId",
 });

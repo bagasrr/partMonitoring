@@ -3,6 +3,7 @@ import { Op, where } from "sequelize";
 import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
 import { getUserAdminEmail } from "./users.js";
+import { addItemHistories } from "./itemHistories.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -149,17 +150,23 @@ export const createItem = async (req, res) => {
   const { name, amount, description, status, lowerLimit, machine_name, machine_number, section_name, section_number, replacementType, year, item_number, vendor_name } = req.body;
 
   try {
-    if (typeof amount !== "number" || typeof lowerLimit !== "number" || typeof year !== "number") {
+    if (typeof amount !== "number" || typeof lowerLimit !== "number") {
       return res.status(400).json({ message: "Invalid data type" });
     }
     // Validate that amount is greater than 0
     if (amount <= 0) return res.status(400).json({ message: "Amount must be greater than 0" });
 
-    const item = await itemModel.findOne({ where: { item_number } });
-    if (item) return res.status(400).json({ message: "PartNumber Already Exist, Please use different Name" });
+    let machine = await machineModel.findOne({ where: { machine_name } });
+
+    if (replacementType === "Replace") {
+      const item = await itemModel.findOne({ where: { name, deletedAt: null, machineId: machine.id } });
+      if (item) return res.status(400).json({ message: `PartName '${name}' in machine ${machine_name} Already Exist, Please use different Name or select Add Amount` });
+    } else {
+      const item = await itemModel.findOne({ where: { item_number } });
+      if (item) return res.status(400).json({ message: `PartNumber ${item_number} Already Exist, Please use different Number` });
+    }
 
     // Find or create machine
-    let machine = await machineModel.findOne({ where: { machine_name } });
 
     if (!machine) {
       // Find or create section
@@ -211,8 +218,9 @@ export const createItem = async (req, res) => {
         section_name: section.section_name,
       });
     }
+
     const vendor = await vendorModel.findOne({ where: { vendor_name } });
-    if (!vendor) {
+    if (!vendor && vendor_name !== null) {
       await vendorModel.create({
         vendor_name,
         userId: req.userId,
@@ -238,8 +246,10 @@ export const createItem = async (req, res) => {
       replacementType,
       year,
       item_number,
-      vendorId: vendor.id,
+      vendorId: vendor?.id || null,
     });
+
+    await addItemHistories(newItem.id, req.userId, "Part Created");
 
     // Create history record for new item creation
     await historyModel.create({

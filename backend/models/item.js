@@ -70,7 +70,7 @@ export const item = {
   },
   year: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   replacementDate: {
     type: DataTypes.DATE,

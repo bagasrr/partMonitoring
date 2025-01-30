@@ -18,6 +18,7 @@ import Parts from "./pages/Parts";
 import ChangePartPages from "./pages/AddGroup/ChangePart";
 import ItemUseHistory from "./pages/ItemUseHistory";
 import Details from "./pages/Details";
+import Vendors from "./pages/Vendors";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
   {
     path: "/sections/add",
     element: <AddSection />,
+  },
+  {
+    path: "/vendors",
+    element: <Vendors />,
   },
   {
     path: "/yourenotadmin",

@@ -10,3 +10,12 @@ export const getVendors = async () => {
     throw new Error(error.response?.data?.message || "Error fetching vendors");
   }
 };
+
+export const deleteVendor = async (uuid) => {
+  try {
+    const response = await axios.patch(`${host}/api/vendors/${uuid}/delete`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error deleting vendor");
+  }
+};
