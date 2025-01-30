@@ -11,10 +11,7 @@ export const item = {
   },
   item_number: {
     type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,

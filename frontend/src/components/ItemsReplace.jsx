@@ -104,7 +104,7 @@ const ItemsReplace = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       {isLoading && <LoadingAnimate isOpen={isLoading}>Please Wait Changing Status...</LoadingAnimate>}
       {notification && (
         <div className={`${deleted ? "bg-rose-100 border border-rose-400 text-rose-700" : "bg-green-100 border border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
@@ -112,15 +112,14 @@ const ItemsReplace = () => {
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search parts or machines name" />
-      <div className="overflow-auto max-h-96 lg:max-h-[calc(100vh-150px)] ">
-        <table>
+      <div className="overflow-auto min-w-full max-h-96 lg:max-h-[calc(100vh-150px)] ">
+        <table className="w-full">
           <thead className="sticky top-0 z-10">
             <tr>
               <ThData>No</ThData>
               <ThData>Nama Part</ThData>
               <ThData>Amount</ThData>
               <ThData>Status</ThData>
-              <ThData>Year</ThData>
               <ThData>Deskripsi</ThData>
               <ThData>Batas Bawah</ThData>
               <ThData>Machine Name</ThData>
@@ -155,7 +154,6 @@ const ItemsReplace = () => {
                     <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
                   )}
                 </TData>
-                <TData>{item.year}</TData>
                 <TData>{item.description}</TData>
                 <TData>{item.lowerLimit}</TData>
                 <TData>{highlightText(item.machine.machine_name, search)}</TData>

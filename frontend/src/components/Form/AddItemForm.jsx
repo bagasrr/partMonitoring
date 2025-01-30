@@ -13,19 +13,18 @@ import { getVendors } from "../../utils/vendor";
 
 const AddItemForm = () => {
   const navigate = useNavigate();
-  const [part, setPart] = useState([]);
-  const [machines, setMachines] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [isNewPart, setIsNewPart] = useState(false);
-  const [isNewMachine, setIsNewMachine] = useState(false);
-  const [isNewSection, setIsNewSection] = useState(false);
   const [isNew, setIsNew] = useState({
+    part: false,
+    machine: false,
+    section: false,
     vendor: false,
+    replaceType: false,
   });
   const [list, setList] = useState({
     vendor: [],
     machine: [],
     section: [],
+    part: [],
   });
   const [error, setError] = useState(false);
   const [errors, setErrors] = useState({});
@@ -52,12 +51,16 @@ const AddItemForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Convert amount and lowerLimit to numbers
-    const newValue = name === "amount" || name === "lowerLimit" || name === "year" ? Number(value) : value;
+    const isType = name === "replacementType";
+    if (isType && value === "Swap") {
+      setIsNew((prev) => ({ ...prev, replaceType: true }));
+    } else {
+      setIsNew((prev) => ({ ...prev, replaceType: false }));
+    }
 
+    const newValue = name === "amount" || name === "lowerLimit" || name === "year" ? Number(value) : value;
     setFormData({ ...formData, [name]: newValue });
 
-    // Validate numerical inputs
     if (name === "amount" || name === "lowerLimit") {
       if (newValue < 0) {
         setErrors({ ...errors, [name]: "Nilai Harus lebih dari 0" });
@@ -71,22 +74,14 @@ const AddItemForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate form data before submitting
     const newErrors = {};
-    if (formData.amount <= 0) {
-      newErrors.amount = "Nilai harus lebih dari 0";
-    }
-    if (formData.lowerLimit < 0) {
-      newErrors.lowerLimit = "Nilai harus lebih dari 0";
-    }
-    if (formData.year > new Date().getFullYear()) {
-      newErrors.year = "Tahun tidak bisa lebih dari tahun sekarang";
-    }
+
+    if (formData.amount <= 0) newErrors.amount = "Nilai harus lebih dari 0";
+    if (formData.lowerLimit < 0) newErrors.lowerLimit = "Nilai harus lebih dari 0";
+    if (formData.year > new Date().getFullYear()) newErrors.year = "Tahun tidak bisa lebih dari tahun sekarang";
+
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      return;
-    }
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       console.log(formData);
@@ -105,22 +100,22 @@ const AddItemForm = () => {
         section_name: "",
         section_number: "",
       });
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       setError(true);
-      setNotification(`Error: ${error.message}`);
+      dispatch(setNotification(`Error: ${error.message}`));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handlePartChange = (e) => {
     const { value } = e.target;
     if (value === "new") {
-      setIsNewPart(true);
+      setIsNew((prev) => ({ ...prev, part: true }));
       setFormData({ ...formData, name: "", amount: "", description: "" });
     } else {
-      setIsNewPart(false);
-      const selectedPart = part.find((part) => part.name === value);
+      setIsNew((prev) => ({ ...prev, part: false }));
+      const selectedPart = list.part.find((part) => part.name === value);
       setFormData({
         ...formData,
         name: value,
@@ -132,14 +127,15 @@ const AddItemForm = () => {
       });
     }
   };
+
   const handleMachineChange = (e) => {
     const { value } = e.target;
     if (value === "new") {
-      setIsNewMachine(true);
+      setIsNew((prev) => ({ ...prev, machine: true }));
       setFormData({ ...formData, machine_name: "", machine_number: "" });
     } else {
-      setIsNewMachine(false);
-      const selectedMachine = machines.find((machine) => machine.machine_name === value);
+      setIsNew((prev) => ({ ...prev, machine: false }));
+      const selectedMachine = list.machine.find((machine) => machine.machine_name === value);
       setFormData({
         ...formData,
         machine_name: value,
@@ -153,98 +149,81 @@ const AddItemForm = () => {
   const handleSectionChange = (e) => {
     const { value } = e.target;
     if (value === "new") {
-      setIsNewSection(true);
+      setIsNew((prev) => ({ ...prev, section: true }));
       setFormData({ ...formData, section_name: "", section_number: "" });
     } else {
-      setIsNewSection(false);
+      setIsNew((prev) => ({ ...prev, section: false }));
       setFormData({
         ...formData,
         section_name: value,
-        section_number: sections.find((section) => section.section_name === value)?.section_number || "",
+        section_number: list.section.find((section) => section.section_name === value)?.section_number || "",
       });
     }
   };
 
   const handleVendorChange = (e) => {
     const { value } = e.target;
-    console.log(value);
     if (value === "new") {
-      setIsNew({
-        vendor: true,
-      });
+      setIsNew((prev) => ({ ...prev, vendor: true }));
       setFormData({ ...formData, vendor_name: "" });
     } else {
-      setIsNew({
-        vendor: false,
-      });
+      setIsNew((prev) => ({ ...prev, vendor: false }));
       setFormData({ ...formData, vendor_name: value });
     }
   };
 
-  const fetchMachines = async () => {
-    const response = await getMachines();
-    setMachines(response);
-  };
+  const fetchData = async () => {
+    try {
+      const [machines, sections, parts, vendors] = await Promise.all([getMachines(), getSections(), getItems(), getVendors()]);
 
-  const fetchPart = async () => {
-    const response = await getItems();
-    setPart(response);
-  };
-
-  const fetchSections = async () => {
-    const response = await getSections();
-    setSections(response);
-  };
-  const fetchVendor = async () => {
-    const res = await getVendors();
-    setList({ vendor: res });
+      setList((prev) => ({
+        ...prev,
+        machine: machines,
+        section: sections,
+        part: parts,
+        vendor: vendors,
+      }));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   useEffect(() => {
-    fetchMachines();
-    fetchSections();
-    fetchPart();
-    fetchVendor();
+    fetchData();
   }, []);
+
+  const uniqueParts = Array.from(new Set(list.part.map((item) => item.name))).map((name) => list.part.find((item) => item.name === name)); // untuk menghindari duplikasi nama
 
   return (
     <div>
       {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Part...</LoadingAnimate>}
-      {notification && <div className="mb-4 p-2 text-white bg-green-500 rounded">{notification}</div>}
       <form onSubmit={handleSubmit} className="shadow-md bg-white p-5 rounded-lg">
-        <FormField label="Part Number" name={"item_number"} value={formData.item_number} onChange={handleChange} placeholder={"Masukkan nomor part"} />
-        <FormField label="Part Name" name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange} type="select">
+        <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
           <option value="" disabled>
-            Pilih Part
+            Select Type
           </option>
-          <option value="new">Enter New Part</option>
-          {part &&
-            part.map((data) => (
-              <option key={data.uuid} value={data.name}>
-                {data.name}
-              </option>
-            ))}
+          <option value="Swap">Swap</option>
+          <option value="Replace">Replace</option>
         </FormField>
-        {isNewPart && (
-          <>
-            <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder={"Masukkan nama part baru"} />
-          </>
-        )}
-        {/* <FormField type="select" label={"Part Name"} name="name" value={isNewPart ? "new" : formData.name} onChange={handlePartChange}>
+
+        {isNew.replaceType && <FormField label="Part Number" name="item_number" value={formData.item_number} onChange={handleChange} placeholder="Masukkan nomor part" />}
+
+        <FormField label="Part Name" name="name" value={isNew.part ? "new" : formData.name} onChange={handlePartChange} type="select">
           <option value="" disabled>
             Pilih Part
           </option>
           <option value="new">Enter New Part</option>
-          {part &&
-            part.map((data) => (
-              <option key={data.uuid} value={data.name}>
-                {data.name}
-              </option>
-            ))}
-        </FormField> */}
+          {uniqueParts.map((data) => (
+            <option key={data.uuid} value={data.name}>
+              {data.name}
+            </option>
+          ))}
+        </FormField>
+
+        {isNew.part && <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder="Masukkan nama part baru" />}
 
         <FormField label="Amount" name="amount" type="number" value={formData.amount} onChange={handleChange} error={errors.amount} placeholder={"Masukkan jumlah part"} />
-        <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />
+        {isNew.replaceType && <FormField label="Year" name="year" type="number" error={errors.year} value={formData.year} onChange={handleChange} placeholder={"Masukkan tahun"} />}
         <FormField label="Description" name="description" value={formData.description} onChange={handleChange} placeholder={"Masukkan deskripsi"} />
 
         <FormField label="Vendor" name="vendor_name" type="select" value={isNew.vendor ? "new" : formData.vendor_name} onChange={handleVendorChange} placeholder={"Masukkan vendor"}>
@@ -263,13 +242,7 @@ const AddItemForm = () => {
 
         {/* {isNewPart && (
           <> */}
-        <FormField label="Replacement Type" type="select" name="replacementType" value={formData.replacementType} onChange={handleChange}>
-          <option value="" disabled>
-            Select Type
-          </option>
-          <option value="Swap">Swap</option>
-          <option value="Replace">Replace</option>
-        </FormField>
+
         <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
           <option value="Not Set" disabled>
             Not Set
@@ -284,36 +257,36 @@ const AddItemForm = () => {
         {/* </>
         )} */}
 
-        <FormField label="Machine Name" name="machine_name" value={isNewMachine ? "new" : formData.machine_name} onChange={handleMachineChange} type="select">
+        <FormField label="Machine Name" name="machine_name" value={isNew.machine ? "new" : formData.machine_name} onChange={handleMachineChange} type="select">
           <option value="" disabled>
             Pilih Machine
           </option>
           <option value="new">Enter New Machine</option>
-          {machines &&
-            machines.map((data) => (
+          {list.machine &&
+            list.machine.map((data) => (
               <option key={data.uuid} value={data.machine_name}>
                 {data.machine_name}
               </option>
             ))}
         </FormField>
-        {isNewMachine && (
+        {isNew.machine && (
           <>
             <FormField label="New Machine Name" name="machine_name" value={formData.machine_name} onChange={handleChange} placeholder={"Masukkan nama machine baru"} />
             <FormField label="Machine Number" name="machine_number" value={formData.machine_number} onChange={handleChange} placeholder={"Masukkan nomor machine"} />
 
-            <FormField label="Room Name" name="section_name" value={isNewSection ? "new" : formData.section_name} onChange={handleSectionChange} type="select">
+            <FormField label="Room Name" name="section_name" value={isNew.section ? "new" : formData.section_name} onChange={handleSectionChange} type="select">
               <option value="" disabled>
                 Pilih Ruangan
               </option>
               <option value="new">Enter New Section Room</option>
-              {sections &&
-                sections.map((data) => (
+              {list.section &&
+                list.section.map((data) => (
                   <option key={data.uuid} value={data.section_name}>
                     {data.section_name}
                   </option>
                 ))}
             </FormField>
-            {isNewSection && (
+            {isNew.section && (
               <>
                 <FormField label="New Room Name" name="section_name" value={formData.section_name} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />
 
@@ -322,6 +295,7 @@ const AddItemForm = () => {
             )}
           </>
         )}
+
         <Button type="submit" buttonName="Add Part" />
       </form>
     </div>

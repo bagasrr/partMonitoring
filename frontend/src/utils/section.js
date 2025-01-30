@@ -1,5 +1,5 @@
 import axios from "axios";
-import { host } from "../features/AuthSlice";
+import { host } from "../features/authSlice";
 
 export const getSections = async () => {
   const response = await axios.get(`${host}/api/sections`);
