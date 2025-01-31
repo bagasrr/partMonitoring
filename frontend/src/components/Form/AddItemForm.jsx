@@ -58,9 +58,11 @@ const AddItemForm = () => {
     const isType = name === "replacementType";
     if (isType && value === "Swap") {
       setIsNew((prev) => ({ ...prev, replaceType: true }));
-    } else {
+    } else if (isType && value !== "Swap") {
       setIsNew((prev) => ({ ...prev, replaceType: false }));
-      console.log("Aneh Ngentot");
+      // console.log("Aneh Ngentot");
+    } else {
+      console.log("Aneh ngentot");
     }
     let newValue;
     if (name === "amount" || name === "lowerLimit") {
@@ -99,7 +101,6 @@ const AddItemForm = () => {
       cleanedFormData.year = null;
     }
 
-    createItem(cleanedFormData);
     try {
       console.log("formData: ", formData);
       setIsLoading(true);

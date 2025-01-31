@@ -13,6 +13,7 @@ import TablePagination from "./TablePagination";
 import useNotification from "../services/Notification"; // Importe useNotification
 import LoadingAnimate from "./LoadingAnimate";
 import { MdClose } from "react-icons/md";
+import DetailsAction from "./DetailsAction";
 
 const ItemsSwap = () => {
   const [data, setData] = useState([]);
@@ -185,27 +186,7 @@ const ItemsSwap = () => {
         <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`} />
       </div>
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity z-10">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full transform transition-all">
-            <h2 className="text-xl font-bold mb-4">Detail Item</h2>
-            <div className="space-y-2">
-              <p className="text-gray-600">
-                <span className="font-medium">ID:</span> {selectedItem?.uuid}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Name:</span> {selectedItem?.name}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Detail:</span> {selectedItem?.vendor?.vendor_name}
-              </p>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="mt-4 px-4 py-2 bg-red-600 absolute top-2 right-4 text-white rounded hover:bg-rose-700 transition-colors">
-              <MdClose />
-            </button>
-          </div>
-        </div>
-      )}
+      {isOpen && <DetailsAction data={selectedItem} setIsOpen={setIsOpen} />}
     </div>
   );
 };
