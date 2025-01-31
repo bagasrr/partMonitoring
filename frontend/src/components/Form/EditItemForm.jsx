@@ -5,6 +5,7 @@ import FormField from "../FormField";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const EditItemForm = () => {
   const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ const EditItemForm = () => {
     try {
       setIsLoading(true);
       await updateItem(id, formData);
-      dispatch(setNotification(`Item ${formData.name} Updated`));
+      dispatch(setNotification(`${formData.name} Updated`));
       navigate("/parts");
       setIsLoading(false);
     } catch (error) {
@@ -95,7 +96,7 @@ const EditItemForm = () => {
         <FormField label="Name" name="name" value={formData.name || ""} onChange={handleChange} />
         <FormField label="Amount" name="amount" type="number" value={formData.amount || ""} onChange={handleChange} error={errors.amount} />
         <FormField label="Description" name="description" value={formData.description || ""} onChange={handleChange} />
-        <FormField label="Year" name="year" value={formData.year || ""} onChange={handleChange} />
+        {formData && formData.replacementType === "Swap" && <FormField label="Year" name="year" value={formData.year || ""} onChange={handleChange} />}
         <FormField label="Replacement Type" name="replacementType" type="select" value={formData.replacementType || ""} onChange={handleChange}>
           <option value="" disabled>
             Pilih tipe penggantian

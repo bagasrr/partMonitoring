@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { getTypeSwapItem, updateItemStatus } from "../utils/items"; // Updated import statement
+import { deleteItem, getTypeSwapItem, updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
@@ -14,6 +14,7 @@ import useNotification from "../services/Notification"; // Importe useNotificati
 import LoadingAnimate from "./LoadingAnimate";
 import { MdClose } from "react-icons/md";
 import DetailsAction from "./DetailsAction";
+import { FormatStatusColor } from "../utils/format";
 
 const ItemsSwap = () => {
   const [data, setData] = useState([]);
@@ -43,7 +44,7 @@ const ItemsSwap = () => {
   };
 
   const handleDelete = async () => {
-    await axios.delete(`http://localhost:4000/api/items/${selectedUUIDItem}`);
+    await deleteItem(selectedUUIDItem);
     dispatch(setNotification("Items Deleted"));
     setShowModal(false);
     setDeleted(true);
@@ -76,21 +77,6 @@ const ItemsSwap = () => {
     setCurrentPage(0);
   };
 
-  const getStatusColorClass = (status) => {
-    switch (status) {
-      case "In Use":
-        return "bg-green-100 text-green-700";
-      case "Broken":
-        return "bg-red-100 text-red-700";
-      case "Repair":
-        return "bg-blue-100 text-blue-700";
-      case "Spare":
-        return "bg-yellow-100 text-yellow-700";
-      default:
-        return "bg-white text-gray-700";
-    }
-  };
-
   const filteredData = data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.machine.machine_name.toLowerCase().includes(search.toLowerCase()));
 
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
@@ -107,10 +93,8 @@ const ItemsSwap = () => {
     setShowModal(false);
   };
   const handleClickRow = (item) => {
-    // navigate(`/parts/${uuid}/details`);
     setIsOpen(true);
     setSelectedItem(item);
-    // window.open(`/parts/${uuid}/details`, "_blank"); kalo mau buka tab baru
   };
 
   return (
@@ -154,7 +138,16 @@ const ItemsSwap = () => {
                 <TData>{item.amount}</TData>
                 <TData>
                   {user && user.role === "admin" ? (
-                    <select value={item.status} onChange={(e) => handleStatusChange(e, item.uuid)} className={`p-1 border border-gray-300 rounded text-center cursor-pointer ${getStatusColorClass(item.status)}`}>
+                    <select
+                      value={item.status}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      onChange={(e) => {
+                        handleStatusChange(e, item.uuid);
+                      }}
+                      className={`p-1 border border-gray-300 rounded text-center cursor-pointer ${FormatStatusColor(item.status, "Broken", "Spare", "In Use", "Repair")}`}
+                    >
                       <option value="Not Set" disabled>
                         Not Set
                       </option>
@@ -164,7 +157,7 @@ const ItemsSwap = () => {
                       <option value="Spare">Spare</option>
                     </select>
                   ) : (
-                    <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
+                    <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${FormatStatusColor(item.status, "Broken", "Spare", "In Use", "Repair")}`}>{item.status}</div>
                   )}
                 </TData>
                 <TData>{item.year}</TData>
@@ -174,8 +167,20 @@ const ItemsSwap = () => {
                 {user && user.role === "admin" && (
                   <TData>
                     <div className="flex gap-5 items-center">
-                      <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenDeleteModal(item.uuid, item.name)} />
-                      <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/parts/${item.uuid}/edit`)} />
+                      <FaTrash
+                        className="text-red-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDeleteModal(item.uuid, item.name);
+                        }}
+                      />
+                      <FaEdit
+                        className="text-blue-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/parts/${item.uuid}/edit`);
+                        }}
+                      />
                     </div>
                   </TData>
                 )}

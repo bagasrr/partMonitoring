@@ -8,6 +8,7 @@ import sectionRoute from "./sectionRoute.js";
 import historyRoute from "./historyRoute.js";
 import itemUseHistoryRoute from "./itemUseHistoryRoute.js";
 import vendorRoute from "./vendorRoute.js";
+import itemHistoryRoute from "./itemHistoryRoute.js";
 
 const routes = express.Router();
 
@@ -18,6 +19,7 @@ routes.use("/machines", verifyUser, machineRoute);
 routes.use("/sections", verifyUser, sectionRoute);
 routes.use("/vendors", verifyUser, vendorRoute);
 routes.use("/history", verifyUser, historyRoute);
+routes.use("/item-histories", verifyUser, itemHistoryRoute);
 routes.use("/item-use-histories", verifyUser, itemUseHistoryRoute);
 
 routes.get("/ping", (req, res) => {

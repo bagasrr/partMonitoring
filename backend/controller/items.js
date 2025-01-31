@@ -1,4 +1,4 @@
-import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel, vendorModel } from "../models/index.js";
+import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel, vendorModel, itemHistoryModel } from "../models/index.js";
 import { Op, where } from "sequelize";
 import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
@@ -38,6 +38,10 @@ export const getAllItems = async (req, res) => {
           model: vendorModel,
           attributes: ["uuid", "vendor_name"],
         },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+        },
       ],
     });
     res.status(200).json(response);
@@ -67,6 +71,10 @@ export const getItemById = async (req, res) => {
           model: vendorModel,
           attributes: ["uuid", "vendor_name"],
         },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+        },
       ],
     });
     if (!item) return res.status(404).json({ message: "Item1 not found" });
@@ -90,7 +98,19 @@ export const getReplaceItem = async (req, res) => {
           model: vendorModel,
           attributes: ["uuid", "vendor_name"],
         },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: userModel,
+              attributes: ["name"],
+            },
+          ],
+        },
       ],
+      order: [["updatedAt", "DESC"]],
     });
     res.status(200).json(items);
   } catch (error) {
@@ -112,6 +132,21 @@ export const getSwapItem = async (req, res) => {
           model: vendorModel,
           attributes: ["uuid", "vendor_name"],
         },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+
+          include: [
+            {
+              model: userModel,
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+      order: [
+        ["updatedAt", "DESC"],
+        [itemHistoryModel, "createdAt", "DESC"],
       ],
     });
     res.status(200).json(items);
@@ -249,7 +284,7 @@ export const createItem = async (req, res) => {
       vendorId: vendor?.id || null,
     });
 
-    await addItemHistories(newItem.id, req.userId, "Part Created");
+    await addItemHistories(newItem.id, req.userId, "Part Added");
 
     // Create history record for new item creation
     await historyModel.create({
@@ -332,9 +367,10 @@ export const updateItem = async (req, res) => {
         },
         { where: { id: item.id } }
       );
+      status === "Broken" ? await addItemHistories(item.id, req.userId, "Part Broken") : await addItemHistories(item.id, req.userId, "Part Updated");
     } else {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to update this item" });
-      response = await itemModel.update(
+      await itemModel.update(
         {
           name,
           amount,
@@ -346,6 +382,7 @@ export const updateItem = async (req, res) => {
         },
         { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
       );
+      await addItemHistories(item.id, req.userId, "Part Updated");
     }
 
     // Log the update action in the audit logs
@@ -417,6 +454,7 @@ export const updateItemStatus = async (req, res) => {
         }
       );
 
+      status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, "Status Changed No Broken");
       // Buat catatan riwayat
       await historyModel.create({
         name: item.name,
@@ -487,6 +525,8 @@ export const updateItemStatusForm = async (req, res) => {
         }
       );
 
+      status === "Broken" ? await addItemHistories(item.id, req.userId, "Part Broken") : status === "Terminated" ? await addItemHistories(item.id, req.userId, "Terminated") : await addItemHistories(item.id, req.userId, "Status Changed");
+
       // Buat catatan riwayat
       await historyModel.create({
         name: item.name,
@@ -530,6 +570,7 @@ export const deleteItem = async (req, res) => {
       );
     }
 
+    await addItemHistories(item.id, req.userId, "Part Deleted");
     // Create history record
     await historyModel.create({
       name: item.name,
@@ -572,6 +613,7 @@ export const addItemAmount = async (req, res) => {
     // Update the amount
     await itemModel.update({ amount: item.amount + amountToAdd }, { where: { id: item.id } });
 
+    await addItemHistories(item.id, req.userId, "Amount Added");
     // Create history record
     await historyModel.create({
       name: item.name,
@@ -655,6 +697,7 @@ export const swapItem = async (req, res) => {
       if (itemStatus === "Broken") {
         try {
           await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
+          await addItemHistories(item.id, req.userId, "Part Broken");
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
           return res.status(500).json({ message: "Email failed to send." });
@@ -684,6 +727,7 @@ export const swapItem = async (req, res) => {
     //update item replacement status
     await itemModel.update({ status: "In Use", replacementDate: itemEndUseDate }, { where: { id: replacementItem.id } });
 
+    await addItemHistories(item.id, req.userId, "Part Swapped");
     //history
     await historyModel.create({
       name: item.name,
@@ -734,6 +778,7 @@ export const replaceItem = async (req, res) => {
       }
     }
 
+    await addItemHistories(item.id, req.userId, "Part Replace");
     // Create history record
     await historyModel.create({
       name: item.name,
@@ -780,15 +825,6 @@ export const getBrokenItems = async (req, res) => {
 export const getRepairItems = async (req, res) => {
   try {
     const items = await itemModel.findAll({ where: { status: "Repair", deletedAt: null } });
-    res.status(200).json(items);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getItemwithVendor = async (req, res) => {
-  try {
-    const items = await itemModel.findAll({ where: { deletedAt: null }, include: [{ model: vendorModel }] });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });

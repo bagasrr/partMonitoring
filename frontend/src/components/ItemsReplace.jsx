@@ -12,6 +12,8 @@ import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import TablePagination from "./TablePagination";
 import useNotification from "../services/Notification"; // Importe useNotification
 import LoadingAnimate from "./LoadingAnimate";
+import DetailsAction from "./DetailsAction";
+import { FormatStatusColor } from "../utils/format";
 
 const ItemsReplace = () => {
   const [data, setData] = useState([]);
@@ -25,6 +27,8 @@ const ItemsReplace = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUUIDItem, setSelectedUUIDItem] = useState(null);
   const [selectedItemName, setSelectedItemName] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [deleted, setDeleted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,21 +76,6 @@ const ItemsReplace = () => {
     setCurrentPage(0);
   };
 
-  const getStatusColorClass = (status) => {
-    switch (status) {
-      case "In Use":
-        return "bg-green-100 text-green-700";
-      case "Broken":
-        return "bg-red-100 text-red-700";
-      case "Repair":
-        return "bg-blue-100 text-blue-700";
-      case "Spare":
-        return "bg-yellow-100 text-yellow-700";
-      default:
-        return "bg-white text-gray-700";
-    }
-  };
-
   const filteredData = data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.machine.machine_name.toLowerCase().includes(search.toLowerCase()));
 
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
@@ -101,6 +90,10 @@ const ItemsReplace = () => {
   };
   const handleCloseModal = () => {
     setShowModal(false);
+  };
+  const handleClickRow = (item) => {
+    setIsOpen(true);
+    setSelectedItem(item);
   };
 
   return (
@@ -135,13 +128,18 @@ const ItemsReplace = () => {
               </tr>
             )}
             {currentItems.map((item, index) => (
-              <TRow key={item.uuid}>
+              <TRow key={item.uuid} onClick={() => handleClickRow(item)}>
                 <TData>{index + 1 + indexOfFirstItem}</TData>
                 <TData>{highlightText(item.name, search)}</TData>
                 <TData>{item.amount}</TData>
                 <TData>
                   {user && user.role === "admin" ? (
-                    <select value={item.status} onChange={(e) => handleStatusChange(e, item.uuid)} className={`p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>
+                    <select
+                      value={item.status}
+                      onChange={(e) => handleStatusChange(e, item.uuid)}
+                      className={`p-1 border border-gray-300 rounded text-center ${FormatStatusColor(item.status, "Broken", "Spare", "In Use", "Repair")}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <option value="Not Set" disabled>
                         Not Set
                       </option>
@@ -151,7 +149,7 @@ const ItemsReplace = () => {
                       <option value="Spare">Spare</option>
                     </select>
                   ) : (
-                    <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${getStatusColorClass(item.status)}`}>{item.status}</div>
+                    <div className={`min-w-28 p-1 border border-gray-300 rounded text-center ${FormatStatusColor(item.status, "Broken", "Spare", "In Use", "Repair")}`}>{item.status}</div>
                   )}
                 </TData>
                 <TData>{item.description}</TData>
@@ -160,8 +158,20 @@ const ItemsReplace = () => {
                 {user && user.role === "admin" && (
                   <TData>
                     <div className="flex gap-5 items-center">
-                      <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(item.uuid, item.name)} />
-                      <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/parts/${item.uuid}/edit`)} />
+                      <FaTrash
+                        className="text-red-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenModal(item.uuid, item.name);
+                        }}
+                      />
+                      <FaEdit
+                        className="text-blue-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/parts/${item.uuid}/edit`);
+                        }}
+                      />
                     </div>
                   </TData>
                 )}
@@ -172,6 +182,7 @@ const ItemsReplace = () => {
 
         <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`}></DeleteConfirmModalBox>
       </div>
+      {isOpen && <DetailsAction data={selectedItem} setIsOpen={setIsOpen} />}
 
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
