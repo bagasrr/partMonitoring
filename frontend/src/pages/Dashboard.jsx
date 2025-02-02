@@ -13,6 +13,7 @@ import Layout from "./layout";
 import { getMe } from "../features/authSlice";
 import useSections from "../hooks/useSections";
 import FormField from "../components/FormField";
+import { SectionFilter } from "./Parts";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -84,22 +85,13 @@ const Dashboard = () => {
       <div className="mt-5">
         <Title>Part List</Title>
         <div className="flex gap-2 mb-5 items-center">
-          <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
-            {view === "swap" ? "Swap" : "S"}
-          </ButtonTypeParts>
-          <ButtonTypeParts view={view} setView={setView} partType="replace" className={`px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out`}>
-            {view === "replace" ? "Replace" : "R"}
-          </ButtonTypeParts>
-          <div className=" ">
-            <FormField label="Ruangan" name="room" value={selectedSection.id ? `${selectedSection.id} - ${selectedSection.name}` : ""} onChange={handleSectionChange} type="select" className="flex items-center gap-2 ">
-              <option value="">Semua</option>
-              {sections.map((section) => (
-                <option key={section.uuid} value={`${section.uuid} - ${section.section_name}`}>
-                  {section.section_name}
-                </option>
-              ))}
-            </FormField>
-          </div>
+          {["swap", "replace"].map((type) => (
+            <ButtonTypeParts key={type} view={view} setView={setView} partType={type}>
+              {/* {type.charAt(0).toUpperCase() + type.slice(1)} */}
+              {view === type ? type.charAt(0).toUpperCase() + type.slice(1) : type.charAt(0).toUpperCase()}
+            </ButtonTypeParts>
+          ))}
+          <SectionFilter data={sections} selectedData={selectedSection} handleDataChange={handleSectionChange} />
         </div>
 
         <div className="w-full">
