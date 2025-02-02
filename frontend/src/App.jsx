@@ -19,6 +19,7 @@ import ChangePartPages from "./pages/AddGroup/ChangePart";
 import ItemUseHistory from "./pages/ItemUseHistory";
 import Details from "./pages/Details";
 import Vendors from "./pages/Vendors";
+import PartsByMachine from "./pages/PartsByMachine";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/parts/:id/edit",
     element: <EditItem />,
+  },
+  {
+    path: "/parts/by-machine",
+    element: <PartsByMachine />,
   },
   {
     path: "/parts/changepart",

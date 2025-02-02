@@ -74,20 +74,6 @@ const SwapPartForm = () => {
     }
   };
 
-  // const handleReplaceItemChange = (e) => {
-  //   const value = e.target.value;
-  //   const [name, year] = value.split(" - ");
-  //   const replaceItem = items.find((item) => item.name === name && item.year.toString() === year);
-  //   if (replaceItem) {
-  //     setSelectedReplaceItem(replaceItem);
-  //     setFormData({ ...formData, replaceItemName: replaceItem.name, replaceItemYear: replaceItem.year, machineName: replaceItem.machine.machine_name });
-  //     console.log("Replace item selected: ", replaceItem); // Add this line
-  //   } else {
-  //     setSelectedReplaceItem(null);
-  //     setFormData({ ...formData, replaceItemName: "", replaceItemYear: "" });
-  //   }
-  // };
-
   const handleReplaceItemChange = (e) => {
     const value = e.target.value;
 

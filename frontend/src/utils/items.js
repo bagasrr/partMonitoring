@@ -159,3 +159,13 @@ export const updateItemStatusForm = async (data) => {
     throw new Error(error.response?.data?.message || "Error while Add Amount");
   }
 };
+
+export const getItemsBySection = async (sectionId, type) => {
+  try {
+    const response = await axios.get(`${host}/api/sections/${sectionId}/items-${type}`);
+    console.log("id: ", sectionId);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching Part");
+  }
+};

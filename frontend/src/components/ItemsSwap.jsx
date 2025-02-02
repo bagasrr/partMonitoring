@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { deleteItem, getTypeSwapItem, updateItemStatus } from "../utils/items"; // Updated import statement
+import { deleteItem, getItemsBySection, getTypeSwapItem, updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
 import SearchBar from "./SearchBar";
@@ -12,11 +11,14 @@ import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import TablePagination from "./TablePagination";
 import useNotification from "../services/Notification"; // Importe useNotification
 import LoadingAnimate from "./LoadingAnimate";
-import { MdClose } from "react-icons/md";
 import DetailsAction from "./DetailsAction";
 import { FormatStatusColor } from "../utils/format";
+import FormField from "./FormField";
+import { getSections } from "../utils/section";
+import { host } from "../features/authSlice";
+import axios from "axios";
 
-const ItemsSwap = () => {
+const ItemsSwap = ({ section }) => {
   const [data, setData] = useState([]);
   const notification = useNotification(); // Panggil useNotification
   const { user } = useSelector((state) => state.auth);
@@ -35,12 +37,35 @@ const ItemsSwap = () => {
 
   useEffect(() => {
     fetchItems();
+
+    // fetchSection();
   }, [notification, dispatch]);
+  // useEffect(() => {
+  //   fetchSection();
+  // }, []);
+  useEffect(() => {
+    if (section.id === "") {
+      fetchItems();
+    }
+    fetchItemsBySection();
+  }, [section.id]);
 
   const fetchItems = async () => {
     const response = await getTypeSwapItem();
     console.log(response);
     setData(response);
+  };
+
+  const fetchItemsBySection = async () => {
+    if (!section.id) return;
+
+    try {
+      const response = await getItemsBySection(section.id, "Swap");
+      setData(response.length ? response : []);
+    } catch (error) {
+      console.error("Error fetching items by section:", error);
+      setData([]); // Pastikan tidak ada data yang menggantung
+    }
   };
 
   const handleDelete = async () => {
@@ -105,7 +130,9 @@ const ItemsSwap = () => {
           <span className="block sm:inline">{notification}</span>
         </div>
       )}
+
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search parts or machines name" />
+
       <div className="overflow-auto max-h-96 lg:max-h-[calc(100vh-150px)] ">
         <table className="min-w-full bg-white">
           <thead className="sticky top-0 z-10">
@@ -125,11 +152,12 @@ const ItemsSwap = () => {
           <tbody>
             {filteredData.length === 0 && (
               <tr>
-                <td colSpan="8" className="text-center py-4">
-                  No data found
+                <td colSpan="10" className="text-center py-4">
+                  No data found at {section.name}
                 </td>
               </tr>
             )}
+
             {currentItems.map((item, index) => (
               <TRow key={item.uuid} onClick={() => handleClickRow(item)}>
                 <TData>{index + 1 + indexOfFirstItem}</TData>

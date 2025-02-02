@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { historyModel, sectionModel, machineModel, itemModel, userModel, AuditLogModel, vendorModel } from "../models/index.js"; // Adjust the paths as necessary
+import { historyModel, sectionModel, machineModel, itemModel, userModel, AuditLogModel, vendorModel, itemHistoryModel } from "../models/index.js"; // Adjust the paths as necessary
 
 // Function to log audit events
 export const logAuditEvent = async (entityType, entityId, action, details) => {
@@ -23,6 +23,7 @@ export const getAllSections = async (req, res) => {
       where: {
         deletedAt: null, // Exclude soft-deleted sections
       },
+      order: [["section_name", "ASC"]],
       include: [
         {
           model: userModel,
@@ -199,7 +200,7 @@ export const deleteSection = async (req, res) => {
 
 export const getItemsBySection = async (req, res) => {
   try {
-    const { sectionId } = req.params;
+    const { sectionId, type } = req.params;
 
     const section = await sectionModel.findOne({
       where: {
@@ -208,7 +209,10 @@ export const getItemsBySection = async (req, res) => {
     });
     if (!section) return res.status(404).json({ message: "Section not found" });
     const items = await itemModel.findAll({
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      where: {
+        replacementType: type,
+      },
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
       include: [
         {
           model: machineModel,
@@ -220,6 +224,17 @@ export const getItemsBySection = async (req, res) => {
         {
           model: vendorModel,
           attributes: ["uuid", "vendor_name"],
+        },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+
+          include: [
+            {
+              model: userModel,
+              attributes: ["name"],
+            },
+          ],
         },
       ],
     });

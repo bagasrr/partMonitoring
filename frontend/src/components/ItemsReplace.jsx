@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { getItems, getTypeReplaceitem, updateItemStatus } from "../utils/items"; // Updated import statement
+import { getItems, getItemsBySection, getTypeReplaceitem, updateItemStatus } from "../utils/items"; // Updated import statement
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
@@ -15,7 +15,7 @@ import LoadingAnimate from "./LoadingAnimate";
 import DetailsAction from "./DetailsAction";
 import { FormatStatusColor } from "../utils/format";
 
-const ItemsReplace = () => {
+const ItemsReplace = ({ section }) => {
   const [data, setData] = useState([]);
   const notification = useNotification(); // Panggil useNotification
   const { user } = useSelector((state) => state.auth);
@@ -36,10 +36,28 @@ const ItemsReplace = () => {
     fetchItems();
   }, [notification, dispatch]);
 
+  useEffect(() => {
+    if (section.id === "") {
+      fetchItems();
+    }
+    fetchItemsBySection();
+  }, [section.id]);
+
   const fetchItems = async () => {
     const response = await getTypeReplaceitem();
     console.log(response);
     setData(response);
+  };
+  const fetchItemsBySection = async () => {
+    if (!section.id) return;
+
+    try {
+      const response = await getItemsBySection(section.id, "Replace");
+      setData(response.length ? response : []);
+    } catch (error) {
+      console.error("Error fetching items by section:", error);
+      setData([]);
+    }
   };
 
   const handleDelete = async () => {
