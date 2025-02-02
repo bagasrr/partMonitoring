@@ -1,5 +1,6 @@
 import React from "react";
 import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
+import { BsBuildingFillGear } from "react-icons/bs";
 import { MdOutlineManageHistory } from "react-icons/md";
 import { PiEngineFill, PiNotePencilBold } from "react-icons/pi";
 import { IoMdListBox } from "react-icons/io";
@@ -39,25 +40,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <li className="mb-2 flex items-center">
               <FaHistory className="mr-2" />
               <Link to="/history" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Histori
+                Riwayat
               </Link>
             </li>
             <li className="mb-2 flex items-center">
-              <MdOutlineManageHistory className="mr-2" size={20} />
+              <MdOutlineManageHistory className="mr-2" />
               <Link to="/itemusehistory" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Use Histori
+                Pemakaian
               </Link>
             </li>
-            {user && user.role === "admin" && (
-              <>
-                <li className="mb-2 flex items-center">
-                  <FaBox className="mr-2" />
-                  <Link to="/parts" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                    List Part
-                  </Link>
-                </li>
-              </>
-            )}
           </ul>
           {user && user.role === "admin" && (
             <>
@@ -66,19 +57,25 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <li className="mb-2 flex items-center">
                   <FaUsers className="mr-2" />
                   <Link to="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                    List User
+                    Users
                   </Link>
                 </li>
                 <li className="mb-2 flex items-center">
                   <PiEngineFill className="mr-2" />
                   <Link to="/machines" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                    List Mesin
+                    Machines
                   </Link>
                 </li>
                 <li className="mb-2 flex items-center">
                   <MdMeetingRoom className="mr-2" />
                   <Link to="/sections" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                    List Ruangan
+                    Sections
+                  </Link>
+                </li>
+                <li className="mb-2 flex items-center">
+                  <BsBuildingFillGear className="mr-2" />
+                  <Link to="/vendors" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                    Vendors
                   </Link>
                 </li>
               </ul>

@@ -454,7 +454,7 @@ export const updateItemStatus = async (req, res) => {
         }
       );
 
-      status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, "Status Changed No Broken");
+      status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, `Status Changed`);
       // Buat catatan riwayat
       await historyModel.create({
         name: item.name,
@@ -797,7 +797,16 @@ export const replaceItem = async (req, res) => {
 
 export const getInUseItems = async (req, res) => {
   try {
-    const items = await itemModel.findAll({ where: { status: "In Use", deletedAt: null } });
+    const items = await itemModel.findAll({
+      where: { status: "In Use", deletedAt: null },
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -806,7 +815,16 @@ export const getInUseItems = async (req, res) => {
 
 export const getSpareItems = async (req, res) => {
   try {
-    const items = await itemModel.findAll({ where: { status: "Spare", deletedAt: null } });
+    const items = await itemModel.findAll({
+      where: { status: "Spare", deletedAt: null },
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -815,7 +833,16 @@ export const getSpareItems = async (req, res) => {
 
 export const getBrokenItems = async (req, res) => {
   try {
-    const items = await itemModel.findAll({ where: { status: "Broken", deletedAt: null } });
+    const items = await itemModel.findAll({
+      where: { status: "Broken", deletedAt: null },
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -824,7 +851,16 @@ export const getBrokenItems = async (req, res) => {
 
 export const getRepairItems = async (req, res) => {
   try {
-    const items = await itemModel.findAll({ where: { status: "Repair", deletedAt: null } });
+    const items = await itemModel.findAll({
+      where: { status: "Repair", deletedAt: null },
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -1,18 +1,18 @@
 import React from "react";
 
-const FormField = ({ label, name, value, onChange, type = "text", error, children, placeholder, className }) => {
+const FormField = ({ label, name, value, onChange, type = "text", error, children, placeholder, className = "my-2" }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const numberValue = value.replace(/\D/g, ""); // Hanya angka
     onChange({ target: { name, value: numberValue } });
   };
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={` ${className}`}>
       <label className="block font-bold text-gray-700">{label}:</label>
       {type === "textarea" ? (
         <textarea name={name} value={value || ""} onChange={onChange} className={`mt-1 block w-full p-2 border focus:outline-none focus:ring focus:ring-green-600 rounded-md`} placeholder={placeholder} />
       ) : type === "select" ? (
-        <select name={name} value={value || ""} onChange={onChange} className="mt-1 block w-full p-2 border focus:outline-none focus:ring focus:ring-green-600 rounded-md">
+        <select name={name} value={value || ""} onChange={onChange} className="mt-1 block w-full p-2 border focus:outline-none focus:ring focus:ring-green-600 rounded-md ">
           {children}
         </select>
       ) : type === "number" ? (

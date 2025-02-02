@@ -96,6 +96,45 @@ const ItemsReplace = ({ section }) => {
 
   const filteredData = data.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()) || item.machine.machine_name.toLowerCase().includes(search.toLowerCase()));
 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
+
+  const handleSort = (column) => {
+    let direction = "ascending";
+
+    if (sortConfig.key === column && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+
+    const sortedData = [...data].sort((a, b) => {
+      let valA = a[column];
+      let valB = b[column];
+
+      // Ambil nilai dari objek nested (vendor & machine)
+      if (column === "vendor") {
+        valA = a.vendor.vendor_name;
+        valB = b.vendor.vendor_name;
+      } else if (column === "machine") {
+        valA = a.machine.machine_name;
+        valB = b.machine.machine_name;
+      }
+
+      // Sorting teks atau angka
+      if (valA < valB) return direction === "ascending" ? -1 : 1;
+      if (valA > valB) return direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+
+    setData(sortedData);
+    setSortConfig({ key: column, direction });
+  };
+
+  const getSortIndicator = (column) => {
+    if (sortConfig.key === column) {
+      return sortConfig.direction === "ascending" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -125,15 +164,38 @@ const ItemsReplace = ({ section }) => {
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search parts or machines name" />
       <div className="overflow-auto min-w-full max-h-96 lg:max-h-[calc(100vh-150px)] ">
         <table className="w-full">
-          <thead className="sticky top-0 z-10">
+          <thead>
             <tr>
               <ThData>No</ThData>
-              <ThData>Nama Part</ThData>
-              <ThData>Amount</ThData>
-              <ThData>Status</ThData>
+              <ThData onClick={() => handleSort("name")}>
+                <span className="flex gap-2 items-center justify-center w-full">
+                  Name
+                  <span>{getSortIndicator("name")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("amount")}>
+                <span>
+                  Amount
+                  <span>{getSortIndicator("amount")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("status")}>
+                <span>Status</span>
+                <span>{getSortIndicator("status")}</span>
+              </ThData>
               <ThData>Deskripsi</ThData>
-              <ThData>Batas Bawah</ThData>
-              <ThData>Machine Name</ThData>
+              <ThData onClick={() => handleSort("lowerLimit")}>
+                <span className="flex gap-2 items-center justify-between w-full">
+                  Lower Limit
+                  <span>{getSortIndicator("lowerLimit")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("machine")}>
+                <span className="flex  items-center justify-between w-full">
+                  Machine Name
+                  <span>{getSortIndicator("machine")}</span>
+                </span>
+              </ThData>
               {user && user.role === "admin" && <ThData>Actions</ThData>}
             </tr>
           </thead>

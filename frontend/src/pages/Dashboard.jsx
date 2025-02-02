@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import StatusInfo from "../components/StatusInfo";
 import Title from "../element/Title";
 import DayUsedChart from "../components/DayUsedChart";
-import { getTypeReplaceitem, getTypeSwapItem } from "../utils/items";
+import { getBrokenItems, getInUseItems, getRepairItems, getSpareItems, getTypeReplaceitem, getTypeSwapItem } from "../utils/items";
 import AmountLimitChart from "../components/AmountLimitChart";
 import ButtonTypeParts from "../components/ButtonTypeParts";
 import ItemsReplace from "../components/ItemsReplace";
 import ItemsSwap from "../components/ItemsSwap";
 import Layout from "./layout";
 import { getMe } from "../features/authSlice";
+import useSections from "../hooks/useSections";
+import FormField from "../components/FormField";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -21,12 +23,29 @@ const Dashboard = () => {
   const [swapPart, setSwapPart] = useState([]);
   const [replacePart, setReplacePart] = useState([]);
   const [view, setView] = useState("swap");
+  const { sections, selectedSection, handleSectionChange } = useSections();
+  const [statusData, setStatusData] = useState({
+    spare: [],
+    broken: [],
+    inUse: [],
+    repair: [],
+  });
 
   useEffect(() => {
     getSwap();
     getReplace();
+    fetchStatusData();
   }, []);
 
+  const fetchStatusData = async () => {
+    const spare = await getSpareItems();
+    const broken = await getBrokenItems();
+    const inUse = await getInUseItems();
+    const repair = await getRepairItems();
+
+    setStatusData({ spare, broken, inUse, repair });
+  };
+  console.log("statusData : ", statusData);
   const getSwap = async () => {
     const response = await getTypeSwapItem();
     const sortedData = response.sort((a, b) => b.dayUsed - a.dayUsed);
@@ -59,21 +78,33 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="mt-5">
-        <StatusInfo />
+        {/* <StatusInfo  data={statusData}/> */}
+        <StatusInfo statusData={statusData} />
       </div>
       <div className="mt-5">
         <Title>Part List</Title>
-        <div className="flex gap-2 mb-5">
+        <div className="flex gap-2 mb-5 items-center">
           <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
             {view === "swap" ? "Swap" : "S"}
           </ButtonTypeParts>
           <ButtonTypeParts view={view} setView={setView} partType="replace" className={`px-6 py-3 rounded-3xl text-white bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out`}>
             {view === "replace" ? "Replace" : "R"}
           </ButtonTypeParts>
+          <div className=" ">
+            <FormField label="Ruangan" name="room" value={selectedSection.id ? `${selectedSection.id} - ${selectedSection.name}` : ""} onChange={handleSectionChange} type="select" className="flex items-center gap-2 ">
+              <option value="">Semua</option>
+              {sections.map((section) => (
+                <option key={section.uuid} value={`${section.uuid} - ${section.section_name}`}>
+                  {section.section_name}
+                </option>
+              ))}
+            </FormField>
+          </div>
         </div>
+
         <div className="w-full">
-          {view === "replace" && <ItemsReplace />}
-          {view === "swap" && <ItemsSwap />}
+          {view === "replace" && <ItemsReplace section={selectedSection} />}
+          {view === "swap" && <ItemsSwap section={selectedSection} />}
         </div>
       </div>
     </Layout>
