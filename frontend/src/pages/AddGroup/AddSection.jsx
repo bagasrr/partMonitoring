@@ -5,7 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
-import useNotification from "../../services/Notification";
+import useNotification from "../../hooks/UseNotification";
 import { adminArea } from "../../utils/adminArea";
 import { createSection } from "../../utils/section";
 import LoadingAnimate from "../../components/LoadingAnimate";

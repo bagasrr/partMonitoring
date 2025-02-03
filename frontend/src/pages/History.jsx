@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar"; // Import SearchBar component
 import highlightText from "../element/highlightText"; // Import highlightText function
 import TablePagination from "../components/TablePagination";
 import { useSelector } from "react-redux";
+import { getHistories } from "../utils/histories";
 
 const History = () => {
   const [histories, setHistories] = useState([]);
@@ -19,13 +20,11 @@ const History = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/history");
-      console.log("res : ", response);
-      const sortedData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const response = await getHistories();
+      const sortedData = response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setHistories(sortedData);
-      console.log("Data fetched:", sortedData); // Logging to ensure data is fetched
     } catch (error) {
-      console.log(error);
+      throw new Error(error.response?.data?.message);
     }
   };
 
@@ -43,7 +42,7 @@ const History = () => {
 
   const handlePageClick = (selectedItem) => {
     const { selected } = selectedItem;
-    console.log(`Page clicked: ${selected}`); // Logging for debugging
+    // console.log(`Page clicked: ${selected}`); // Logging for debugging
     setCurrentPage(selected);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -64,7 +63,7 @@ const History = () => {
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
-  console.log("Current items:", currentItems); // Logging to ensure displayed data
+  // console.log("Current items:", currentItems); // Logging to ensure displayed data
 
   // Reset currentPage if it exceeds pageCount
   useEffect(() => {
@@ -73,7 +72,7 @@ const History = () => {
     }
   }, [pageCount, currentPage]);
 
-  console.log(currentItems);
+  // console.log(currentItems);
   return (
     <Layout key={currentPage}>
       <h1 className="text-2xl font-bold mb-10">History</h1>

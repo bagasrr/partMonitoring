@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { setNotification } from "../features/notificationSlice";
+import { setDeleted, setNotification } from "../features/notificationSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getMachines } from "../utils/machines";
+import { deleteMachines, getMachines } from "../utils/machines";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar";
 import highlightText from "../element/highlightText";
-import useNotification from "../services/Notification"; // Importe useNotification
+import useNotification from "../hooks/UseNotification"; // Importe useNotification
 import TablePagination from "./TablePagination";
 
 const MachinesTable = () => {
@@ -19,30 +19,30 @@ const MachinesTable = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = useSelector((state) => state.itemsPerPage);
-  const notification = useNotification();
-  const [deleted, setDeleted] = useState(false);
+  const { notification, someDeleted } = useNotification();
+  // const [deleted, setDeleted] = useState(false);
   const [selectedName, setSelectedName] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    Machines();
+    fetchMachines();
   }, [notification, dispatch]);
 
-  const Machines = async () => {
+  const fetchMachines = async () => {
     const response = await getMachines();
     setData(response);
   };
 
   const handleDelete = async () => {
     if (selectedMachine) {
-      setDeleted(true);
-      await axios.delete(`http://localhost:4000/api/machines/${selectedMachine}`);
+      await deleteMachines(selectedMachine);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       dispatch(setNotification(`Machines ${selectedName} Deleted`));
+      dispatch(setDeleted(true));
       setShowModal(false);
-      Machines();
+      fetchMachines();
     }
   };
 
@@ -77,7 +77,7 @@ const MachinesTable = () => {
   return (
     <div>
       {notification && (
-        <div className={`border ${deleted ? "bg-rose-100 border-rose-400 text-rose-700" : "bg-green-100  border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
+        <div className={`border ${someDeleted ? "bg-rose-100 border-rose-400 text-rose-700" : "bg-green-100  border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <strong className="font-bold">Success!</strong>
           <span className="block sm:inline"> {notification}</span>
         </div>

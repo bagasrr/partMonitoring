@@ -12,7 +12,8 @@ import itemHistoryRoute from "./itemHistoryRoute.js";
 
 const routes = express.Router();
 
-routes.use("/users", verifyUser, adminOnly, userRoute);
+// routes.use("/users", verifyUser, adminOnly, userRoute);
+routes.use("/users", userRoute);
 routes.use("/items", verifyUser, itemRoute);
 routes.use("/auth", authRoute);
 routes.use("/machines", verifyUser, machineRoute);

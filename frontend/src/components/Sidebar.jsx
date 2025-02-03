@@ -20,17 +20,64 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     navigate("/");
   };
 
+  const AllAccessGeneral = [
+    {
+      id: 1,
+      name: "Dashboard",
+      icon: <FaTachometerAlt className="mr-2" />,
+      path: "/dashboard",
+    },
+    {
+      id: 2,
+      name: "Riwayat",
+      icon: <FaHistory className="mr-2" />,
+      path: "/history",
+    },
+    {
+      id: 3,
+      name: "Pemakaian",
+      icon: <MdOutlineManageHistory className="mr-2" />,
+      path: "/itemusehistory",
+    },
+  ];
+  const AllAccessPart = [
+    {
+      id: 1,
+      name: "List Part",
+      icon: <IoMdListBox className="mr-2" />,
+      path: "/parts",
+    },
+    {
+      id: 2,
+      name: "Part Type",
+      icon: <PiNotePencilBold />,
+      path: "/parttype",
+    },
+  ];
+
   return (
     <>
       {/* Sidebar */}
       <div
-        className={`fixed overflow-y-auto pt-5 pb-20 left-0 top-16 h-full w-72 md:w-64 z-30 bg-gray-800 text-white shadow-md transition-transform transform ${
+        className={`fixed overflow-y-auto  pt-5 pb-20 left-0 top-16 h-full w-72 md:w-64 z-30 bg-gray-800 text-white shadow-md transition-transform transform ${
           isOpen ? "translate-x-0 " : "-translate-x-full"
         } duration-500 lg:translate-x-0  lg:w-64`}
       >
         <div className="p-4">
           <h2 className="text-lg font-semibold mb-4">GENERAL</h2>
           <ul className="mb-8">
+            {AllAccessGeneral &&
+              AllAccessGeneral.map((list) => (
+                <li key={list.id} className="mb-2 flex items-center">
+                  {list.icon}
+                  <Link to={list.path} className="block px-4 py-2 hover:bg-gray-700 rounded">
+                    {list.name}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+
+          {/* <ul className="mb-8">
             <li className="mb-2 flex items-center">
               <FaTachometerAlt className="mr-2" />
               <Link to="/dashboard" className="block px-4 py-2 hover:bg-gray-700 rounded">
@@ -49,7 +96,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 Pemakaian
               </Link>
             </li>
-          </ul>
+          </ul> */}
           {user && user.role === "admin" && (
             <>
               <h2 className="text-lg font-semibold mb-4">ADMIN</h2>

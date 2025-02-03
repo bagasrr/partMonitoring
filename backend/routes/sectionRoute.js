@@ -8,6 +8,6 @@ sectionRoute.get("/:sectionId/items-:type", getItemsBySection);
 sectionRoute.get("/:id", getSectionById);
 sectionRoute.post("/", addSection);
 sectionRoute.patch("/:id", updateSection);
-sectionRoute.delete("/:id", deleteSection);
+sectionRoute.patch("/:id/delete", deleteSection);
 
 export default sectionRoute;

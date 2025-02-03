@@ -11,15 +11,6 @@ const Sections = () => {
   ScrollToTop();
   return (
     <Layout>
-      {/* <div className="flex flex-col items-center">
-        <Title>Section Room</Title>
-        <div className="mb-10 flex justify-center w-full">
-          <Link to="/sections/add" className="flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105">
-            <FiPlusCircle size={24} />
-            Add Machine
-          </Link>
-        </div>
-      </div> */}
       <HeaderPages title="Section Room" linkAdd="sections" add="section" />
       <SectionsTable />
     </Layout>

@@ -12,7 +12,7 @@ const ItemUsageGraph = () => {
 
   const fetchUsageData = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/item-usage");
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/item-usage`);
       setUsageData(response.data);
     } catch (error) {
       console.error("Error fetching item usage data:", error);

@@ -30,18 +30,43 @@ export const login = async (req, res) => {
   res.status(200).json({ uuid, name: userName, role: userRole });
 };
 
+// export const Me = async (req, res) => {
+//   if (!req.session.userId) {
+//     return res.status(403).json({ message: "Please Login to Your Account" });
+//   }
+//   const user = await userModel.findOne({
+//     attributes: ["uuid", "name", "role"],
+//     where: {
+//       uuid: req.session.userId,
+//     },
+//   });
+//   if (!user) return res.status(404).json({ message: "User not found" });
+//   res.status(200).json(user);
+// };
+
 export const Me = async (req, res) => {
   if (!req.session.userId) {
     return res.status(403).json({ message: "Please Login to Your Account" });
   }
-  const user = await userModel.findOne({
-    attributes: ["uuid", "name", "role"],
-    where: {
-      uuid: req.session.userId,
-    },
-  });
-  if (!user) return res.status(404).json({ message: "User not found" });
-  res.status(200).json(user);
+
+  // Gunakan data dari session jika sudah ada untuk menghindari query ke database berulang
+  if (!req.session.userData) {
+    const user = await userModel.findOne({
+      attributes: ["uuid", "name", "role"],
+      where: { uuid: req.session.userId },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Simpan data ke session
+    req.session.userData = {
+      uuid: user.uuid,
+      name: user.name,
+      role: user.role,
+    };
+  }
+
+  res.status(200).json(req.session.userData);
 };
 
 export const logout = (req, res) => {

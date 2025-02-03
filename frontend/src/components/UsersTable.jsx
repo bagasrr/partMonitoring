@@ -2,42 +2,53 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setNotification } from "../features/notificationSlice";
-import axios from "axios";
+import { clearNotification, setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../utils/users";
+import { deleteUser, getUsers } from "../utils/users";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import TablePagination from "./TablePagination"; // Import komponen TablePagination
 import highlightText from "../element/highlightText"; // Import fungsi highlightText
+import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
+import useNotification from "../hooks/UseNotification";
+import NotificationBar from "./NotificationBar";
 
 const UsersTable = () => {
   const [data, setData] = useState([]);
-  const notification = useSelector((state) => state.notification.message);
+
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
   const [search, setSearch] = useState("");
+  const [show, setShow] = useState({
+    modal: false,
+  });
+  const [selected, setSelected] = useState({
+    userName: "",
+    userId: "",
+  });
 
   useEffect(() => {
     fetchUsers();
-    if (notification) {
-      setTimeout(() => {
-        dispatch(clearNotification());
-      }, 3000);
-    }
-  }, [notification, dispatch]);
+  }, [dispatch]);
 
   const fetchUsers = async () => {
     const response = await getUsers();
     setData(response);
   };
 
-  const handleDelete = async (uuid) => {
-    await axios.delete(`http://localhost:4000/api/users/${uuid}`);
-    dispatch(setNotification("User Deleted"));
+  const handleDelete = async () => {
+    await deleteUser(selected.userId);
+    setShow({ modal: false });
+    dispatchDeleteNotif();
     fetchUsers(); // Refresh data after deletion
   };
 
+  const dispatchDeleteNotif = () => {
+    dispatch(setDeleted(true));
+    dispatch(setNotification("User Deleted"));
+  };
   const handleSearchChange = (value) => {
     setSearch(value);
     setCurrentPage(0);
@@ -48,9 +59,19 @@ const UsersTable = () => {
     setCurrentPage(selected);
   };
 
+  const handleOpenDeleteModal = (uuid, name) => {
+    setSelected({
+      userName: name,
+      userId: uuid,
+    });
+    setShow({ modal: true });
+  };
+  const handleCloseDeleteModal = () => {
+    setShow({ modal: false });
+  };
+
   const filteredData = data.filter((user) => user.name.toLowerCase().includes(search.toLowerCase()) || user.role.toLowerCase().includes(search.toLowerCase()));
 
-  const itemsPerPage = 5; // Default value
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -58,12 +79,13 @@ const UsersTable = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {notification && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+      {/* {notification && (
+        <div className={`${someDeleted ? "bg-rose-100 border border-rose-400 text-rose-700" : "bg-green-100 border border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
           <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline">{notification}</span>
+          <span className={`block sm:inline ${someDeleted ? "text-rose-700" : ""}`}>{notification}</span>
         </div>
-      )}
+      )} */}
+      <NotificationBar />
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search users" />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
@@ -92,7 +114,7 @@ const UsersTable = () => {
                 <TData>{user.email || "NA"}</TData>
                 <TData>
                   <div className="flex gap-5 items-center justify-center">
-                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(user.uuid)} />
+                    <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenDeleteModal(user.uuid, user.name)} />
                     <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/users/edit/${user.uuid}`)} />
                   </div>
                 </TData>
@@ -101,6 +123,7 @@ const UsersTable = () => {
           </tbody>
         </table>
       </div>
+      <DeleteConfirmModalBox show={show.modal} onClose={handleCloseDeleteModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selected.userName} ?`} />
 
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>

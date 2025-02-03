@@ -20,7 +20,9 @@
 
 const highlightText = (text, query) => {
   // Konversi nilai text menjadi string jika bukan string
-  if (typeof text !== "string") {
+  if (text === null) {
+    return "";
+  } else if (typeof text !== "string") {
     console.log("expected string but got:", text);
     text = text.toString();
   }

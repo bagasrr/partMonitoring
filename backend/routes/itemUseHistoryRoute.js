@@ -7,6 +7,6 @@ itemUseHistoryRoute.get("/", getAllItemUseHistories);
 itemUseHistoryRoute.get("/:id", getItemUseHistoryById);
 itemUseHistoryRoute.post("/", createItemUseHistory);
 itemUseHistoryRoute.put("/:id", updateItemUseHistory);
-itemUseHistoryRoute.delete("/:id", deleteItemUseHistory);
+itemUseHistoryRoute.patch("/:id/delete", deleteItemUseHistory);
 
 export default itemUseHistoryRoute;

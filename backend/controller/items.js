@@ -50,6 +50,50 @@ export const getAllItems = async (req, res) => {
   }
 };
 
+export const getItemType = async (req, res) => {
+  const { type } = req.params;
+  try {
+    const items = await itemModel.findAll({
+      where: {
+        replacementType: type,
+        deletedAt: null, // Exclude soft-deleted items
+      },
+      attributes: ["uuid", "name", "item_number", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: userModel,
+          attributes: ["uuid", "name"],
+        },
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name", "machine_number"],
+        },
+        {
+          model: vendorModel,
+          attributes: ["uuid", "vendor_name"],
+        },
+        {
+          model: itemHistoryModel,
+          attributes: ["uuid", "activities", "createdAt"],
+          include: [
+            {
+              model: userModel,
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+      order: [
+        ["updatedAt", "DESC"],
+        [itemHistoryModel, "createdAt", "DESC"],
+      ],
+    });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getItemById = async (req, res) => {
   try {
     const item = await itemModel.findOne({

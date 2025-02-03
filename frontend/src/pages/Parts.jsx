@@ -4,22 +4,20 @@ import Layout from "./layout";
 import HeaderPages from "../components/headerPages";
 import ButtonTypeParts from "../components/ButtonTypeParts";
 import FormField from "../components/FormField";
-import ItemsSwap from "../components/ItemsSwap";
-import ItemsReplace from "../components/ItemsReplace";
 import useSections from "../hooks/useSections";
+import PartList from "../components/PartList";
 
 const Parts = () => {
   ScrollToTop();
-  const [view, setView] = useState("swap");
+  const [view, setView] = useState("Swap");
   const { sections, selectedSection, handleSectionChange } = useSections();
 
   return (
     <Layout>
       <div className="flex flex-col items-center w-full">
         <HeaderPages title="Part List" linkAdd="parts" add="part">
-          {/* Tombol Swap & Replace */}
           <div className="flex gap-5 mb-10">
-            {["swap", "replace"].map((type) => (
+            {["Swap", "Replace"].map((type) => (
               <ButtonTypeParts key={type} view={view} setView={setView} partType={type}>
                 {type.charAt(0).toUpperCase() + type.slice(1)}
               </ButtonTypeParts>
@@ -27,11 +25,11 @@ const Parts = () => {
           </div>
         </HeaderPages>
 
-        {/* Select Filter Ruangan */}
         <SectionFilter data={sections} selectedData={selectedSection} handleDataChange={handleSectionChange} />
 
-        {/* Render Komponen Sesuai View */}
-        <div className="w-full">{view === "replace" ? <ItemsReplace section={selectedSection} /> : <ItemsSwap section={selectedSection} />}</div>
+        <div className="w-full">
+          <PartList section={selectedSection} type={view} />
+        </div>
       </div>
     </Layout>
   );

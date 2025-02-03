@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setNotification } from "../features/notificationSlice";
-import axios from "axios";
+import { setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
-import { getSections } from "../utils/section";
+import { deleteSection, getSections } from "../utils/section";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import highlightText from "../element/highlightText"; // Import fungsi highlightText
-import Pagination from "./Pagination"; // Import komponen Pagination
-import useNotification from "../services/Notification"; // Importe useNotification
 import TablePagination from "./TablePagination";
+import NotificationBar from "./NotificationBar";
 
 const SectionsTable = () => {
   const [data, setData] = useState([]);
@@ -21,15 +19,14 @@ const SectionsTable = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = useSelector((state) => state.itemsPerPage);
-  const [deleted, setDeleted] = useState(false);
+  // const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState(null);
-  const notification = useNotification();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSections();
-  }, [notification, dispatch]);
+  }, [dispatch]);
 
   const fetchSections = async () => {
     const response = await getSections();
@@ -39,9 +36,9 @@ const SectionsTable = () => {
   const handleDelete = async () => {
     try {
       setShowModal(false);
-      setDeleted(true);
-      await axios.delete(`http://localhost:4000/api/sections/${selectedSection}`);
+      await deleteSection(selectedSection);
       dispatch(setNotification("Section Deleted"));
+      dispatch(setDeleted(true));
       fetchSections();
     } catch (error) {
       setError(error.response.data.message);
@@ -78,12 +75,7 @@ const SectionsTable = () => {
 
   return (
     <div>
-      {notification && (
-        <div className={`border ${deleted ? "bg-rose-100 border-rose-400 text-rose-700" : "bg-green-100  border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
-          <strong className="font-bold">Success!</strong>
-          <span className="block sm:inline"> {notification}</span>
-        </div>
-      )}
+      <NotificationBar />
 
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search sections" />
       <div className="overflow-x-auto">

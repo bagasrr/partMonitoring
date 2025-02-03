@@ -12,9 +12,15 @@ const Navbar = () => {
   const { user, isError } = useSelector((state) => state.auth);
   const isOpen = useSelector((state) => state.sidebar.isOpen);
 
+  // useEffect(() => {
+  //   dispatch(getMe());
+  // }, [dispatch]);
+
   useEffect(() => {
-    dispatch(getMe());
-  }, [dispatch]);
+    if (!user) {
+      dispatch(getMe());
+    }
+  }, [dispatch, user]);
 
   useEffect(() => {
     if (isError) {

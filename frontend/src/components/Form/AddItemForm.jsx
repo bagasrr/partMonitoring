@@ -6,7 +6,7 @@ import { getMachines } from "../../utils/machines";
 import { getSections } from "../../utils/section";
 import { useDispatch, useSelector } from "react-redux";
 import { setDeleted, setNotification } from "../../features/notificationSlice";
-import useNotification from "../../services/Notification";
+import useNotification from "../../hooks/UseNotification";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
 import { getVendors } from "../../utils/vendor";

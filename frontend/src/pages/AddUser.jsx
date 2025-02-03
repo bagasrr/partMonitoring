@@ -6,6 +6,7 @@ import { adminArea } from "../utils/adminArea";
 import { createUser } from "../utils/users";
 import { useDispatch } from "react-redux";
 import BackPrev from "../element/BackPrev";
+import { setNotification } from "../features/notificationSlice";
 
 const AddUser = () => {
   adminArea();
@@ -27,7 +28,7 @@ const AddUser = () => {
       confPassword,
       email,
     };
-    console.log(data);
+    // console.log(data);
     try {
       await createUser(data);
       navigate("/users");

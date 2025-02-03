@@ -16,9 +16,9 @@ const store = new sessionStore({
   db: db,
 });
 
-(async () => {
-  await db.sync();
-})();
+// (async () => {
+//   await db.sync();
+// })();
 
 app.use(
   cors({
@@ -27,19 +27,42 @@ app.use(
   })
 );
 
+// app.use(
+//   session({
+//     secret: process.env.SESS_SECRET, // Gunakan environment variable untuk secret
+//     resave: false,
+//     saveUninitialized: true,
+//     store,
+//     cookie: {
+//       secure: "auto",
+//       httpOnly: true,
+//       sameSite: "lax",
+//     },
+//   })
+// );
 app.use(
   session({
-    secret: process.env.SESS_SECRET, // Gunakan environment variable untuk secret
-    resave: false,
-    saveUninitialized: true,
+    secret: process.env.SESS_SECRET,
+    resave: false, // Pastikan ini false untuk tidak menyimpan ulang session jika tidak berubah
+    saveUninitialized: false, // Jangan simpan session yang belum digunakan
+    // rolling: true,
     store,
     cookie: {
       secure: "auto",
       httpOnly: true,
       sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 30 menit
     },
   })
 );
+const requestCount = {};
+
+app.use((req, res, next) => {
+  const route = req.url;
+  requestCount[route] = (requestCount[route] || 0) + 1;
+  console.log(`Endpoint ${route} telah dipanggil ${requestCount[route]} kali`);
+  next();
+});
 
 app.use("/api", routes);
 

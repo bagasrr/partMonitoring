@@ -9,6 +9,6 @@ machinesRoute.post("/", addMachine);
 
 machinesRoute.get("/:id", getMachineById);
 machinesRoute.patch("/:id", updateMachine);
-machinesRoute.delete("/:id", deleteMachine);
+machinesRoute.patch("/:id/delete", deleteMachine);
 
 export default machinesRoute;

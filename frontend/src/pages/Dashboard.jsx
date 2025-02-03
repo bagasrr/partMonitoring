@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import StatusInfo from "../components/StatusInfo";
 import Title from "../element/Title";
@@ -7,59 +7,34 @@ import DayUsedChart from "../components/DayUsedChart";
 import { getBrokenItems, getInUseItems, getRepairItems, getSpareItems, getTypeReplaceitem, getTypeSwapItem } from "../utils/items";
 import AmountLimitChart from "../components/AmountLimitChart";
 import ButtonTypeParts from "../components/ButtonTypeParts";
-import ItemsReplace from "../components/ItemsReplace";
-import ItemsSwap from "../components/ItemsSwap";
 import Layout from "./layout";
-import { getMe } from "../features/authSlice";
 import useSections from "../hooks/useSections";
-import FormField from "../components/FormField";
 import { SectionFilter } from "./Parts";
+import PartList from "../components/PartList";
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isError } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.auth);
-  const [userName, setUserName] = useState("");
-  const [swapPart, setSwapPart] = useState([]);
-  const [replacePart, setReplacePart] = useState([]);
-  const [view, setView] = useState("swap");
+  const [view, setView] = useState("Swap");
   const { sections, selectedSection, handleSectionChange } = useSections();
   const [statusData, setStatusData] = useState({
     spare: [],
     broken: [],
     inUse: [],
     repair: [],
+    swapPart: [],
+    replacePart: [],
   });
+  const memoizedStatusData = useMemo(() => statusData, [statusData]);
+  const hasFetchedData = useRef(false);
 
   useEffect(() => {
-    getSwap();
-    getReplace();
-    fetchStatusData();
+    if (!hasFetchedData.current) {
+      fetchStatusData();
+      hasFetchedData.current = true; // Set flag agar tidak dipanggil lagi
+    }
   }, []);
-
-  const fetchStatusData = async () => {
-    const spare = await getSpareItems();
-    const broken = await getBrokenItems();
-    const inUse = await getInUseItems();
-    const repair = await getRepairItems();
-
-    setStatusData({ spare, broken, inUse, repair });
-  };
-  console.log("statusData : ", statusData);
-  const getSwap = async () => {
-    const response = await getTypeSwapItem();
-    const sortedData = response.sort((a, b) => b.dayUsed - a.dayUsed);
-    setSwapPart(sortedData);
-  };
-  const getReplace = async () => {
-    const response = await getTypeReplaceitem();
-    // const sortedData = response.sort((a, b) => b.amount - a.amount);
-    setReplacePart(response);
-  };
-  useEffect(() => {
-    dispatch(getMe());
-  }, [dispatch]);
 
   useEffect(() => {
     if (isError) {
@@ -67,27 +42,37 @@ const Dashboard = () => {
     }
   }, [isError, navigate]);
 
+  const fetchStatusData = async () => {
+    const spare = await getSpareItems();
+    const broken = await getBrokenItems();
+    const inUse = await getInUseItems();
+    const repair = await getRepairItems();
+    const swapPart = await getTypeSwapItem();
+    const replacePart = await getTypeReplaceitem();
+
+    const sortSwap = swapPart.sort((a, b) => b.dayUsed - a.dayUsed);
+    setStatusData({ spare, broken, inUse, repair, swapPart: sortSwap, replacePart });
+  };
+
   return (
     <Layout>
       <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className=" p-4 bg-white shadow rounded-lg">
-          <DayUsedChart data={swapPart} />
+          <DayUsedChart data={statusData.swapPart} />
         </div>
         <div className="p-4 bg-white shadow rounded-lg">
-          <AmountLimitChart data={replacePart} />
+          <AmountLimitChart data={statusData.replacePart} />
         </div>
       </div>
       <div className="mt-5">
-        {/* <StatusInfo  data={statusData}/> */}
-        <StatusInfo statusData={statusData} />
+        <StatusInfo statusData={memoizedStatusData} />
       </div>
       <div className="mt-5">
         <Title>Part List</Title>
-        <div className="flex gap-2 mb-5 items-center">
-          {["swap", "replace"].map((type) => (
+        <div className="flex gap-2 mb-5 items-center ">
+          {["Swap", "Replace"].map((type) => (
             <ButtonTypeParts key={type} view={view} setView={setView} partType={type}>
-              {/* {type.charAt(0).toUpperCase() + type.slice(1)} */}
               {view === type ? type.charAt(0).toUpperCase() + type.slice(1) : type.charAt(0).toUpperCase()}
             </ButtonTypeParts>
           ))}
@@ -95,8 +80,7 @@ const Dashboard = () => {
         </div>
 
         <div className="w-full">
-          {view === "replace" && <ItemsReplace section={selectedSection} />}
-          {view === "swap" && <ItemsSwap section={selectedSection} />}
+          <PartList section={selectedSection} type={view} />
         </div>
       </div>
     </Layout>
@@ -114,50 +98,3 @@ export const AnimatedBox = () => {
     </div>
   );
 };
-
-// import React, { useState } from "react";
-// import Layout from "./Layout";
-// import StatusInfo from "../components/StatusInfo";
-// import Title from "../element/Title";
-// import DayUsedChart from "../components/DayUsedChart";
-// import AmountLimitChart from "../components/AmountLimitChart";
-// import ButtonTypeParts from "../components/ButtonTypeParts";
-
-// const Dashboard = () => {
-//   const [view, setView] = useState("swap");
-
-//   return (
-//     <Layout>
-//       <h1 className="text-xl font-bold mb-6">Welcome</h1>
-//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-//         <div className="p-4 bg-white shadow rounded-lg">
-//           <DayUsedChart data={[]} />
-//         </div>
-//         <div className="p-4 bg-white shadow rounded-lg">
-//           <AmountLimitChart data={[]} />
-//         </div>
-//       </div>
-//       <div className="mt-5">
-//         <StatusInfo />
-//       </div>
-//       <div className="mt-5">
-//         <Title>Part List</Title>
-//         <div className="flex gap-2">
-//           <ButtonTypeParts view={view} setView={setView} partType="swap" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
-//             {view === "swap" ? "Swap" : "S"}
-//           </ButtonTypeParts>
-//           <ButtonTypeParts view={view} setView={setView} partType="replace" className="px-6 py-3 rounded-3xl bg-blue-600 hover:text-white hover:bg-blue-800 transition-all duration-300 ease-in-out">
-//             {view === "replace" ? "Replace" : "R"}
-//           </ButtonTypeParts>
-//         </div>
-//         <div className="w-full">
-//           {view === "replace" && <ItemsReplace />}
-//           {view === "swap" && <ItemsSwap />}
-//         </div>
-
-//       </div>
-//     </Layout>
-//   );
-// };
-
-// export default Dashboard;

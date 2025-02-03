@@ -56,7 +56,7 @@ const DetailsAction = ({ data, setIsOpen }) => {
                     {/* Untuk layar kecil (Mobile) */}
                     <TData className={`block sm:hidden ${FormatStatusColor(his.activities, "Parts Broken", "Part Updated", "Part Added", "Status Changed")}`}>{his.activities}</TData>
 
-                    <TData>{his.user?.name}</TData>
+                    <TData>{his.user?.name || "NA"}</TData>
                   </TRow>
                 ))}
               </tbody>

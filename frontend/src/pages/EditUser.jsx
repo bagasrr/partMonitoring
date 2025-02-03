@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./layout";
-import { getUserById } from "../utils/users";
+import { getUserById, updateUser } from "../utils/users";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -35,13 +35,14 @@ const EditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`http://localhost:4000/api/users/${id}`, {
-        name: name,
-        role: role,
-        password: password,
+      const data = {
+        name,
+        role,
+        password,
         confPassword: confirmPassword,
         email,
-      });
+      };
+      await updateUser(id, data);
       dispatch(setNotification("User Edit Success"));
       navigate("/users");
     } catch (error) {
@@ -82,7 +83,7 @@ const EditUser = () => {
               )}
             </select>
           </div>
-          <NormalInput value={email} type="email" id="email" onChange={(e) => setEmail(e.target.value)} label="Email" placeholder="Email" />
+          {role === "admin" && <NormalInput value={email} type="email" id="email" onChange={(e) => setEmail(e.target.value)} label="Email" placeholder="Email" />}
 
           <PasswordInput value={password} type="password" id="password" onChange={(e) => setPassword(e.target.value)} label="New Password" placeholder={"*********"} />
 
