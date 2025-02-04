@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { deleteItem, getItemType, getItemsBySection, updateItemStatus } from "../utils/items";
-import { TData, ThData, TRow } from "../element/Table";
+import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
@@ -203,7 +203,7 @@ const PartList = ({ section, type }) => {
       {isLoading && <LoadingAnimate isOpen={isLoading}>Please Wait Changing Status...</LoadingAnimate>}
       <NotificationBar />
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search Parts Number Or Name or Machines Name" />
-      <div className="overflow-auto max-h-96 lg:max-h-[calc(100vh-150px)]">
+      <TableContainer>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -324,8 +324,8 @@ const PartList = ({ section, type }) => {
             ))}
           </tbody>
         </table>
-        <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`} />
-      </div>
+      </TableContainer>
+      <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selectedItemName} ?`} />
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
       {isOpen && <DetailsAction data={selectedItem} setIsOpen={setIsOpen} />}
     </div>

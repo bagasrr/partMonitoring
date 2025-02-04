@@ -18,3 +18,7 @@ export const ThData = ({ children, onClick, className }) => {
 export const TData = ({ children, className }) => {
   return <td className={`px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center ${className}`}>{children}</td>;
 };
+
+export const TableContainer = ({ children }) => {
+  return <div className="overflow-auto max-h-[70vh] lg:max-h-[calc(100vh-150px)] ">{children}</div>;
+};

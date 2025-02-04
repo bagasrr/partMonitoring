@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { TData, ThData, TRow } from "../element/Table";
+import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,6 @@ import TablePagination from "./TablePagination"; // Import komponen TablePaginat
 import highlightText from "../element/highlightText"; // Import fungsi highlightText
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import NotificationBar from "./NotificationBar";
-import ScrollToTop from "../utils/scrollToTop";
 
 const UsersTable = () => {
   const [data, setData] = useState([]);
@@ -82,7 +81,7 @@ const UsersTable = () => {
     <div className="flex flex-col gap-5">
       <NotificationBar />
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search users" />
-      <div className="overflow-x-auto">
+      <TableContainer>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -117,7 +116,7 @@ const UsersTable = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableContainer>
       <DeleteConfirmModalBox show={show.modal} onClose={handleCloseDeleteModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selected.userName} ?`} />
 
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />

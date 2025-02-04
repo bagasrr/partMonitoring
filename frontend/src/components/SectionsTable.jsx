@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { TData, ThData, TRow } from "../element/Table";
+import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
@@ -76,10 +76,9 @@ const SectionsTable = () => {
   return (
     <div>
       <NotificationBar />
-
+      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">{error}</div>}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search sections" />
-      <div className="overflow-x-auto">
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">{error}</div>}
+      <TableContainer>
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -112,7 +111,7 @@ const SectionsTable = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableContainer>
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus Ruangan ini?">
         <p>
           Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">{selectedSectionName}</span>} ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}

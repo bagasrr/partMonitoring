@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import { createMachines } from "../../utils/machines";
 import Button from "../../element/Button";
+import LoadingAnimate from "../LoadingAnimate";
 
 const AddMachineForm = () => {
   const [sections, setSections] = useState([]);
@@ -69,8 +70,8 @@ const AddMachineForm = () => {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log(error.response);
-      setError(error.response.data.message);
+      console.log(error);
+      setError(error.message);
     }
   };
 

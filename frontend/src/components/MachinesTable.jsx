@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { TData, ThData, TRow } from "../element/Table";
+import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
 import { setDeleted, setNotification } from "../features/notificationSlice";
 import axios from "axios";
@@ -83,7 +83,7 @@ const MachinesTable = () => {
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search machines or sections" />
-      <div className="overflow-auto max-h-96 lg:max-h-[calc(100vh-150px)] ">
+      <TableContainer>
         <table className="min-w-full bg-white">
           <thead className="sticky top-0 z-10">
             <tr>
@@ -120,7 +120,8 @@ const MachinesTable = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableContainer>
+
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus mesin ini?">
         <p>
           Jika menghapus mesin ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan mesin ini akan <span className="text-red-500 text-2xl"> terhapus.</span>
