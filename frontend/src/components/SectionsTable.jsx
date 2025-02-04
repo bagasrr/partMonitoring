@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
@@ -18,8 +18,8 @@ const SectionsTable = () => {
   const [selectedSectionName, setSelectedSectionName] = useState(null);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
   const itemsPerPage = useSelector((state) => state.itemsPerPage);
-  // const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -66,12 +66,46 @@ const SectionsTable = () => {
     setCurrentPage(0);
   };
 
-  const filteredData = data.filter((section) => section.section_name.toLowerCase().includes(search.toLowerCase()));
+  const handleSort = (column) => {
+    let direction = "ascending";
+    if (sortConfig.key === column && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key: column, direction });
+  };
 
+  const getSortIndicator = (column) => {
+    if (sortConfig.key === column) {
+      return sortConfig.direction === "ascending" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
+  const filteredData = useMemo(() => {
+    return data.filter((section) => section.section_name.toLowerCase().includes(search.toLowerCase()) || section.section_number.toString().includes(search));
+  }, [data, search]);
+
+  const sortedData = useMemo(() => {
+    const sorted = [...filteredData];
+    if (!sortConfig.key) return sorted;
+    return sorted.sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (valA < valB) return sortConfig.direction === "ascending" ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredData, sortConfig]);
+
+  const currentItems = useMemo(() => {
+    const start = currentPage * itemsPerPage;
+    return sortedData.slice(start, start + itemsPerPage);
+  }, [sortedData, currentPage, itemsPerPage]);
+
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
     <div>
@@ -83,8 +117,18 @@ const SectionsTable = () => {
           <thead>
             <tr>
               <ThData>No</ThData>
-              <ThData>Nama Ruangan</ThData>
-              <ThData>Nomor Ruangan</ThData>
+              <ThData onClick={() => handleSort("section_name")}>
+                <span className="flex justify-center">
+                  Nama Ruangan
+                  <span>{getSortIndicator("section_name")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("section_number")}>
+                <span className="flex justify-center">
+                  Nomor Ruangan
+                  <span>{getSortIndicator("section_number")}</span>
+                </span>
+              </ThData>
               <ThData>Action</ThData>
             </tr>
           </thead>
@@ -114,7 +158,7 @@ const SectionsTable = () => {
       </TableContainer>
       <DeleteConfirmModalBox show={showModal} onClose={handleCloseModal} onConfirm={handleDelete} title="Apakah anda yakin ingin menghapus Ruangan ini?">
         <p>
-          Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">{selectedSectionName}</span>} ini,maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}
+          Jika menghapus Ruangan dengan Nama {<span className="text-red-500 text-2xl">{selectedSectionName}</span>} ini, maka<span className="text-red-500 text-2xl"> semua data </span> yang berkaitan dengan Ruangan ini akan{" "}
           <span className="text-red-500 text-2xl"> terhapus.</span>
         </p>
       </DeleteConfirmModalBox>

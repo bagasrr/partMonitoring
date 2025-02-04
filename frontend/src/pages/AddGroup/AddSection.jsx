@@ -1,54 +1,18 @@
-import React, { useState } from "react";
-import FormLayout from "../FormLayout";
-import { NormalInput } from "../../element/Input";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setNotification } from "../../features/notificationSlice";
-import useNotification from "../../hooks/UseNotification";
-import { adminArea } from "../../utils/adminArea";
-import { createSection } from "../../utils/section";
-import LoadingAnimate from "../../components/LoadingAnimate";
+import React from "react";
+import Title from "../../element/Title";
+import Layout from "../layout";
+import BackPrev from "../../element/BackPrev";
+import AddUsersForm from "../../components/Form/AddUsersForm";
+import AddSectionForm from "../../components/Form/AddSectionsForm";
 
-const AddSection = () => {
-  adminArea();
-  const [formData, setFormData] = useState({
-    sectionName: "",
-    sectionNumber: "",
-  });
-  const [sectionName, setSectionName] = useState("");
-  const [sectionNumber, setSectionNumber] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const notification = useNotification();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = {
-      section_name: sectionName,
-      section_number: sectionNumber,
-    };
-    try {
-      setIsLoading(true);
-      await createSection(data);
-      navigate("/sections");
-      dispatch(setNotification(`Section ${sectionName} Added`));
-    } catch (error) {
-      dispatch(setNotification(error.response.data.message));
-    }
-  };
+const AddUser = () => {
   return (
-    <>
-      {isLoading && <LoadingAnimate isOpen={isLoading}>Adding Section Room...</LoadingAnimate>}
-      <FormLayout formTitle={"Tambah Ruangan"} onSubmit={handleSubmit}>
-        {notification && <p className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded relative mb-4">{notification}</p>}
-
-        <NormalInput label="Nama Ruangan" id="section_name" type="text" onChange={(e) => setSectionName(e.target.value)} />
-        <NormalInput label="Nomor Ruangan" id="section_number" type="text" onChange={(e) => setSectionNumber(e.target.value)} />
-      </FormLayout>
-    </>
+    <Layout>
+      <BackPrev url="/sections" />
+      <Title>Add new Section</Title>
+      <AddSectionForm />
+    </Layout>
   );
 };
 
-export default AddSection;
+export default AddUser;

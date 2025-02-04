@@ -19,6 +19,7 @@ import ItemUseHistory from "./pages/ItemUseHistory";
 import Details from "./pages/Details";
 import Vendors from "./pages/Vendors";
 import AddUser from "./pages/AddGroup/AddUser";
+import AddVendor from "./pages/AddGroup/AddVendor";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
   {
     path: "/vendors",
     element: <Vendors />,
+  },
+  {
+    path: "/vendors/add",
+    element: <AddVendor />,
   },
   {
     path: "/yourenotadmin",

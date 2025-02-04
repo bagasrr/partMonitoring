@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,9 +13,9 @@ import NotificationBar from "./NotificationBar";
 
 const UsersTable = () => {
   const [data, setData] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
 
   const itemsPerPage = useSelector((state) => state.itemsPerPage);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
@@ -49,6 +49,7 @@ const UsersTable = () => {
     dispatch(setDeleted(true));
     dispatch(setNotification("User Deleted"));
   };
+
   const handleSearchChange = (value) => {
     setSearch(value);
     setCurrentPage(0);
@@ -66,15 +67,48 @@ const UsersTable = () => {
     });
     setShow({ modal: true });
   };
+
   const handleCloseDeleteModal = () => {
     setShow({ modal: false });
   };
 
-  const filteredData = data.filter((user) => user.name.toLowerCase().includes(search.toLowerCase()) || user.role.toLowerCase().includes(search.toLowerCase()));
+  const handleSort = (column) => {
+    let direction = "ascending";
+    if (sortConfig.key === column && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key: column, direction });
+  };
 
-  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const getSortIndicator = (column) => {
+    if (sortConfig.key === column) {
+      return sortConfig.direction === "ascending" ? " ▲" : " ▼";
+    }
+    return "";
+  };
+
+  const filteredData = useMemo(() => {
+    return data.filter((user) => user.name.toLowerCase().includes(search.toLowerCase()) || user.role.toLowerCase().includes(search.toLowerCase()) || (user.email && user.email.toLowerCase().includes(search.toLowerCase())));
+  }, [data, search]);
+
+  const sortedData = useMemo(() => {
+    const sorted = [...filteredData];
+    if (!sortConfig.key) return sorted;
+    return sorted.sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (valA < valB) return sortConfig.direction === "ascending" ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === "ascending" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredData, sortConfig]);
+
+  const currentItems = useMemo(() => {
+    const start = currentPage * itemsPerPage;
+    return sortedData.slice(start, start + itemsPerPage);
+  }, [sortedData, currentPage, itemsPerPage]);
+
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
@@ -86,23 +120,38 @@ const UsersTable = () => {
           <thead>
             <tr>
               <ThData>No</ThData>
-              <ThData>Nama</ThData>
-              <ThData>Role</ThData>
-              <ThData>Email</ThData>
+              <ThData onClick={() => handleSort("name")}>
+                <span className="flex justify-center">
+                  Nama
+                  <span>{getSortIndicator("name")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("role")}>
+                <span className="flex justify-center">
+                  Role
+                  <span>{getSortIndicator("role")}</span>
+                </span>
+              </ThData>
+              <ThData onClick={() => handleSort("email")}>
+                <span className="flex justify-center">
+                  Email
+                  <span>{getSortIndicator("email")}</span>
+                </span>
+              </ThData>
               <ThData>Action</ThData>
             </tr>
           </thead>
           <tbody>
             {currentItems.length === 0 && (
               <tr>
-                <td colSpan="4" className="text-center py-4">
+                <td colSpan="5" className="text-center py-4">
                   No data found
                 </td>
               </tr>
             )}
             {currentItems.map((user, index) => (
               <TRow key={user.uuid}>
-                <TData>{indexOfFirstItem + index + 1}</TData>
+                <TData>{currentPage * itemsPerPage + index + 1}</TData>
                 <TData>{highlightText(user.name, search)}</TData>
                 <TData>{highlightText(user.role, search)}</TData>
                 <TData>{user.email || "NA"}</TData>
@@ -118,7 +167,6 @@ const UsersTable = () => {
         </table>
       </TableContainer>
       <DeleteConfirmModalBox show={show.modal} onClose={handleCloseDeleteModal} onConfirm={handleDelete} title={`Apakah anda yakin ingin menghapus ${selected.userName} ?`} />
-
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
   );

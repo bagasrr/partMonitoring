@@ -6,6 +6,7 @@ const FormField = ({ label, name, value, onChange, type = "text", error, childre
     const numberValue = value.replace(/\D/g, ""); // Hanya angka
     onChange({ target: { name, value: numberValue } });
   };
+
   return (
     <div className={` ${className}`}>
       <label className="block font-bold text-gray-700">{label}:</label>

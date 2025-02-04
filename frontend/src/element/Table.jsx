@@ -20,5 +20,5 @@ export const TData = ({ children, className }) => {
 };
 
 export const TableContainer = ({ children }) => {
-  return <div className="overflow-auto max-h-[70vh] lg:max-h-[calc(100vh-150px)] ">{children}</div>;
+  return <div className="overflow-auto max-h-[65vh] lg:max-h-[calc(100vh-150px)] ">{children}</div>;
 };
