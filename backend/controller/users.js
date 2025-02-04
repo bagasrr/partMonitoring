@@ -30,6 +30,11 @@ export const getUserById = async (req, res) => {
 export const createUser = async (req, res) => {
   const { name, password, confPassword, role, email } = req.body;
 
+  const cekUser = await userModel.findOne({ where: { name, deletedAt: null } });
+  if (cekUser) {
+    return res.status(400).json({ message: "username already exist, please use different name" });
+  }
+
   if (password !== confPassword) {
     return res.status(400).json({
       message: "password and confirm password not match",

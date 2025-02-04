@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-d
 import Login from "./pages/Login";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
-import AddUser from "./pages/AddUser";
 import History from "./pages/History";
 import Machines from "./pages/Machines";
 import Sections from "./pages/Sections";
@@ -19,6 +18,7 @@ import ChangePartPages from "./pages/AddGroup/ChangePart";
 import ItemUseHistory from "./pages/ItemUseHistory";
 import Details from "./pages/Details";
 import Vendors from "./pages/Vendors";
+import AddUser from "./pages/AddGroup/AddUser";
 
 const router = createBrowserRouter([
   {

@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { clearNotification, setDeleted, setNotification } from "../features/notificationSlice";
+import { setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteUser, getUsers } from "../utils/users";
 import SearchBar from "./SearchBar"; // Import komponen SearchBar
 import TablePagination from "./TablePagination"; // Import komponen TablePagination
 import highlightText from "../element/highlightText"; // Import fungsi highlightText
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
-import useNotification from "../hooks/UseNotification";
 import NotificationBar from "./NotificationBar";
+import ScrollToTop from "../utils/scrollToTop";
 
 const UsersTable = () => {
   const [data, setData] = useState([]);
@@ -42,6 +42,7 @@ const UsersTable = () => {
     await deleteUser(selected.userId);
     setShow({ modal: false });
     dispatchDeleteNotif();
+    window.scrollTo({ top: 0, behavior: "smooth" });
     fetchUsers(); // Refresh data after deletion
   };
 
@@ -79,12 +80,6 @@ const UsersTable = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* {notification && (
-        <div className={`${someDeleted ? "bg-rose-100 border border-rose-400 text-rose-700" : "bg-green-100 border border-green-400 text-green-700"} px-4 py-3 rounded relative mb-4`} role="alert">
-          <strong className="font-bold">Success!</strong>
-          <span className={`block sm:inline ${someDeleted ? "text-rose-700" : ""}`}>{notification}</span>
-        </div>
-      )} */}
       <NotificationBar />
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search users" />
       <div className="overflow-x-auto">

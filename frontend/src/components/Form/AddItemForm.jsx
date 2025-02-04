@@ -293,8 +293,6 @@ const AddItemForm = () => {
         </FormField>
 
         <FormField label="Lower Limit" name="lowerLimit" type="number" value={formData.lowerLimit} onChange={handleChange} error={errors.lowerLimit} placeholder={"Masukkan batas minimum"} />
-        {/* </>
-        )} */}
 
         <FormField label="Machine Name" name="machine_name" value={isNew.machine ? "new" : formData.machine_name} onChange={handleMachineChange} type="select">
           <option value="" disabled>

@@ -21,6 +21,7 @@ const Login = () => {
 
   const Auth = (e) => {
     e.preventDefault();
+
     dispatch(LoginUser({ username, password }));
   };
 
@@ -37,9 +38,11 @@ const Login = () => {
               type="text"
               id="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value.toUpperCase())}
               className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+              maxLength={3}
               required
+              placeholder="Your Initial"
               autoComplete="username"
             />
           </div>
@@ -53,6 +56,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+              placeholder="*****"
               required
               autoComplete="current-password"
             />

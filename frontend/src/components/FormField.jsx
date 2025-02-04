@@ -1,6 +1,6 @@
 import React from "react";
 
-const FormField = ({ label, name, value, onChange, type = "text", error, children, placeholder, className = "my-2" }) => {
+const FormField = ({ label, name, value, onChange, type = "text", error, children, placeholder, className = "my-2", maxLength }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const numberValue = value.replace(/\D/g, ""); // Hanya angka
@@ -28,7 +28,16 @@ const FormField = ({ label, name, value, onChange, type = "text", error, childre
       ) : type === "date" ? (
         <input type="date" name={name} value={value || ""} onChange={onChange} className={`mt-1 block w-full p-2 border focus:outline-none focus:ring focus:ring-indigo-600 rounded-md`} required placeholder={placeholder} />
       ) : (
-        <input type={type} name={name} value={value || ""} onChange={onChange} className="mt-1 block w-full p-3 border focus:outline-none focus:ring focus:ring-green-600 rounded-md" required placeholder={placeholder} />
+        <input
+          type={type}
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={`mt-1 block w-full p-3 border focus:outline-none focus:ring focus:ring-green-600 rounded-md  `}
+          required
+          maxLength={maxLength}
+        />
       )}
       {error && <p className="text-red-500 text-xs font-bold mt-1 ml-1">*{error}</p>}
     </div>
