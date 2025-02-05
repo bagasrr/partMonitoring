@@ -1,29 +1,45 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import Layout from "../layout";
 import BackPrev from "../../element/BackPrev";
 import FormField from "../../components/FormField";
 import Button from "../../element/Button";
-import { Title } from "chart.js";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Title from "../../element/Title";
+import { setDeleted, setNotification } from "../../features/notificationSlice";
+import LoadingAnimate from "../../components/LoadingAnimate";
+import NotificationBar from "../../components/NotificationBar";
+import { createVendor } from "../../utils/vendor";
 
 const AddVendor = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [vendorName, setVendorName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      vendor_name: vendorName,
+    };
     try {
-      console.log(vendorName);
+      setIsLoading(true);
+      await createVendor(data);
+      dispatch(setNotification(`${vendorName} Added`));
+      navigate("/vendors");
+      setIsLoading(false);
     } catch (error) {
-      console.log(error.message);
+      setIsLoading(false);
+      dispatch(setNotification(`error:${error.message}`));
+      dispatch(setDeleted(true));
     }
   };
   return (
     <Layout>
+      {isLoading && <LoadingAnimate />}
       <BackPrev url="/vendors" />
       <Title>Add new Vendor</Title>
+      <NotificationBar />
 
       <form onSubmit={handleSubmit}>
         <FormField

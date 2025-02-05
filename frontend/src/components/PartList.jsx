@@ -9,7 +9,6 @@ import highlightText from "../element/highlightText";
 import SearchBar from "./SearchBar";
 import DeleteConfirmModalBox from "./DeleteConfirmModalBox";
 import TablePagination from "./TablePagination";
-import useNotification from "../hooks/UseNotification";
 import LoadingAnimate from "./LoadingAnimate";
 import DetailsAction from "./DetailsAction";
 import { FormatStatusColor } from "../utils/format";

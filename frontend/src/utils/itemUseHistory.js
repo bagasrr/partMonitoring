@@ -5,6 +5,6 @@ export const getItemUseHistories = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/item-use-histories`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };

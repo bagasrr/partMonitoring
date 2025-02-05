@@ -7,7 +7,7 @@ export const createItem = async (itemData) => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/items`, itemData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error creating item");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating item");
   }
 };
 
@@ -17,7 +17,7 @@ export const getItems = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -27,7 +27,7 @@ export const getSpareItems = async () => {
     console.log(response.length);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -36,7 +36,7 @@ export const getInUseItems = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/in-use`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -45,7 +45,7 @@ export const getRepairItems = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/repair`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -54,7 +54,7 @@ export const getBrokenItems = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/broken`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -64,7 +64,7 @@ export const updateItemStatus = async (itemId, statusData) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}/status`, statusData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error updating Part status");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating Part status");
   }
 };
 
@@ -74,7 +74,7 @@ export const deleteItem = async (itemId) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}/delete`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error deleting Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error deleting Part");
   }
 };
 
@@ -83,7 +83,7 @@ export const getItemById = async (itemId) => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -93,7 +93,7 @@ export const updateItem = async (itemId, itemData) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}`, itemData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error updating Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating Part");
   }
 };
 
@@ -102,7 +102,7 @@ export const changeItem = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/change/swap`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error Changing Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
   }
 };
 export const replaceItem = async (data) => {
@@ -110,7 +110,7 @@ export const replaceItem = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/change/replace`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error Changing Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
   }
 };
 
@@ -119,7 +119,7 @@ export const getTypeSwapReplaceItem = async (query) => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/type-swap/machine?machineName=${query}`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error Fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Fetching Part");
   }
 };
 
@@ -128,7 +128,7 @@ export const getTypeSwapItem = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/type-swap`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error Fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Fetching Part");
   }
 };
 
@@ -137,7 +137,7 @@ export const getTypeReplaceitem = async () => {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/type-replace`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error Fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Fetching Part");
   }
 };
 
@@ -146,7 +146,7 @@ export const addItemAmount = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/add-amount`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error while Add Amount");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
   }
 };
 
@@ -155,7 +155,7 @@ export const updateItemStatusForm = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/status`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error while Add Amount");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
   }
 };
 
@@ -165,7 +165,7 @@ export const getItemsBySection = async (sectionId, type) => {
     console.log("id: ", sectionId);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };
 
@@ -175,6 +175,6 @@ export const getItemType = async (type) => {
     console.log("API Call");
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
   }
 };

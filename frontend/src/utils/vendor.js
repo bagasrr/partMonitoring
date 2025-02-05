@@ -6,7 +6,7 @@ export const getVendors = async () => {
     console.log(response.data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching vendors");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching vendors");
   }
 };
 
@@ -15,6 +15,16 @@ export const deleteVendor = async (uuid) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/${uuid}/delete`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error deleting vendor");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error deleting vendor");
+  }
+};
+
+export const createVendor = async (data) => {
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/`, data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.response.data.error || error.response.data.message || "Error creating vendor");
   }
 };

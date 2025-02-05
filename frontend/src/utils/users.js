@@ -19,7 +19,7 @@ export const createUser = async (data) => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error creating user");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating user");
   }
 };
 
@@ -28,6 +28,6 @@ export const updateUser = async (id, data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error updating user");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating user");
   }
 };

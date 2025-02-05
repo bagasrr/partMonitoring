@@ -1,4 +1,3 @@
-import { where } from "sequelize";
 import { historyModel, userModel, vendorModel } from "../models/index.js";
 import { logAuditEvent } from "./sections.js";
 
@@ -6,8 +5,12 @@ export const createVendor = async (req, res) => {
   try {
     if (req.role !== "admin") return res.status(403).json({ message: "You are not allowed to this function" });
     const { vendor_name } = req.body;
+
+    const vendor = await vendorModel.findOne({ where: { vendor_name, deletedAt: null } });
+    if (vendor) return res.status(400).json({ message: "Vendor already exists" });
+
     const userId = req.userId; // Ambil userId dari middleware
-    await vendorModel.create({ vendor_name, userId });
+    const newVendor = await vendorModel.create({ vendor_name, userId });
     historyModel.create({
       name: vendor_name,
       changeType: "Create",
@@ -15,7 +18,7 @@ export const createVendor = async (req, res) => {
       username: req.name,
       description: `Vendor created by ${req.name}`,
     });
-    await logAuditEvent("Vendor", vendor.id, "create", { vendor_name: vendor.vendor_name });
+    await logAuditEvent("Vendor", newVendor.id, "create", { vendor_name: vendor_name });
     res.status(201).json({ message: "create success" });
   } catch (error) {
     res.status(400).json({ error: error.message });
