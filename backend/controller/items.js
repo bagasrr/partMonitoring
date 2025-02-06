@@ -4,6 +4,7 @@ import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js"
 import { createPDFWithTable } from "../services/pdfCreate.js";
 import { getUserAdminEmail } from "./users.js";
 import { addItemHistories } from "./itemHistories.js";
+import { generateHTMLLowerLimitReport } from "../services/reportGenerator.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -788,10 +789,13 @@ export const swapItem = async (req, res) => {
 };
 
 export const replaceItem = async (req, res) => {
-  const { itemName, itemYear, reason, useAmount } = req.body;
+  const { itemName, itemYear, reason, useAmount, machine_name } = req.body;
   try {
+    const machine = await machineModel.findOne({
+      where: { machine_name, deletedAt: null },
+    });
     const item = await itemModel.findOne({
-      where: { name: itemName, year: itemYear, deletedAt: null },
+      where: { name: itemName, machineId: machine.id, deletedAt: null },
       include: [
         {
           model: machineModel,
@@ -810,12 +814,17 @@ export const replaceItem = async (req, res) => {
 
     if (newAmount <= item.lowerLimit) {
       try {
-        const subject = `${item.name + " ( " + item.machine.machine_name + " ) "} is Low Stock`;
-        const text = `Part ${item.name} is now hit the Lower limit.\nDetail: \nPart Name : ${item.name} \nPart Year : ${item.year} \nMachine Name : ${item.machine.machine_name} \nCurrent Amount: ${newAmount} \nLower Limit: ${item.lowerLimit}`;
+        const subject = `${item.name + " (" + item.machine.machine_name + ") is Low Stock"}`;
+        const htmlContent = generateHTMLLowerLimitReport(item, newAmount);
 
-        // Memanggil fungsi sendLowerLimitEmail
-        const info = await sendLowerLimitEmail(adminEmails, subject, text);
+        const info = await sendLowerLimitEmail(adminEmails, subject, htmlContent);
         console.log(`Email sent: ${info.response}`);
+        // const subject = `${item.name + " ( " + item.machine.machine_name + " ) "} is Low Stock`;
+        // const text = `Part ${item.name} is now hit the Lower limit.\nDetail: \nPart Name : ${item.name} \nPart Year : ${item.year} \nMachine Name : ${item.machine.machine_name} \nCurrent Amount: ${newAmount} \nLower Limit: ${item.lowerLimit}`;
+
+        // // Memanggil fungsi sendLowerLimitEmail
+        // const info = await sendLowerLimitEmail(adminEmails, subject, text);
+        // console.log(`Email sent: ${info.response}`);
       } catch (error) {
         console.error(`Error sending email: ${error}`);
         return res.status(500).json({ message: "Gagal mengirim email" });

@@ -47,13 +47,13 @@ export const sendEmailWithPDF = (to, subject, text, filename, pdfBuffer) => {
   });
 };
 
-export const sendLowerLimitEmail = (to, subject, text) => {
+export const sendLowerLimitEmail = (to, subject, htmlContent) => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: "monitoringbybarra.adhan@gmail.com",
       to: to.join(", "), // Menggabungkan array email dengan koma
       subject,
-      text,
+      html: htmlContent,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
