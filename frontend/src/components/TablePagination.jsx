@@ -18,8 +18,8 @@ const TablePagination = ({ pageCount, onPageChange, currentPage }) => {
   };
 
   return (
-    <div className="mt-4 flex justify-between items-center">
-      <div>
+    <div className="mt-4 flex flex-col md:flex-row gap-3 md:gap-0 md:justify-between items-center">
+      <div className="flex md:block items-center justify-between w-full">
         <label className="mr-2">Rows per Page:</label>
         <select value={itemsPerPage} onChange={handleRowsPerPageChange} className="p-2 border rounded">
           <option value="5">5</option>

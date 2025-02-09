@@ -61,7 +61,7 @@ const ItemUseHistoryTable = () => {
           <span className="block sm:inline">{notification}</span>
         </div>
       )}
-      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search items name" />
+      <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search Part by Part name, Machine name, Part number" />
       <TableContainer>
         <table className="min-w-full bg-white overflow-x-auto">
           <thead>

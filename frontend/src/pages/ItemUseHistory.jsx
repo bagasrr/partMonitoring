@@ -6,7 +6,7 @@ import Layout from "./layout";
 const ItemUseHistory = () => {
   return (
     <Layout>
-      <Title>List Pemakaian Part</Title>
+      <Title>Histori Pemakaian Part</Title>
       <ItemUseHistoryTable />
     </Layout>
   );
