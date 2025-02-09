@@ -1,4 +1,4 @@
-import { itemModel, itemUseHistoryModel } from "../models/index.js";
+import { itemModel, itemUseHistoryModel, machineModel } from "../models/index.js";
 
 export const getAllItemUseHistories = async (req, res) => {
   try {
@@ -7,14 +7,17 @@ export const getAllItemUseHistories = async (req, res) => {
         {
           model: itemModel,
           as: "item", // Alias untuk item yang digunakan
-          where: { deletedAt: null },
-          attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+          attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+          include: [{ model: machineModel, attributes: ["machine_name"], paranoid: false }],
+          paranoid: false,
         },
+
         {
           model: itemModel,
           as: "replacementItem", // Alias untuk item pengganti
-          where: { deletedAt: null },
-          attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
+          attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType"],
+          include: [{ model: machineModel, attributes: ["machine_name"], paranoid: false }],
+          paranoid: false,
         },
       ],
       order: [["createdAt", "DESC"]],

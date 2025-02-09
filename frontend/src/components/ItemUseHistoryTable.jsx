@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { getItemUseHistories } from "../utils/itemUseHistory";
 import { format, differenceInDays } from "date-fns";
 import SearchBar from "./SearchBar";
-import { TData, ThData, TRow } from "../element/Table";
+import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import TablePagination from "./TablePagination";
+import highlightText from "../element/highlightText";
+import { useSelector } from "react-redux";
 
 const formatDate = (dateString) => {
   return format(new Date(dateString), "dd-MM-yyyy");
@@ -19,8 +21,7 @@ const ItemUseHistoryTable = () => {
   const [search, setSearch] = useState("");
   const [notification, setNotification] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
-
+  const itemsPerPage = useSelector((state) => state.itemsPerPage);
   useEffect(() => {
     fetchHistories();
   }, []);
@@ -31,8 +32,9 @@ const ItemUseHistoryTable = () => {
     setHistories(data);
   };
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
+  const handleSearchChange = (value) => {
+    console.log("Search : ", value);
+    setSearch(value);
     setCurrentPage(0); // Reset to first page on search
   };
 
@@ -41,12 +43,16 @@ const ItemUseHistoryTable = () => {
   };
 
   // Filter histories based on search input
-  const filteredHistories = histories.filter((history) => history.item.name.toLowerCase().includes(search.toLowerCase()) || history.replacementItem.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredHistories = histories.filter(
+    (history) =>
+      history?.item?.name?.toLowerCase().includes(search.toLowerCase()) || history?.item?.machine?.machine_name?.toLowerCase().includes(search.toLowerCase()) || history?.item?.item_number?.toLowerCase().includes(search.toLowerCase())
+  );
 
   // Pagination logic
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredHistories.slice(indexOfFirstItem, indexOfLastItem);
+  const pageCount = Math.ceil(filteredHistories.length / itemsPerPage);
 
   return (
     <div>
@@ -56,17 +62,19 @@ const ItemUseHistoryTable = () => {
         </div>
       )}
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search items name" />
-      <div className="overflow-x-auto">
+      <TableContainer>
         <table className="min-w-full bg-white overflow-x-auto">
           <thead>
             <tr>
               <ThData>No</ThData>
-              <ThData>Item Name</ThData>
+              <ThData>Machine</ThData>
+              <ThData>Part Number</ThData>
+              <ThData>Part Name</ThData>
               <ThData>Start Use Date</ThData>
               <ThData>End Use Date</ThData>
               <ThData>Total Use (Days)</ThData>
               <ThData>Replace To</ThData>
-              <ThData>Use Count</ThData>
+              <ThData>Part Number</ThData>
               <ThData>Reason</ThData>
             </tr>
           </thead>
@@ -82,29 +90,31 @@ const ItemUseHistoryTable = () => {
             {currentItems.map((history, index) => (
               <TRow key={history.uuid}>
                 <TData>{index + 1 + indexOfFirstItem}</TData>
+                <TData>{highlightText(history.item.machine?.machine_name, search) || "NA"}</TData>
+                <TData>{highlightText(history.item.item_number, search) || "NA"}</TData>
                 <TData>
-                  {history.item.name} ({history.item.year})
+                  {highlightText(history.item.name, search)} ({history.item.year})
                 </TData>
                 <TData>{formatDate(history.itemStartUseDate)}</TData>
-                <TData>{history.itemEndUseDate ? formatDate(history.itemEndUseDate) : "-"}</TData>
+                <TData>{history.itemEndUseDate ? formatDate(history.itemEndUseDate) : "NA"}</TData>
                 <TData>{calculateTotalDays(history.itemStartUseDate, history.itemEndUseDate)}</TData>
                 <TData>
                   {history.replacementItem !== null ? (
                     <>
-                      {history.replacementItem.name} ({history.replacementItem.year})
+                      {highlightText(history.replacementItem?.name, search)} ({history.replacementItem?.year})
                     </>
                   ) : (
-                    "Na"
+                    "NA"
                   )}
                 </TData>
-                <TData>{history.useCount}</TData>
-                <TData>{history.reason || "-"}</TData>
+                <TData>{history.replacementItem?.item_number || "NA"}</TData>
+                <TData>{history.reason || "NA"}</TData>
               </TRow>
             ))}
           </tbody>
         </table>
-      </div>
-      <TablePagination pageCount={Math.ceil(filteredHistories.length / itemsPerPage)} onPageChange={handlePageClick} currentPage={currentPage} />
+      </TableContainer>
+      <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
     </div>
   );
 };

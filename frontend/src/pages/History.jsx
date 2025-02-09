@@ -24,6 +24,7 @@ const History = () => {
       const sortedData = response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setHistories(sortedData);
     } catch (error) {
+      console.log(error);
       throw new Error(error.response?.data?.message);
     }
   };

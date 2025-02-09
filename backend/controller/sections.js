@@ -183,7 +183,7 @@ export const deleteSection = async (req, res) => {
         changeType: "Delete",
         username: req.name,
         category: "Section Room",
-        description: "Ruangan dihapus, semua data mesin dan part yang ada diruangan ini juga terhapus",
+        description: "Ruangan dihapus, semua data didalamnya juga terhapus (mesin dan part)",
       });
 
       // Log the delete action in the audit logs

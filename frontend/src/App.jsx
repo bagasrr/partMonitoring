@@ -20,6 +20,7 @@ import Details from "./pages/Details";
 import Vendors from "./pages/Vendors";
 import AddUser from "./pages/AddGroup/AddUser";
 import AddVendor from "./pages/AddGroup/AddVendor";
+import TestingPage from "./pages/testing";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
   {
     path: "/yourenotadmin",
     element: <YoureNotAdmin />,
+  },
+  {
+    path: "/testing",
+    element: <TestingPage />,
   },
   {
     path: "/itemusehistory",

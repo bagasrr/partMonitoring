@@ -38,7 +38,7 @@ const StatusInfo = ({ statusData }) => {
                 <ul>
                   {selectedItems.map((item) => (
                     <li key={item.uuid} className="mb-2">
-                      {item.name} {item.year && "(" + item.year + " )"} - {item.machine.machine_name}
+                      {item.item_number ? "[" + item.item_number + "]" : ""} {item.name} {item.year && "(" + item.year + " )"} - {item.machine.machine_name}
                     </li>
                   ))}
                 </ul>

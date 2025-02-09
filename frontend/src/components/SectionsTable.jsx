@@ -41,7 +41,7 @@ const SectionsTable = () => {
       dispatch(setDeleted(true));
       fetchSections();
     } catch (error) {
-      setError(error.response.data.message);
+      setError(error.message);
     }
   };
 

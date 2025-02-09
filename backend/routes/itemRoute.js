@@ -49,6 +49,6 @@ itemRoute.post("/", createItem);
 itemRoute.get("/:id", getItemById);
 itemRoute.patch("/:id", updateItem);
 itemRoute.patch("/:id/status", updateItemStatus);
-itemRoute.delete("/:id", deleteItem);
+itemRoute.patch("/:id/delete", deleteItem);
 
 export default itemRoute;

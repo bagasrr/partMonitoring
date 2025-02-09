@@ -67,3 +67,24 @@ export const sendLowerLimitEmail = (to, subject, htmlContent) => {
     });
   });
 };
+
+export const sendBrokenPartEmail = (to, subject, htmlContent) => {
+  return new Promise((resolve, reject) => {
+    const mailOptions = {
+      from: "monitoringbybarra.adhan@gmail.com",
+      to: to.join(", "), // Menggabungkan array email dengan koma
+      subject,
+      html: htmlContent,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(`Error: ${error}`);
+        reject(error);
+      } else {
+        resolve(info);
+        console.log(`Email sent: ${info.response}`);
+      }
+    });
+  });
+};

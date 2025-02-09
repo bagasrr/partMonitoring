@@ -3,7 +3,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { deleteItem, getItemType, getItemsBySection, updateItemStatus } from "../utils/items";
 import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
-import { setNotification } from "../features/notificationSlice";
+import { setDeleted, setNotification } from "../features/notificationSlice";
 import { useNavigate } from "react-router-dom";
 import highlightText from "../element/highlightText";
 import SearchBar from "./SearchBar";
@@ -31,7 +31,6 @@ const PartList = ({ section, type }) => {
   const [selectedItemName, setSelectedItemName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [deleted, setDeleted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
 
@@ -75,14 +74,20 @@ const PartList = ({ section, type }) => {
 
   // Handle Delete: setelah delete, invalidasi cache untuk tipe ini dan refetch data
   const handleDelete = async () => {
-    await deleteItem(selectedUUIDItem);
-    dispatch(setNotification("Items Deleted"));
-    dispatch(setDeleted(true));
-    setShowModal(false);
-    setDeleted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setCache((prevCache) => ({ ...prevCache, [type]: null }));
-    fetchItems();
+    try {
+      await deleteItem(selectedUUIDItem);
+      dispatch(setDeleted(true));
+      dispatch(setNotification("Items Deleted"));
+      setShowModal(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setCache((prevCache) => ({ ...prevCache, [type]: null }));
+      fetchItems();
+    } catch (error) {
+      setShowModal(false);
+      console.log(error);
+      dispatch(setNotification(error.message));
+      dispatch(setDeleted(true));
+    }
   };
 
   // Update status dan invalidasi cache agar data terbaru diambil
@@ -195,6 +200,7 @@ const PartList = ({ section, type }) => {
   const handleClickRow = (item) => {
     setIsOpen(true);
     setSelectedItem(item);
+    console.log(item);
   };
 
   return (

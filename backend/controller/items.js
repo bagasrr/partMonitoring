@@ -1,10 +1,10 @@
 import { historyModel, itemModel, machineModel, sectionModel, userModel, AuditLogModel, itemUseHistoryModel, vendorModel, itemHistoryModel } from "../models/index.js";
 import { Op, where } from "sequelize";
-import { sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
+import { sendBrokenPartEmail, sendEmailWithPDF, sendLowerLimitEmail } from "../services/sendEmail.js";
 import { createPDFWithTable } from "../services/pdfCreate.js";
 import { getUserAdminEmail } from "./users.js";
 import { addItemHistories } from "./itemHistories.js";
-import { generateHTMLLowerLimitReport } from "../services/reportGenerator.js";
+import { generateHTMLBrokenReport, generateHTMLLowerLimitReport } from "../services/reportGenerator.js";
 
 const logAuditEvent = async (entityType, entityId, action, details) => {
   try {
@@ -18,6 +18,7 @@ const logAuditEvent = async (entityType, entityId, action, details) => {
     console.error("Error logging audit event:", error);
   }
 };
+const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
 export const getAllItems = async (req, res) => {
   try {
@@ -213,12 +214,14 @@ export const getSwapReplaceItem = async (req, res) => {
         status: { [Op.ne]: "In Use" }, // Menggunakan Op.ne untuk status yang bukan "In Use"
         machineId: machine.id,
       },
-      attributes: ["uuid", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      attributes: ["uuid", "item_number", "name", "amount", "description", "status", "lowerLimit", "year", "replacementType", "replacementDate", "dayUsed"],
+      include: [
+        {
+          model: machineModel,
+          attributes: ["uuid", "machine_name"],
+        },
+      ],
     });
-
-    if (!items.length) {
-      return res.status(404).json({ message: "No items found for this machine" });
-    }
 
     res.status(200).json(items);
   } catch (error) {
@@ -472,48 +475,57 @@ export const updateItemStatus = async (req, res) => {
     const prevStatus = item.status; // Update the item status
 
     // Membuat deskripsi item dan data tabel
-    const title = "Parts Broken Report";
-    const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
-    const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-    const rows = [[currentDate, item.name, status, item.amount, `Status changed to ${status}.`, item.machine.machine_name, req.name]];
+    // const title = "Parts Broken Report";
+    // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+    // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    // const rows = [[currentDate, item.name, status, item.amount, `Status changed to ${status}.`, item.machine.machine_name, req.name]];
 
-    const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+    // const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
     const adminEmails = await getUserAdminEmail();
-
+    const htmlContent = generateHTMLBrokenReport(item, status, currentDate, "Status Changed", req.name);
     // Membuat PDF
-    createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
-      if (status === "Broken") {
-        try {
-          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
-        } catch (error) {
-          console.log(`Email failed to send: ${error}`);
-          return res.status(500).json({ message: "Email failed to send." });
-        }
+    // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
+    //   if (status === "Broken") {
+    //     try {
+    //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
+    //     } catch (error) {
+    //       console.log(`Email failed to send: ${error}`);
+    //       return res.status(500).json({ message: "Email failed to send." });
+    //     }
+    //   }
+    // });
+
+    if (status === "Broken") {
+      try {
+        await sendBrokenPartEmail(adminEmails, `${item.name} (${item.item_number})- ${item.machine.machine_name} is now ${status}`, htmlContent);
+      } catch (error) {
+        console.log(`Email failed to send: ${error}`);
+        return res.status(500).json({ message: "Email failed to send." });
       }
+    }
 
-      await itemModel.update(
-        { status },
-        {
-          where: { id: item.id },
-        }
-      );
+    await itemModel.update(
+      { status },
+      {
+        where: { id: item.id },
+      }
+    );
 
-      status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, `Status Changed`);
-      // Buat catatan riwayat
-      await historyModel.create({
-        name: item.name,
-        changeType: "Update",
-        category: "Part",
-        username: req.name,
-        description: `Status changed from ${prevStatus} to ${status}`,
-      });
-
-      // Log the update action in the audit logs
-      await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
-
-      res.status(200).json({ message: "Part status updated" });
+    status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, `Status Changed`);
+    // Buat catatan riwayat
+    await historyModel.create({
+      name: item.name,
+      changeType: "Update",
+      category: "Part",
+      username: req.name,
+      description: `Status changed from ${prevStatus} to ${status}`,
     });
+
+    // Log the update action in the audit logs
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+    res.status(200).json({ message: "Part status updated" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -543,49 +555,58 @@ export const updateItemStatusForm = async (req, res) => {
     }
 
     // Membuat deskripsi item dan data tabel
-    const title = "Parts Broken Report";
-    const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
-    const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-    const rows = [[currentDate, item.name, status, item.amount, reason, item.machine.machine_name, req.name]];
+    // const title = "Parts Broken Report";
+    // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+    // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    // const rows = [[currentDate, item.name, status, item.amount, reason, item.machine.machine_name, req.name]];
 
-    const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
-
-    const adminEmails = await getUserAdminEmail();
+    // const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
     // Membuat PDF
-    createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
-      if (status === "Broken") {
-        try {
-          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
-        } catch (error) {
-          console.log(`Email failed to send: ${error}`);
-          return res.status(500).json({ message: "Email failed to send." });
-        }
+    // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
+    //   if (status === "Broken") {
+    //     try {
+    //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${status}.`, fileName, pdfBuffer);
+    //     } catch (error) {
+    //       console.log(`Email failed to send: ${error}`);
+    //       return res.status(500).json({ message: "Email failed to send." });
+    //     }
+    //   }
+    // });
+    const adminEmails = await getUserAdminEmail();
+    const htmlContent = generateHTMLBrokenReport(item, status, currentDate, reason, req.name);
+
+    if (status === "Broken") {
+      try {
+        await sendBrokenPartEmail(adminEmails, `${item.name} (${item.item_number})- ${item.machine.machine_name} is now ${status}`, htmlContent);
+      } catch (error) {
+        console.log(`Email failed to send: ${error}`);
+        return res.status(500).json({ message: "Email failed to send." });
       }
+    }
 
-      await itemModel.update(
-        { status },
-        {
-          where: { name: itemName, year: itemYear },
-        }
-      );
+    await itemModel.update(
+      { status },
+      {
+        where: { name: itemName, year: itemYear },
+      }
+    );
 
-      status === "Broken" ? await addItemHistories(item.id, req.userId, "Part Broken") : status === "Terminated" ? await addItemHistories(item.id, req.userId, "Terminated") : await addItemHistories(item.id, req.userId, "Status Changed");
+    status === "Broken" ? await addItemHistories(item.id, req.userId, "Part Broken") : status === "Terminated" ? await addItemHistories(item.id, req.userId, "Terminated") : await addItemHistories(item.id, req.userId, "Status Changed");
 
-      // Buat catatan riwayat
-      await historyModel.create({
-        name: item.name,
-        changeType: "Update",
-        category: "Part",
-        username: req.name,
-        description: reason,
-      });
-
-      // Log the update action in the audit logs
-      await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
-
-      res.status(200).json({ message: "Part status updated" });
+    // Buat catatan riwayat
+    await historyModel.create({
+      name: item.name,
+      changeType: "Update",
+      category: "Part",
+      username: req.name,
+      description: reason,
     });
+
+    // Log the update action in the audit logs
+    await logAuditEvent("Item", item.id, "update", { name: item.name, prevStatus: prevStatus, newStatus: status });
+
+    res.status(200).json({ message: "Part status updated" });
   } catch (error) {
     console.log(`Error: ${error.message}`);
     res.status(500).json({ message: error.message });
@@ -597,19 +618,17 @@ export const deleteItem = async (req, res) => {
     const item = await itemModel.findOne({
       where: {
         uuid: req.params.id,
-        deletedAt: null,
       },
     });
     if (!item) return res.status(404).json({ message: "Item not found" });
-    let response;
     if (req.role === "admin") {
-      response = await itemModel.update(
+      await itemModel.update(
         { deletedAt: new Date() }, // Perform soft delete
         { where: { id: item.id } }
       );
     } else {
       if (req.userId !== item.userId) return res.status(403).json({ message: "You are not allowed to delete this, please contact your administrator" });
-      response = await itemModel.update(
+      await itemModel.update(
         { deletedAt: new Date() }, // Perform soft delete
         { where: { [Op.and]: [{ id: item.id }, { userId: req.userId }] } }
       );
@@ -689,7 +708,7 @@ export const swapItem = async (req, res) => {
   const { itemName, itemYear, replaceItemName, replaceItemYear, itemStartUseDate, itemEndUseDate, reason, itemStatus } = req.body;
   try {
     if (!itemName || !itemYear || !reason) {
-      return res.status(400).json({ message: "Missing required fields" });
+      return res.status(400).json({ message: "Name, Year, and Reason are required" });
     }
 
     // Validate to ensure itemEndUseDate is not before itemStartUseDate
@@ -713,83 +732,161 @@ export const swapItem = async (req, res) => {
     });
     if (!item) return res.status(404).json({ message: "Item not found" });
 
-    //cari replace item berdasarkan nama, tahun
-    const replacementItem = await itemModel.findOne({
-      where: {
-        name: replaceItemName,
-        year: replaceItemYear,
-        deletedAt: null, // Exclude soft-deleted items
-      },
-    });
-    if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
-    if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken and can't be replaced" });
-    if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is under repair and can't be replaced" });
+    if (replaceItemName === null) {
+      //membuat data tabel pdf
+      const title = "Parts Broken Report";
+      const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+      const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+      const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
+      const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
 
-    //cek apakah mesinnya sama
-    if (item.machineId !== replacementItem.machineId) return res.status(403).json({ message: "Parts must be in the same machine" });
+      const adminEmails = await getUserAdminEmail();
 
-    //membuat data tabel pdf
-    const title = "Parts Broken Report";
-    const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
-    const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-    const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
-    const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+      const htmlContent = generateHTMLBrokenReport(item, itemStatus, currentDate, reason, req.name);
 
-    const adminEmails = await getUserAdminEmail();
-
-    // Membuat PDF
-    createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
+      // Kirim email
       if (itemStatus === "Broken") {
         try {
-          await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
-          await addItemHistories(item.id, req.userId, "Part Broken");
+          await sendBrokenPartEmail(adminEmails, `${item.name} is Broken`, htmlContent);
         } catch (error) {
           console.log(`Email failed to send: ${error}`);
-          return res.status(500).json({ message: "Email failed to send." });
+          return res.status(500).json({ message: error.message });
         }
       }
-    });
 
-    const itemUseHistories = await itemUseHistoryModel.findAll({
-      where: { itemId: item.id },
-    });
-    const totalUseCount = itemUseHistories.length;
-    const dayUsed = Math.ceil((new Date(itemEndUseDate) - new Date(itemStartUseDate)) / (1000 * 60 * 60 * 24)); // Calculate the difference in days
+      // Membuat PDF
+      // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
+      //   if (itemStatus === "Broken") {
+      //     try {
+      //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
+      //       await addItemHistories(item.id, req.userId, "Part Broken");
+      //     } catch (error) {
+      //       console.log(`Email failed to send: ${error}`);
+      //       return res.status(500).json({ message: "Email failed to send." });
+      //     }
+      //   }
+      // });
 
-    await itemUseHistoryModel.create({
-      itemId: item.id,
-      replacementItemId: replacementItem.id,
-      itemStartUseDate: itemStartUseDate,
-      itemEndUseDate: itemEndUseDate,
-      useAmount: totalUseCount + 1,
-      reason,
-      dayUsed,
-    });
-    const totalDayUsed = item.dayUsed + dayUsed;
+      const itemUseHistories = await itemUseHistoryModel.findAll({
+        where: { itemId: item.id },
+      });
+      const totalUseCount = itemUseHistories.length;
+      const dayUsed = Math.ceil((new Date(itemEndUseDate) - new Date(itemStartUseDate)) / (1000 * 60 * 60 * 24)); // Calculate the difference in days
 
-    // Update item status
-    await itemModel.update({ status: itemStatus, dayUsed: totalDayUsed }, { where: { id: item.id } });
-    //update item replacement status
-    await itemModel.update({ status: "In Use", replacementDate: itemEndUseDate }, { where: { id: replacementItem.id } });
+      await itemUseHistoryModel.create({
+        itemId: item.id,
+        replacementItemId: null,
+        itemStartUseDate: itemStartUseDate,
+        itemEndUseDate: itemEndUseDate,
+        useAmount: totalUseCount + 1,
+        reason,
+        dayUsed,
+      });
+      const totalDayUsed = item.dayUsed + dayUsed;
 
-    await addItemHistories(item.id, req.userId, "Part Swapped");
-    //history
-    await historyModel.create({
-      name: item.name,
-      changeType: "Swap",
-      category: "Part",
-      username: req.name, // Use req.name for the username field
-      description: `Swap item ${item.name} with ${replacementItem.name}`,
-    });
+      // Update item status
+      await itemModel.update({ status: itemStatus, dayUsed: totalDayUsed, replacementDate: currentDate }, { where: { id: item.id } });
+      //update item replacement status
 
-    res.status(200).json({ message: "Item replaced successfully" });
+      await addItemHistories(item.id, req.userId, "Part Swapped");
+      //history
+      await historyModel.create({
+        name: item.name,
+        changeType: "Swap",
+        category: "Part",
+        username: req.name, // Use req.name for the username field
+        description: reason,
+      });
+
+      res.status(200).json({ message: "Item replaced successfully" });
+    } else {
+      //cari replace item berdasarkan nama, tahun
+      const replacementItem = await itemModel.findOne({
+        where: {
+          name: replaceItemName,
+          year: replaceItemYear,
+          deletedAt: null, // Exclude soft-deleted items
+        },
+      });
+
+      if (!replacementItem) return res.status(404).json({ message: "Replacement part not found" });
+      if (replacementItem.status === "Broken") return res.status(403).json({ message: "Replacement part is broken and can't be replaced" });
+      if (replacementItem.status === "Repair") return res.status(403).json({ message: "Replacement part is under repair and can't be replaced" });
+
+      // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+      //membuat data tabel pdf
+      // const title = "Parts Broken Report";
+      // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
+      // const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
+      // const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
+
+      const adminEmails = await getUserAdminEmail();
+
+      const htmlContent = generateHTMLBrokenReport(item, itemStatus, currentDate, reason, req.name);
+
+      // Kirim email
+      if (itemStatus === "Broken") {
+        try {
+          await sendBrokenPartEmail(adminEmails, `${item.name} is Broken`, htmlContent);
+        } catch (error) {
+          console.log(`Email failed to send: ${error}`);
+          return res.status(500).json({ message: error.message });
+        }
+      }
+
+      // Membuat PDF
+      // createPDFWithTable(title, headers, rows, async (pdfBuffer) => {
+      //   if (itemStatus === "Broken") {
+      //     try {
+      //       await sendEmailWithPDF(adminEmails, `${item.name} is Broken`, `Part ${item.name} is now ${itemStatus}.`, fileName, pdfBuffer);
+      //       await addItemHistories(item.id, req.userId, "Part Broken");
+      //     } catch (error) {
+      //       console.log(`Email failed to send: ${error}`);
+      //       return res.status(500).json({ message: "Email failed to send." });
+      //     }
+      //   }
+      // });
+
+      const itemUseHistories = await itemUseHistoryModel.findAll({
+        where: { itemId: item.id },
+      });
+      const totalUseCount = itemUseHistories.length;
+      const dayUsed = Math.ceil((new Date(itemEndUseDate) - new Date(itemStartUseDate)) / (1000 * 60 * 60 * 24)); // Calculate the difference in days
+
+      await itemUseHistoryModel.create({
+        itemId: item.id,
+        replacementItemId: replacementItem.id || null,
+        itemStartUseDate: itemStartUseDate,
+        itemEndUseDate: itemEndUseDate,
+        useAmount: totalUseCount + 1,
+        reason,
+        dayUsed,
+      });
+      const totalDayUsed = item.dayUsed + dayUsed;
+
+      // Update item status
+      await itemModel.update({ status: itemStatus, dayUsed: totalDayUsed }, { where: { id: item.id } });
+      //update item replacement status
+      await itemModel.update({ status: "In Use", replacementDate: itemEndUseDate }, { where: { id: replacementItem.id } });
+      await addItemHistories(item.id, req.userId, "Part Swapped");
+      //history
+      await historyModel.create({
+        name: item.name,
+        changeType: "Swap",
+        category: "Part",
+        username: req.name, // Use req.name for the username field
+        description: `Swap item ${item.name} with ${replacementItem.name}`,
+      });
+
+      res.status(200).json({ message: "Item replaced successfully" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 export const replaceItem = async (req, res) => {
-  const { itemName, itemYear, reason, useAmount, machine_name } = req.body;
+  const { itemName, reason, useAmount, machine_name } = req.body;
   try {
     const machine = await machineModel.findOne({
       where: { machine_name, deletedAt: null },

@@ -29,9 +29,10 @@ export const updateSection = async (id, data) => {
 
 export const deleteSection = async (id) => {
   try {
-    const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/sections/${id}`);
+    const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/sections/${id}/delete`);
+    return response;
   } catch (error) {
+    console.log(error);
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Deleting Section");
   }
-  return response.data;
 };

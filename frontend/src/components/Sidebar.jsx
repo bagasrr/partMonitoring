@@ -57,7 +57,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      {/* Sidebar */}
       <div
         className={`fixed overflow-y-auto  pt-5 pb-20 left-0 top-16 h-full w-72 md:w-64 z-30 bg-gray-800 text-white shadow-md transition-transform transform ${
           isOpen ? "translate-x-0 " : "-translate-x-full"
@@ -76,27 +75,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 </li>
               ))}
           </ul>
+          <h2 className="text-lg font-semibold mb-4">PARTS</h2>
+          <ul className="mb-8">
+            <li className="mb-2 flex items-center">
+              <IoMdListBox className="mr-2" />
+              <Link to="/parts" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                List Part
+              </Link>
+            </li>
+            <li className="mb-2 flex items-center">
+              <MdCreateNewFolder className="mr-2" />
+              <Link to="/parts/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                Part Masuk
+              </Link>
+            </li>
+            <li className="mb-2 flex items-center">
+              <PiNotePencilBold className="mr-2" />
+              <Link to="/parts/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                Ganti Part
+              </Link>
+            </li>
+          </ul>
 
-          {/* <ul className="mb-8">
-            <li className="mb-2 flex items-center">
-              <FaTachometerAlt className="mr-2" />
-              <Link to="/dashboard" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Dashboard
-              </Link>
-            </li>
-            <li className="mb-2 flex items-center">
-              <FaHistory className="mr-2" />
-              <Link to="/history" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Riwayat
-              </Link>
-            </li>
-            <li className="mb-2 flex items-center">
-              <MdOutlineManageHistory className="mr-2" />
-              <Link to="/itemusehistory" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Pemakaian
-              </Link>
-            </li>
-          </ul> */}
           {user && user.role === "admin" && (
             <>
               <h2 className="text-lg font-semibold mb-4">ADMIN</h2>
@@ -128,27 +128,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </ul>
             </>
           )}
-          <h2 className="text-lg font-semibold mb-4">PARTS</h2>
-          <ul className="mb-8">
-            <li className="mb-2 flex items-center">
-              <IoMdListBox className="mr-2" />
-              <Link to="/parts" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                List Part
-              </Link>
-            </li>
-            <li className="mb-2 flex items-center">
-              <MdCreateNewFolder className="mr-2" />
-              <Link to="/parts/add" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Part Masuk
-              </Link>
-            </li>
-            <li className="mb-2 flex items-center">
-              <PiNotePencilBold className="mr-2" />
-              <Link to="/parts/changepart" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                Ganti Part
-              </Link>
-            </li>
-          </ul>
+
           <h2 className="text-lg font-semibold mb-4">SETTINGS</h2>
           <ul>
             <li className="mb-2 flex items-center">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getItems, updateItemStatusForm } from "../../utils/items";
+import { getTypeSwapItem, updateItemStatusForm } from "../../utils/items";
 import FormField, { ReadOnlyForm } from "../FormField";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +27,18 @@ const UpdateItemStatusForm = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await getItems();
-      setItems(response);
+      const response = await getTypeSwapItem();
+      // Gunakan localeCompare untuk membandingkan string
+      const sortRes = response.sort((a, b) => {
+        if (a.machine?.machine_name < b.machine?.machine_name) {
+          return -1;
+        }
+        if (a.machine?.machine_name > b.machine?.machine_name) {
+          return 1;
+        }
+        return 0;
+      });
+      setItems(sortRes);
     } catch (error) {
       setErrors({ getPart: error.message || "Error fetching Part" });
     }
@@ -103,7 +113,7 @@ const UpdateItemStatusForm = () => {
           </option>
           {items.map((item) => (
             <option key={item.uuid} value={`${item.name} - ${item.year}`}>
-              {item.status + " - " + item.name} ({item.year})
+              {item.status + " - " + item.name} ({item.year}) - {item.machine.machine_name}
             </option>
           ))}
         </FormField>

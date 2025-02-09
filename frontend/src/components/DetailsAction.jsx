@@ -6,6 +6,7 @@ import { formatDate, FormatStatusColor } from "../utils/format";
 
 const DetailsAction = ({ data, setIsOpen }) => {
   const histori = data?.itemHistories;
+
   console.log("histori:", histori);
   return (
     <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity z-50">
@@ -13,8 +14,8 @@ const DetailsAction = ({ data, setIsOpen }) => {
         <h2 className="text-xl font-bold mb-4">Detail Part</h2>
         <div className="flex gap-5">
           <div>
-            <DetailsKey>Part Number</DetailsKey>
-            <DetailsKey>Part Name</DetailsKey>
+            <DetailsKey>Number</DetailsKey>
+            <DetailsKey>Name</DetailsKey>
             <DetailsKey>Vendor</DetailsKey>
             <DetailsKey>Amount</DetailsKey>
             <DetailsKey>Year</DetailsKey>
@@ -30,7 +31,7 @@ const DetailsAction = ({ data, setIsOpen }) => {
             <DetailsProperty>:{data?.year || "NA"}</DetailsProperty>
             <DetailsProperty>:{data?.status || "NA"}</DetailsProperty>
             <DetailsProperty>:{data?.machine?.machine_name || "NA"}</DetailsProperty>
-            <DetailsProperty>:{data?.part_usage || "0"} Day</DetailsProperty>
+            <DetailsProperty>:{data?.dayUsed || "0"} Day</DetailsProperty>
           </div>
         </div>
         {histori.length !== 0 && (

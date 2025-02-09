@@ -1,4 +1,4 @@
-import { changeItem, getTypeReplaceitem, getTypeSwapItem, getTypeSwapReplaceItem } from "../../utils/items";
+import { changeItem, getInUseItems, getTypeSwapReplaceItem } from "../../utils/items";
 import FormField, { ReadOnlyForm } from "../FormField";
 
 import React, { useEffect, useState } from "react";
@@ -10,12 +10,16 @@ import LoadingAnimate from "../LoadingAnimate";
 import ErrorText from "../ErrorText";
 import { format } from "date-fns";
 
+const formatDate = (dateString) => {
+  return format(new Date(dateString), "yyyy-MM-dd");
+};
+
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
   const [replaceItems, setReplaceItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedMachineName, setSelectedMachineName] = useState("");
-  const [selectedReplaceItem, setSelectedReplaceItem] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({});
@@ -25,18 +29,52 @@ const SwapPartForm = () => {
     replaceItemName: "",
     itemStartUseDate: "",
     itemEndUseDate: "",
-    machineName: "",
     reason: "",
     itemYear: "",
     replaceItemYear: "",
     itemStatus: "",
-    useAmount: 0,
   });
 
   useEffect(() => {
     fetchItems();
-    fetchSwapReplaceItem();
+  }, []);
+
+  useEffect(() => {
+    if (selectedItem) {
+      fetchSwapReplaceItem();
+    }
   }, [selectedItem]);
+
+  const fetchItems = async () => {
+    const data = await getInUseItems();
+    const sortedData = data.sort((a, b) => {
+      if (a.machine?.machine_name < b.machine?.machine_name) {
+        return -1;
+      }
+      if (a.machine?.machine_name > b.machine?.machine_name) {
+        return 1;
+      }
+      return 0;
+    });
+
+    setItems(sortedData);
+  };
+  // console.log(selectedMachineName);
+  // const fetchSwapReplaceItem = async () => {
+  //   if (selectedItem) {
+  //     const data = await getTypeSwapReplaceItem(selectedMachineName);
+  //     // console.log("replaceItem : ", data);
+  //     setReplaceItems(data);
+  //   }
+  // };
+  const fetchSwapReplaceItem = async () => {
+    if (selectedItem) {
+      console.log("Fetching swap replace items for machine:", selectedMachineName);
+      const data = await getTypeSwapReplaceItem(selectedMachineName);
+      console.log("Replace items fetched:", data);
+      setReplaceItems(data);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,26 +82,53 @@ const SwapPartForm = () => {
       ...formData,
       [name]: value,
     });
-    console.log(name + " : " + value);
-  };
-  const formatDate = (dateString) => {
-    return format(new Date(dateString), "yyyy-MM-dd");
+    // console.log(name + " : " + value);
   };
 
+  // const handleItemChange = (e) => {
+  //   const uuid = e.target.value;
+  //   const item = items.find((item) => item.uuid === uuid);
+
+  //   setSelectedValue(uuid);
+
+  //   if (item) {
+  //     setSelectedItem(item);
+  //     setSelectedMachineName(item.machine.machine_name);
+  //     setFormData({
+  //       ...formData,
+  //       itemName: item.name,
+  //       itemYear: item.year,
+  //       itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
+  //     });
+  //     // console.log("Item selected: ", item);
+  //     // console.log("Machine selected: ", item.machine.machine_name);
+  //   } else {
+  //     setSelectedItem(null);
+  //     setFormData({
+  //       ...formData,
+  //       itemName: "",
+  //       itemYear: "",
+  //     });
+  //   }
+  // };
+
   const handleItemChange = (e) => {
-    const [name, year] = e.target.value.split(" - ");
-    const item = items.find((item) => item.name === name && item.year.toString() === year);
+    const uuid = e.target.value;
+    const item = items.find((item) => item.uuid === uuid);
+
+    setSelectedValue(uuid);
+
     if (item) {
       setSelectedItem(item);
       setSelectedMachineName(item.machine.machine_name);
+      console.log("Selected item:", item);
+      console.log("Selected machine name:", item.machine.machine_name);
       setFormData({
         ...formData,
         itemName: item.name,
         itemYear: item.year,
         itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
       });
-      console.log("Item selected: ", item); // Add this line
-      console.log("machine selected: ", item.machine.machine_name); // Add this line
     } else {
       setSelectedItem(null);
       setFormData({
@@ -76,33 +141,28 @@ const SwapPartForm = () => {
 
   const handleReplaceItemChange = (e) => {
     const value = e.target.value;
-
+    console.log(value);
     if (value === "NA") {
-      setSelectedReplaceItem(null);
       setFormData({
         ...formData,
         replaceItemName: "NA",
-        replaceItemYear: "",
-        machineName: "",
+        replaceItemYear: null,
       });
     } else {
       const [name, year] = value.split(" - ");
-      const replaceItem = items.find((item) => item.name === name && item.year.toString() === year);
+      const replaceItem = replaceItems.find((item) => item.name === name && item.year.toString() === year);
+      console.log("replaceitem : ", replaceItem);
       if (replaceItem) {
-        setSelectedReplaceItem(replaceItem);
         setFormData({
           ...formData,
           replaceItemName: replaceItem.name,
           replaceItemYear: replaceItem.year,
-          machineName: replaceItem.machine.machine_name,
         });
       } else {
-        setSelectedReplaceItem(null);
         setFormData({
           ...formData,
           replaceItemName: "",
           replaceItemYear: "",
-          machineName: "",
         });
       }
     }
@@ -110,6 +170,11 @@ const SwapPartForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      ...formData,
+      replaceItemName: null,
+    };
+    // console.log(data);
     try {
       setIsLoading(true);
       await changeItem(formData);
@@ -123,35 +188,24 @@ const SwapPartForm = () => {
     }
   };
 
-  const fetchItems = async () => {
-    const data = await getTypeSwapItem();
-    console.log(data);
-    setItems(data);
-  };
-  const fetchSwapReplaceItem = async () => {
-    if (selectedItem) {
-      const data = await getTypeSwapReplaceItem(selectedMachineName);
-      setReplaceItems(data);
-    }
-  };
+  // console.log(formData);
 
   return (
     <div>
       {isLoading && <LoadingAnimate isOpen={isLoading}>Swapping Part ...</LoadingAnimate>}
       <form onSubmit={handleSubmit} className="mx-auto p-4 bg-white shadow-md rounded-lg overflow-x-hidden">
-        <FormField label="Part yang ingin diganti" name="itemName" value={formData.itemName ? `${formData.itemName} - ${formData.itemYear}` : ""} onChange={handleItemChange} type="select">
+        <FormField label="Part yang ingin diganti" name="itemName" value={selectedValue} onChange={handleItemChange} type="select">
           <option value="" disabled>
             Select Item
           </option>
           {items.map((item) => (
-            <option key={item.uuid} value={`${item.name} - ${item.year}`}>
-              {item.status + " - " + item.name} ({item.year})
+            <option key={item.uuid} value={item.uuid}>
+              {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
             </option>
           ))}
         </FormField>
 
         <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} placeholder={"Tahun Part"} />
-        {/* <FormField label="Tahun" name="itemYear" value={formData.itemYear} onChange={handleChange} type="number" placeholder="Masukkan tahun" /> */}
 
         <FormField label="Status Part Sekarang" name="itemStatus" value={formData.itemStatus} onChange={handleChange} type="select">
           <option value="" disabled>
@@ -169,6 +223,7 @@ const SwapPartForm = () => {
 
         <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />
 
+        {/* {replaceItems && ( */}
         <FormField label="Part Pengganti" name="replaceItemName" value={formData.replaceItemName ? `${formData.replaceItemName} - ${formData.replaceItemYear}` : ""} onChange={handleReplaceItemChange} type="select">
           <option value="" disabled>
             Select Replace Item
@@ -177,16 +232,10 @@ const SwapPartForm = () => {
           {replaceItems &&
             replaceItems.map((item) => (
               <option key={item.uuid} value={`${item.name} - ${item.year}`}>
-                {item.status + " - " + item.name} ({item.year})
+                {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
               </option>
             ))}
         </FormField>
-        {/* 
-        <FormField label="Tahun Part Pengganti" name="replaceItemYear" value={formData.replaceItemYear} onChange={handleChange} type="number" placeholder="Masukkan tahun part pengganti" />
-
-        <FormField label="Machine Name" name="machineName" value={formData.machineName} onChange={handleChange} placeholder="Masukkan nama mesin" /> */}
-
-        {selectedItem && selectedItem.replacementType === "Replace" && <FormField label="Use Amount" name="useAmount" value={formData.useAmount} onChange={handleChange} type="number" placeholder="Masukkan jumlah penggunaan" />}
 
         <Button type="submit" buttonName="Ganti Part" />
         {errors && <ErrorText message={errors.message} />}

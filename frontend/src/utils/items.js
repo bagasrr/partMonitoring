@@ -69,12 +69,13 @@ export const updateItemStatus = async (itemId, statusData) => {
 };
 
 // Delete item
-export const deleteItem = async (itemId) => {
+export const deleteItem = async (id) => {
   try {
-    const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}/delete`);
+    console.log(id);
+    const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${id}/delete`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error deleting Part");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating Part status");
   }
 };
 
@@ -117,6 +118,7 @@ export const replaceItem = async (data) => {
 export const getTypeSwapReplaceItem = async (query) => {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/type-swap/machine?machineName=${query}`);
+    console.log(response);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Fetching Part");

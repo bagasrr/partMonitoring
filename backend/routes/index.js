@@ -24,7 +24,7 @@ routes.use("/item-histories", verifyUser, itemHistoryRoute);
 routes.use("/item-use-histories", verifyUser, itemUseHistoryRoute);
 
 routes.get("/ping", (req, res) => {
-  res.status(200).json({ message: "Server is kocak!" });
+  res.status(200).json({ message: "Server is Connected!" });
 });
 
 export default routes;

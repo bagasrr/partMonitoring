@@ -30,7 +30,7 @@ const AddItemForm = () => {
   });
   const [error, setError] = useState(false);
   const [errors, setErrors] = useState({});
-  const notification = useNotification();
+  const { notification, someDeleted } = useNotification();
   const deleted = useSelector((state) => state.notification.deleted);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
