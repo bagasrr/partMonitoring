@@ -21,11 +21,16 @@ import Vendors from "./pages/Vendors";
 import AddUser from "./pages/AddGroup/AddUser";
 import AddVendor from "./pages/AddGroup/AddVendor";
 import TestingPage from "./pages/testing";
+import Register from "./pages/Register";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
   {
     path: "/dashboard",

@@ -8,7 +8,7 @@ import ErrorText from "../ErrorText";
 import { createUser } from "../../utils/users";
 import LoadingAnimate from "../LoadingAnimate";
 
-const AddUsersForm = () => {
+const AddUsersForm = ({ isCreateByAdmin }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -36,7 +36,8 @@ const AddUsersForm = () => {
       console.log(formData);
       await createUser(formData);
       setIsLoading(true);
-      navigate("/users");
+      isCreateByAdmin ? navigate("/dashboard") : navigate("/");
+      // navigate("/users");
       dispatch(setNotification("User Added"));
       setIsLoading(false);
     } catch (error) {

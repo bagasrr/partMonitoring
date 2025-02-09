@@ -9,7 +9,7 @@ const AddUser = () => {
     <Layout>
       <BackPrev url="/users" />
       <Title>Add new User</Title>
-      <AddUsersForm />
+      <AddUsersForm isCreateByAdmin={true} />
     </Layout>
   );
 };

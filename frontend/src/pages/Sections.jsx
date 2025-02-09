@@ -6,9 +6,11 @@ import ScrollToTop from "../utils/scrollToTop";
 import { FiPlusCircle } from "react-icons/fi";
 import Layout from "./layout";
 import HeaderPages from "../components/headerPages";
+import { adminArea } from "../utils/adminArea";
 
 const Sections = () => {
   ScrollToTop();
+  adminArea();
   return (
     <Layout>
       <HeaderPages title="Section Room" linkAdd="sections" add="section" />
