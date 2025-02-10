@@ -5,10 +5,10 @@ import Layout from "./layout";
 
 const ItemUseHistory = () => {
   return (
-    <Layout>
+    <>
       <Title>Histori Pemakaian Part</Title>
       <ItemUseHistoryTable />
-    </Layout>
+    </>
   );
 };
 

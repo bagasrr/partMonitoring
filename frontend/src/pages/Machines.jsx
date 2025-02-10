@@ -9,11 +9,11 @@ const Machines = () => {
   scrollToTop();
   adminArea();
   return (
-    <Layout>
+    <>
       <HeaderPages title="Mesin List" linkAdd="machines" add="mesin" />
 
       <MachinesTable />
-    </Layout>
+    </>
   );
 };
 

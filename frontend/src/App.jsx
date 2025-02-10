@@ -22,10 +22,110 @@ import AddUser from "./pages/AddGroup/AddUser";
 import AddVendor from "./pages/AddGroup/AddVendor";
 import TestingPage from "./pages/testing";
 import Register from "./pages/Register";
+import Layout from "./pages/layout";
+
+// const router = createBrowserRouter([
+//   {
+//     path: "/login",
+//     element: <Login />,
+//   },
+//   // {
+//   //   path: "/",
+//   //   element: <Login />,
+//   // },
+//   {
+//     path: "/register",
+//     element: <Register />,
+//   },
+//   {
+//     path: "/",
+//     element: <Dashboard />,
+//   },
+//   {
+//     path: "/dashboard",
+//     element: <Dashboard />,
+//   },
+//   {
+//     path: "/parts",
+//     element: <Parts />,
+//   },
+//   {
+//     path: "/parts/:uuid/details",
+//     element: <Details />,
+//   },
+//   {
+//     path: "/parts/add",
+//     element: <AddItemPages />,
+//   },
+//   {
+//     path: "/parts/:id/edit",
+//     element: <EditItem />,
+//   },
+//   {
+//     path: "/parts/changepart",
+//     element: <ChangePartPages />,
+//   },
+//   {
+//     path: "/users",
+//     element: <Users />,
+//   },
+//   {
+//     path: "/users/edit/:id",
+//     element: <EditUser />,
+//   },
+//   {
+//     path: "/users/add/",
+//     element: <AddUser />,
+//   },
+//   {
+//     path: "/history",
+//     element: <History />,
+//   },
+//   {
+//     path: "/machines/add",
+//     element: <AddMachineNew />,
+//   },
+//   {
+//     path: "/machines",
+//     element: <Machines />,
+//   },
+//   {
+//     path: "/machines/:id/edit",
+//     element: <EditMachine />,
+//   },
+//   {
+//     path: "/sections",
+//     element: <Sections />,
+//   },
+//   {
+//     path: "/sections/add",
+//     element: <AddSection />,
+//   },
+//   {
+//     path: "/vendors",
+//     element: <Vendors />,
+//   },
+//   {
+//     path: "/vendors/add",
+//     element: <AddVendor />,
+//   },
+//   {
+//     path: "/yourenotadmin",
+//     element: <YoureNotAdmin />,
+//   },
+//   {
+//     path: "/testing",
+//     element: <TestingPage />,
+//   },
+//   {
+//     path: "/itemusehistory",
+//     element: <ItemUseHistory />,
+//   },
+// ]);
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/login",
     element: <Login />,
   },
   {
@@ -33,93 +133,35 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "/parts",
-    element: <Parts />,
-  },
-  {
-    path: "/parts/:uuid/details",
-    element: <Details />,
-  },
-  {
-    path: "/parts/add",
-    element: <AddItemPages />,
-  },
-  {
-    path: "/parts/:id/edit",
-    element: <EditItem />,
-  },
-  {
-    path: "/parts/changepart",
-    element: <ChangePartPages />,
-  },
-  {
-    path: "/users",
-    element: <Users />,
-  },
-  {
-    path: "/users/edit/:id",
-    element: <EditUser />,
-  },
-  {
-    path: "/users/add/",
-    element: <AddUser />,
-  },
-  {
-    path: "/history",
-    element: <History />,
-  },
-  {
-    path: "/machines/add",
-    element: <AddMachineNew />,
-  },
-  {
-    path: "/machines",
-    element: <Machines />,
-  },
-  {
-    path: "/machines/:id/edit",
-    element: <EditMachine />,
-  },
-  {
-    path: "/sections",
-    element: <Sections />,
-  },
-  {
-    path: "/sections/add",
-    element: <AddSection />,
-  },
-  {
-    path: "/vendors",
-    element: <Vendors />,
-  },
-  {
-    path: "/vendors/add",
-    element: <AddVendor />,
-  },
-  {
-    path: "/yourenotadmin",
-    element: <YoureNotAdmin />,
-  },
-  {
-    path: "/testing",
-    element: <TestingPage />,
-  },
-  {
-    path: "/itemusehistory",
-    element: <ItemUseHistory />,
+    path: "/",
+    element: <Layout />, // 👈 Layout sebagai wrapper
+    children: [
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/parts", element: <Parts /> },
+      { path: "/parts/:uuid/details", element: <Details /> },
+      { path: "/parts/add", element: <AddItemPages /> },
+      { path: "/parts/:id/edit", element: <EditItem /> },
+      { path: "/parts/changepart", element: <ChangePartPages /> },
+      { path: "/users", element: <Users /> },
+      { path: "/users/edit/:id", element: <EditUser /> },
+      { path: "/users/add/", element: <AddUser /> },
+      { path: "/history", element: <History /> },
+      { path: "/machines/add", element: <AddMachineNew /> },
+      { path: "/machines", element: <Machines /> },
+      { path: "/machines/:id/edit", element: <EditMachine /> },
+      { path: "/sections", element: <Sections /> },
+      { path: "/sections/add", element: <AddSection /> },
+      { path: "/vendors", element: <Vendors /> },
+      { path: "/vendors/add", element: <AddVendor /> },
+      { path: "/yourenotadmin", element: <YoureNotAdmin /> },
+      { path: "/testing", element: <TestingPage /> },
+      { path: "/itemusehistory", element: <ItemUseHistory /> },
+    ],
   },
 ]);
 
 const App = () => {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

@@ -10,11 +10,11 @@ const EditItem = () => {
   adminArea();
   scrollToTop();
   return (
-    <Layout>
+    <>
       <BackPrev url="/parts" />
       <Title>Edit Part</Title>
       <EditItemForm />
-    </Layout>
+    </>
   );
 };
 

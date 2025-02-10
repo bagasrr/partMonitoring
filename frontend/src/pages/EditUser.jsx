@@ -51,7 +51,7 @@ const EditUser = () => {
   };
 
   return (
-    <Layout>
+    <>
       <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
         <h1 className="text-2xl font-bold text-center mb-4">Edit User</h1>
         <form onSubmit={handleSubmit}>
@@ -96,7 +96,7 @@ const EditUser = () => {
           </div>
         </form>
       </div>
-    </Layout>
+    </>
   );
 };
 

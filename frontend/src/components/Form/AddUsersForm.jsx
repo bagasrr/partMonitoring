@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormField from "../FormField";
 import Button from "../../element/Button";
 import { useDispatch } from "react-redux";
@@ -36,7 +36,7 @@ const AddUsersForm = ({ isCreateByAdmin }) => {
       console.log(formData);
       await createUser(formData);
       setIsLoading(true);
-      isCreateByAdmin ? navigate("/dashboard") : navigate("/");
+      isCreateByAdmin ? navigate("/") : navigate("/login");
       // navigate("/users");
       dispatch(setNotification("User Added"));
       setIsLoading(false);
@@ -61,7 +61,18 @@ const AddUsersForm = ({ isCreateByAdmin }) => {
       <FormField label="Password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder={"**********"} />
       <FormField label="Confirm Password" name="confPassword" type="password" value={formData.confPassword} onChange={handleChange} placeholder={"**********"} />
       {error && <ErrorText message={error} />}
-      <Button type="submit" buttonName={"Submit"} />
+      <Button type="submit" buttonName={"Submit"} className={isCreateByAdmin === false ? "text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200" : "bg-blue-500 hover:bg-blue-600"} />
+
+      {isCreateByAdmin === false && (
+        <div>
+          <p className="text-center">
+            Already have an account?{" "}
+            <Link to="/login" className="text-indigo-600 hover:underline">
+              Login
+            </Link>
+          </p>
+        </div>
+      )}
     </form>
   );
 };

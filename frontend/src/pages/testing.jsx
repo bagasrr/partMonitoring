@@ -3,7 +3,7 @@ import Layout from "./layout";
 
 const TestingPage = () => {
   return (
-    <Layout>
+    <>
       <p>testing</p>
       <table border="1" cellpadding="5" cellspacing="0">
         <thead>
@@ -27,7 +27,7 @@ const TestingPage = () => {
           </tr>
         </tbody>
       </table>
-    </Layout>
+    </>
   );
 };
 

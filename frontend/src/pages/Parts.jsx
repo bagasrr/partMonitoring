@@ -13,7 +13,7 @@ const Parts = () => {
   const { sections, selectedSection, handleSectionChange } = useSections();
 
   return (
-    <Layout>
+    <>
       <div className="flex flex-col items-center w-full">
         <HeaderPages title="Part List" linkAdd="parts" add="part">
           <div className="flex gap-5 mb-10">
@@ -31,7 +31,7 @@ const Parts = () => {
           <PartList section={selectedSection} type={view} />
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

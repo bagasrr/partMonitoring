@@ -7,11 +7,11 @@ import AddSectionForm from "../../components/Form/AddSectionsForm";
 
 const AddUser = () => {
   return (
-    <Layout>
+    <>
       <BackPrev url="/sections" />
       <Title>Add new Section</Title>
       <AddSectionForm />
-    </Layout>
+    </>
   );
 };
 

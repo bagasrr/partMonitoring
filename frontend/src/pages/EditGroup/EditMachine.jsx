@@ -10,12 +10,12 @@ const EditMachine = () => {
   scrollToTop();
   adminArea();
   return (
-    <Layout>
+    <>
       <BackPrev url="/machines" />
 
       <Title>Edit Machine</Title>
       <EditMachineForm />
-    </Layout>
+    </>
   );
 };
 

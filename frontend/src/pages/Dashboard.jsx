@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (isError) {
-      navigate("/");
+      navigate("/login");
     }
   }, [isError, navigate]);
 
@@ -49,14 +49,13 @@ const Dashboard = () => {
     const repair = await getRepairItems();
     const swapPart = await getTypeSwapItem();
     const replacePart = await getTypeReplaceitem();
-    console.log(spare);
 
     const sortSwap = swapPart.sort((a, b) => b.dayUsed - a.dayUsed);
     setStatusData({ spare, broken, inUse, repair, swapPart: sortSwap, replacePart });
   };
 
   return (
-    <Layout>
+    <>
       <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className=" p-4 bg-white shadow rounded-lg">
@@ -84,7 +83,7 @@ const Dashboard = () => {
           <PartList section={selectedSection} type={view} />
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

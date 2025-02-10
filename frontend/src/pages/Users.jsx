@@ -8,10 +8,10 @@ const Users = () => {
   scrollToTop();
   adminArea();
   return (
-    <Layout>
+    <>
       <HeaderPages title="Users" linkAdd="users" add="user" />
       <UsersTable />
-    </Layout>
+    </>
   );
 };
 

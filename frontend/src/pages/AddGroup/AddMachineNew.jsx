@@ -6,11 +6,11 @@ import BackPrev from "../../element/BackPrev";
 
 const AddMachineNew = () => {
   return (
-    <Layout>
+    <>
       <BackPrev url="/machines" />
       <Title>Add new Machine</Title>
       <AddMachineForm />
-    </Layout>
+    </>
   );
 };
 

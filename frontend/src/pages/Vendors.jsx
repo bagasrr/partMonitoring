@@ -9,10 +9,10 @@ const Vendors = () => {
   ScrollToTop();
   adminArea();
   return (
-    <Layout>
+    <>
       <HeaderPages title="Vendors" linkAdd="vendors" add="vendor" />
       <VendorTable />
-    </Layout>
+    </>
   );
 };
 

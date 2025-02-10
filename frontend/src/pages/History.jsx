@@ -75,7 +75,7 @@ const History = () => {
 
   // console.log(currentItems);
   return (
-    <Layout key={currentPage}>
+    <div key={currentPage}>
       <h1 className="text-2xl font-bold mb-10">History</h1>
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search history by name or date" />
       <div className="w-full">
@@ -123,7 +123,7 @@ const History = () => {
       </div>
 
       <TablePagination pageCount={pageCount} onPageChange={handlePageClick} currentPage={currentPage} />
-    </Layout>
+    </div>
   );
 };
 

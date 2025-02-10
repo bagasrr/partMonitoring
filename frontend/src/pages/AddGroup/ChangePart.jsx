@@ -14,7 +14,7 @@ const ChangePartPages = () => {
     setRender(value);
   };
   return (
-    <Layout>
+    <>
       <BackPrev url="/parts" />
       <Title>Penggantian Part</Title>
       <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
@@ -26,7 +26,7 @@ const ChangePartPages = () => {
         <option value="status">Status</option>
       </FormField>
       {render && render === "replace" ? <ReplacePartForm /> : render === "swap" ? <SwapPartForm /> : render === "status" ? <UpdateItemStatusForm /> : null}
-    </Layout>
+    </>
   );
 };
 

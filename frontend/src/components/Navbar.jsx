@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { FaSignOutAlt, FaUser, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,27 +12,45 @@ const Navbar = () => {
   const { user, isError } = useSelector((state) => state.auth);
   const isOpen = useSelector((state) => state.sidebar.isOpen);
 
-  // useEffect(() => {
-  //   dispatch(getMe());
-  // }, [dispatch]);
-
-  useEffect(() => {
-    if (!user) {
-      dispatch(getMe());
-    }
-  }, [dispatch, user]);
+  console.log(isError);
+  const hasFetchedUser = useRef(false);
 
   useEffect(() => {
     if (isError) {
-      navigate("/");
+      navigate("/login");
     }
   }, [isError, navigate]);
+
+  useEffect(() => {
+    if (!user && !hasFetchedUser.current) {
+      dispatch(getMe());
+      hasFetchedUser.current = true;
+    }
+  }, [dispatch, user]);
+
+  // useEffect(() => {
+  //   if (!user) {
+  //     dispatch(getMe());
+  //   }
+  // }, [dispatch, user]);
 
   const handleLogout = () => {
     dispatch(Logout());
     dispatch(reset());
-    navigate("/");
+    navigate("/login");
   };
+
+  // useEffect(() => {
+  //   if (isError) {
+  //     navigate("/");
+  //   }
+  // }, [isError, navigate]);
+
+  // const handleLogout = () => {
+  //   dispatch(Logout());
+  //   dispatch(reset());
+  //   navigate("/");
+  // };
 
   const handleToggleSidebar = () => {
     dispatch(toggleSidebar());

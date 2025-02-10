@@ -6,11 +6,11 @@ import AddUsersForm from "../../components/Form/AddUsersForm";
 
 const AddUser = () => {
   return (
-    <Layout>
+    <>
       <BackPrev url="/users" />
       <Title>Add new User</Title>
       <AddUsersForm isCreateByAdmin={true} />
-    </Layout>
+    </>
   );
 };
 

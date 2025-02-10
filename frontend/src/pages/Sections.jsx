@@ -12,10 +12,10 @@ const Sections = () => {
   ScrollToTop();
   adminArea();
   return (
-    <Layout>
+    <>
       <HeaderPages title="Section Room" linkAdd="sections" add="section" />
       <SectionsTable />
-    </Layout>
+    </>
   );
 };
 

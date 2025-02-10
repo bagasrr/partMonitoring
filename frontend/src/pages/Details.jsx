@@ -7,10 +7,10 @@ const Details = () => {
   const { uuid } = useParams();
 
   return (
-    <Layout>
+    <>
       <BackPrev url="/parts" />
       Details : {uuid}
-    </Layout>
+    </>
   );
 };
 

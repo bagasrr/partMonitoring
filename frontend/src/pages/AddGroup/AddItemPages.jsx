@@ -13,7 +13,7 @@ const AddItemPages = () => {
     setRender(value);
   };
   return (
-    <Layout>
+    <>
       <BackPrev url="/parts" />
       <Title> {render && render === "AddNew" ? "Tambah Part Baru" : render === "AddAmount" ? "Tambah Jumlah Part" : "Tambah Part"}</Title>
       <FormField type="select" label="Add Type" onChange={handleChange} value={render ? render : ""}>
@@ -24,7 +24,7 @@ const AddItemPages = () => {
         <option value="AddAmount">Add Amount</option>
       </FormField>
       {render && render === "AddNew" ? <AddItemForm /> : render === "AddAmount" ? <AddAmountForm /> : null}
-    </Layout>
+    </>
   );
 };
 

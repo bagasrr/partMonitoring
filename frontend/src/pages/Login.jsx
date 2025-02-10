@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LoginUser, reset, getMe, authSlice } from "../features/authSlice";
 
@@ -62,9 +62,17 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="w-full px-4 py-2 font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200">
+          <button type="submit" className="w-full px-4 py-2 font-bold  rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200">
             {isLoading ? "Loading..." : "Login"}
           </button>
+          <div>
+            <p className="text-center">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-indigo-600 hover:underline">
+                Register
+              </Link>
+            </p>
+          </div>
           {isError && <p className="text-red-500 text-center">{message}</p>}
         </form>
       </div>

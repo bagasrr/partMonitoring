@@ -35,7 +35,7 @@ const AddVendor = () => {
     }
   };
   return (
-    <Layout>
+    <>
       {isLoading && <LoadingAnimate />}
       <BackPrev url="/vendors" />
       <Title>Add new Vendor</Title>
@@ -54,7 +54,7 @@ const AddVendor = () => {
         />
         <Button type="submit" buttonName={"Add Vendor"} />
       </form>
-    </Layout>
+    </>
   );
 };
 
