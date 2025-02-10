@@ -1,4 +1,3 @@
-import Layout from "./layout";
 import UsersTable from "../components/UsersTable";
 import { adminArea } from "../utils/adminArea";
 import scrollToTop from "../utils/scrollToTop";

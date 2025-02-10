@@ -1,5 +1,4 @@
 import { adminArea } from "../utils/adminArea";
-import Layout from "./layout";
 import { Button } from "../element/Input";
 import Title from "../element/Title";
 

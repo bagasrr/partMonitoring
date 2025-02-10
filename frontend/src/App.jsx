@@ -23,6 +23,7 @@ import AddVendor from "./pages/AddGroup/AddVendor";
 import TestingPage from "./pages/testing";
 import Register from "./pages/Register";
 import Layout from "./pages/layout";
+import ErrorElement from "./components/ErrorElement";
 
 // const router = createBrowserRouter([
 //   {
@@ -132,9 +133,11 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
+  { path: "/yourenotadmin", element: <YoureNotAdmin /> },
   {
     path: "/",
     element: <Layout />, // 👈 Layout sebagai wrapper
+    errorElement: <ErrorElement />,
     children: [
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/parts", element: <Parts /> },
@@ -153,7 +156,6 @@ const router = createBrowserRouter([
       { path: "/sections/add", element: <AddSection /> },
       { path: "/vendors", element: <Vendors /> },
       { path: "/vendors/add", element: <AddVendor /> },
-      { path: "/yourenotadmin", element: <YoureNotAdmin /> },
       { path: "/testing", element: <TestingPage /> },
       { path: "/itemusehistory", element: <ItemUseHistory /> },
     ],
