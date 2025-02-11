@@ -60,7 +60,6 @@ const Dashboard = () => {
       <Helmet>
         <title>Dashboard | Part Monitoring</title>
       </Helmet>
-      <LuMonitorCog size={65} />
 
       <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
