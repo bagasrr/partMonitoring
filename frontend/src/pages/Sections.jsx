@@ -6,12 +6,16 @@ import ScrollToTop from "../utils/scrollToTop";
 import { FiPlusCircle } from "react-icons/fi";
 import HeaderPages from "../components/headerPages";
 import { adminArea } from "../utils/adminArea";
+import { Helmet } from "react-helmet-async";
 
 const Sections = () => {
   ScrollToTop();
   adminArea();
   return (
     <>
+      <Helmet>
+        <title>Section | Part Monitoring</title>
+      </Helmet>
       <HeaderPages title="Section Room" linkAdd="sections" add="section" />
       <SectionsTable />
     </>

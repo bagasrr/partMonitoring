@@ -5,6 +5,7 @@ import ButtonTypeParts from "../components/ButtonTypeParts";
 import FormField from "../components/FormField";
 import useSections from "../hooks/useSections";
 import PartList from "../components/PartList";
+import { Helmet } from "react-helmet-async";
 
 const Parts = () => {
   ScrollToTop();
@@ -13,6 +14,9 @@ const Parts = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Part List | Part Monitoring</title>
+      </Helmet>
       <div className="flex flex-col items-center w-full">
         <HeaderPages title="Part List" linkAdd="parts" add="part">
           <div className="flex gap-5 mb-10">

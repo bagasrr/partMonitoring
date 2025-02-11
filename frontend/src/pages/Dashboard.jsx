@@ -7,10 +7,11 @@ import DayUsedChart from "../components/DayUsedChart";
 import { getBrokenItems, getInUseItems, getRepairItems, getSpareItems, getTypeReplaceitem, getTypeSwapItem } from "../utils/items";
 import AmountLimitChart from "../components/AmountLimitChart";
 import ButtonTypeParts from "../components/ButtonTypeParts";
-import Layout from "./layout";
 import useSections from "../hooks/useSections";
 import { SectionFilter } from "./Parts";
 import PartList from "../components/PartList";
+import { Helmet } from "react-helmet-async";
+import { LuMonitorCog } from "react-icons/lu";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -56,6 +57,11 @@ const Dashboard = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Dashboard | Part Monitoring</title>
+      </Helmet>
+      <LuMonitorCog size={65} />
+
       <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className=" p-4 bg-white shadow rounded-lg">

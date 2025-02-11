@@ -9,6 +9,7 @@ import { setDeleted, setNotification } from "../../features/notificationSlice";
 import LoadingAnimate from "../../components/LoadingAnimate";
 import NotificationBar from "../../components/NotificationBar";
 import { createVendor } from "../../utils/vendor";
+import { Helmet } from "react-helmet-async";
 
 const AddVendor = () => {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ const AddVendor = () => {
   };
   return (
     <>
+      <Helmet>
+        <title>Add Vendor | Part Monitoring</title>
+      </Helmet>
       {isLoading && <LoadingAnimate />}
       <BackPrev url="/vendors" />
       <Title>Add new Vendor</Title>

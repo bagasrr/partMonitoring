@@ -5,6 +5,7 @@ import Title from "../../element/Title";
 import SwapPartForm from "../../components/Form/SwapPartForm";
 import UpdateItemStatusForm from "../../components/Form/UpdateItemStaturForm";
 import ReplacePartForm from "../../components/Form/ReplacePartForm";
+import { Helmet } from "react-helmet-async";
 
 const ChangePartPages = () => {
   const [render, setRender] = useState(null);
@@ -14,6 +15,9 @@ const ChangePartPages = () => {
   };
   return (
     <>
+      <Helmet>
+        <title>Change Part | Part Monitoring</title>
+      </Helmet>
       <BackPrev url="/parts" />
       <Title>Penggantian Part</Title>
       <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>

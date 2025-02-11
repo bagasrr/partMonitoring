@@ -4,6 +4,7 @@ import Title from "../../element/Title";
 import BackPrev from "../../element/BackPrev";
 import FormField from "../../components/FormField";
 import AddAmountForm from "../../components/Form/AddAmountForm";
+import { Helmet } from "react-helmet-async";
 
 const AddItemPages = () => {
   const [render, setRender] = useState(null);
@@ -13,6 +14,9 @@ const AddItemPages = () => {
   };
   return (
     <>
+      <Helmet>
+        <title>Add Part | Part Monitoring</title>
+      </Helmet>
       <BackPrev url="/parts" />
       <Title> {render && render === "AddNew" ? "Tambah Part Baru" : render === "AddAmount" ? "Tambah Jumlah Part" : "Tambah Part"}</Title>
       <FormField type="select" label="Add Type" onChange={handleChange} value={render ? render : ""}>

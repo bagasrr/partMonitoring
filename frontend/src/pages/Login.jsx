@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LoginUser, reset, getMe, authSlice } from "../features/authSlice";
+import { Helmet } from "react-helmet-async";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -27,6 +28,9 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <Helmet>
+        <title>Login | Part Monitoring</title>
+      </Helmet>
       <div className="w-full max-w-md p-8 space-y-3 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold text-center">Login</h1>
         <form onSubmit={Auth} className="space-y-6">

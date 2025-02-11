@@ -1,6 +1,7 @@
 import { Link, useRouteError, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TiHome } from "react-icons/ti";
+import { Helmet } from "react-helmet-async";
 
 const ErrorElement = () => {
   const error = useRouteError();
@@ -14,6 +15,9 @@ const ErrorElement = () => {
       transition={{ duration: 0.5 }}
       className="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-6"
     >
+      <Helmet>
+        <title>Error | Part Monitoring</title>
+      </Helmet>
       <motion.h1 initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ duration: 0.5, ease: "easeOut" }} className="text-6xl font-extrabold drop-shadow-lg">
         Oops!
       </motion.h1>

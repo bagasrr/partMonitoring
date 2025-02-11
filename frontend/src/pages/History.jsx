@@ -5,6 +5,7 @@ import highlightText from "../element/highlightText"; // Import highlightText fu
 import TablePagination from "../components/TablePagination";
 import { useSelector } from "react-redux";
 import { getHistories } from "../utils/histories";
+import { Helmet } from "react-helmet-async";
 
 const History = () => {
   const [histories, setHistories] = useState([]);
@@ -75,6 +76,9 @@ const History = () => {
   // console.log(currentItems);
   return (
     <div key={currentPage}>
+      <Helmet>
+        <title>History | Part Monitoring</title>
+      </Helmet>
       <h1 className="text-2xl font-bold mb-10">History</h1>
       <SearchBar search={search} setSearch={handleSearchChange} placeholder="Search history by name or date" />
       <div className="w-full">

@@ -7,6 +7,7 @@ import { setNotification } from "../features/notificationSlice";
 import { Button, NormalInput, PasswordInput } from "../element/Input";
 import { adminArea } from "../utils/adminArea";
 import BackPrev from "../element/BackPrev";
+import { Helmet } from "react-helmet-async";
 
 const EditUser = () => {
   adminArea();
@@ -52,6 +53,9 @@ const EditUser = () => {
   return (
     <>
       <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+        <Helmet>
+          <title>Edit User | Part Monitoring</title>
+        </Helmet>
         <h1 className="text-2xl font-bold text-center mb-4">Edit User</h1>
         <form onSubmit={handleSubmit}>
           <NormalInput value={name} type="text" id="name" onChange={(e) => setName(e.target.value)} label="User Name" autoComplete="userName" />

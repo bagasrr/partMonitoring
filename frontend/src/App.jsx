@@ -1,6 +1,7 @@
 import React from "react";
+import { HelmetProvider } from "react-helmet-async";
 import Dashboard from "./pages/Dashboard";
-import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
@@ -163,7 +164,11 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <HelmetProvider>
+      <RouterProvider router={router} />
+    </HelmetProvider>
+  );
 };
 
 export default App;
