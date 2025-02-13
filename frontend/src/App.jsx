@@ -1,7 +1,7 @@
 import React from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Dashboard from "./pages/Dashboard";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import Users from "./pages/Users";
 import EditUser from "./pages/EditUser";
@@ -140,6 +140,7 @@ const router = createBrowserRouter([
     element: <Layout />, // 👈 Layout sebagai wrapper
     errorElement: <ErrorElement />,
     children: [
+      { path: "/", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/parts", element: <Parts /> },
       { path: "/parts/:uuid/details", element: <Details /> },

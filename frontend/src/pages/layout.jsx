@@ -34,7 +34,7 @@ const Layout = () => {
       <div className="flex flex-1">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={handleToggleSidebar} />
         <main className={`flex-1 overflow-x-hidden transition-all duration-300 p-10 mt-16 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
-          <Outlet /> {/* Komponen ini akan berubah sesuai halaman yang dikunjungi */}
+          {<Outlet /> ? <Outlet /> : <p>Loading...</p>} {/* Komponen ini akan berubah sesuai halaman yang dikunjungi */}
         </main>
       </div>
       <div className={`${sidebarOpen ? "ml-64" : "ml-0"}`}>
