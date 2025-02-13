@@ -51,11 +51,11 @@ const DetailsAction = ({ data, setIsOpen }) => {
 
                     {/* Untuk layar besar (Tablet/Desktop) */}
                     <TData className="hidden sm:block">
-                      <span className={`rounded-3xl px-3 py-2 ${FormatStatusColor(his.activities, "Part Broken", ["Part Updated", "Part Swapped"], "Part Added", "Status Changed")}`}>{his.activities}</span>
+                      <span className={`rounded-3xl px-3 py-2 ${FormatStatusColor(his.activities, "Part Broken", ["Part Updated", "Part Swapped"], "Part Added", ["Part Replace", "Status Changed", "Part Replaced"])}`}>{his.activities}</span>
                     </TData>
 
                     {/* Untuk layar kecil (Mobile) */}
-                    <TData className={`block sm:hidden ${FormatStatusColor(his.activities, "Part Broken", ["Part Updated", "Part Swapped"], "Part Added", "Status Changed")}`}>{his.activities}</TData>
+                    <TData className={`block sm:hidden ${FormatStatusColor(his.activities, "Part Broken", ["Part Updated", "Part Swapped"], "Part Added", ["Part Replace", "Status Changed", "Part Replaced"])}`}>{his.activities}</TData>
 
                     <TData>{his.user?.name || "NA"}</TData>
                   </TRow>

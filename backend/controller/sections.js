@@ -228,7 +228,6 @@ export const getItemsBySection = async (req, res) => {
         {
           model: itemHistoryModel,
           attributes: ["uuid", "activities", "createdAt"],
-
           include: [
             {
               model: userModel,
@@ -236,6 +235,10 @@ export const getItemsBySection = async (req, res) => {
             },
           ],
         },
+      ],
+      order: [
+        ["updatedAt", "DESC"],
+        [itemHistoryModel, "createdAt", "DESC"],
       ],
     });
     res.status(200).json(items);

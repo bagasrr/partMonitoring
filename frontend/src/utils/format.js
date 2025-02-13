@@ -11,7 +11,7 @@ export const FormatStatusColor = (status, red, yellow, green, blue) => {
     ? "bg-yellow-100 text-yellow-700"
     : status.includes(green)
     ? "bg-green-100 text-green-700"
-    : status.includes(blue)
+    : [blue].flat().some((y) => status.includes(y))
     ? "bg-blue-100 text-blue-700"
     : "bg-white text-gray-700"; // default
 };

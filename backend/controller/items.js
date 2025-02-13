@@ -129,7 +129,6 @@ export const getItemById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const getReplaceItem = async (req, res) => {
   try {
     const items = await itemModel.findAll({
@@ -475,7 +474,7 @@ export const updateItemStatus = async (req, res) => {
     const prevStatus = item.status; // Update the item status
 
     // Membuat deskripsi item dan data tabel
-    // const title = "Parts Broken Report";
+    // const title = "Part Broken Report";
     // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
     // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
     // const rows = [[currentDate, item.name, status, item.amount, `Status changed to ${status}.`, item.machine.machine_name, req.name]];
@@ -512,7 +511,7 @@ export const updateItemStatus = async (req, res) => {
       }
     );
 
-    status === "Broken" ? await addItemHistories(item.id, req.userId, "Parts Broken") : await addItemHistories(item.id, req.userId, `Status Changed`);
+    status === "Broken" ? await addItemHistories(item.id, req.userId, "Part Broken") : await addItemHistories(item.id, req.userId, `Status Changed`);
     // Buat catatan riwayat
     await historyModel.create({
       name: item.name,
@@ -555,7 +554,7 @@ export const updateItemStatusForm = async (req, res) => {
     }
 
     // Membuat deskripsi item dan data tabel
-    // const title = "Parts Broken Report";
+    // const title = "Part Broken Report";
     // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
     // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
     // const rows = [[currentDate, item.name, status, item.amount, reason, item.machine.machine_name, req.name]];
@@ -734,7 +733,7 @@ export const swapItem = async (req, res) => {
 
     if (replaceItemName === null) {
       //membuat data tabel pdf
-      const title = "Parts Broken Report";
+      const title = "Part Broken Report";
       const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
       const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
       const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
@@ -815,7 +814,7 @@ export const swapItem = async (req, res) => {
 
       // const currentDate = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
       //membuat data tabel pdf
-      // const title = "Parts Broken Report";
+      // const title = "Part Broken Report";
       // const headers = ["Date", "Part Name", "Status", "Amount", "Reason", "Machine Name", "Changed By"];
       // const rows = [[currentDate, item.name, itemStatus, item.amount, reason, item.machine.machine_name, req.name]];
       // const fileName = `Parts ${item.name} Broken Report ${currentDate.replace(/[\s,:]/g, "-")}.pdf`;
@@ -928,7 +927,7 @@ export const replaceItem = async (req, res) => {
       }
     }
 
-    await addItemHistories(item.id, req.userId, "Part Replace");
+    await addItemHistories(item.id, req.userId, "Part Replaced");
     // Create history record
     await historyModel.create({
       name: item.name,

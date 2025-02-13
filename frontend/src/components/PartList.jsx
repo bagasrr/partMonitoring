@@ -200,7 +200,7 @@ const PartList = ({ section, type }) => {
   const handleClickRow = (item) => {
     setIsOpen(true);
     setSelectedItem(item);
-    console.log(item);
+    // console.log(item);
   };
 
   return (
