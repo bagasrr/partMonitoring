@@ -40,18 +40,6 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // useEffect(() => {
-  //   if (isError) {
-  //     navigate("/");
-  //   }
-  // }, [isError, navigate]);
-
-  // const handleLogout = () => {
-  //   dispatch(Logout());
-  //   dispatch(reset());
-  //   navigate("/");
-  // };
-
   const handleToggleSidebar = () => {
     dispatch(toggleSidebar());
   };
@@ -71,10 +59,10 @@ const Navbar = () => {
                 <FaSignOutAlt className="mr-2" />
                 Logout
               </button>
-              <div className="flex items-center gap-3">
+              <Link to="/profile" className="flex items-center gap-3">
                 <FaUser className="ml-2" />
                 <h1>{user && user.name}</h1>
-              </div>
+              </Link>
             </div>
 
             <button onClick={handleToggleSidebar} className="lg:hidden text-white focus:outline-none">

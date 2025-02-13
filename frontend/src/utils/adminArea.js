@@ -8,7 +8,7 @@ export const adminArea = () => {
 
   useEffect(() => {
     if (user && user.role !== "admin") {
-      navigate("/yourenotadmin");
+      navigate("/access-denied");
     }
   }, [user]);
 };

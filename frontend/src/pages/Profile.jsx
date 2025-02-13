@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { getUserById, updateUser } from "../utils/users";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import { Button, NormalInput, PasswordInput } from "../element/Input";
-import { adminArea } from "../utils/adminArea";
 import BackPrev from "../element/BackPrev";
 import { Helmet } from "react-helmet-async";
+import { ReadOnlyForm } from "../components/FormField";
+import LoadingAnimate from "../components/LoadingAnimate";
 
-const EditUser = () => {
-  adminArea();
+const Profile = () => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
@@ -17,8 +17,8 @@ const EditUser = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { id } = useParams();
   const [error, setError] = useState("");
+  const { user } = useSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const EditUser = () => {
   }, []);
 
   const fetchUserDetails = async () => {
-    const User = await getUserById(id); // Mendapatkan detail User berdasarkan id
+    const User = await getUserById(user.uuid); // Mendapatkan detail User berdasarkan id
     setName(User.name);
     setRole(User.role);
     setEmail(User.email);
@@ -42,11 +42,11 @@ const EditUser = () => {
         confPassword: confirmPassword,
         email,
       };
-      await updateUser(id, data);
       setIsLoading(true);
+      await updateUser(user.uuid, data);
       dispatch(setNotification("User Edit Success"));
       setIsLoading(false);
-      navigate("/users");
+      navigate("/dashboard");
     } catch (error) {
       setIsLoading(false);
       setError(error.response.data.message);
@@ -55,39 +55,17 @@ const EditUser = () => {
 
   return (
     <>
+      <LoadingAnimate isLoading={isLoading} />
       <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
         <Helmet>
-          <title>Edit User | Part Monitoring</title>
+          <title>Profile | Part Monitoring</title>
         </Helmet>
-        <h1 className="text-2xl font-bold text-center mb-4">Edit User</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Profile</h1>
         <form onSubmit={handleSubmit}>
           <NormalInput value={name} type="text" id="name" onChange={(e) => setName(e.target.value)} label="User Name" autoComplete="userName" />
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
-              Role
-            </label>
-
-            <select
-              name="role"
-              id="role"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              {name && role === "admin" ? (
-                <>
-                  <option value="admin">admin</option>
-                  <option value="user">user</option>
-                </>
-              ) : (
-                <>
-                  <option value="user">user</option>
-                  <option value="admin">admin</option>
-                </>
-              )}
-            </select>
+          <div>
+            <ReadOnlyForm label="Role" name="role" value={role} />
           </div>
           {role === "admin" && <NormalInput value={email} type="email" id="email" onChange={(e) => setEmail(e.target.value)} label="Email" placeholder="Email" />}
 
@@ -106,4 +84,4 @@ const EditUser = () => {
   );
 };
 
-export default EditUser;
+export default Profile;

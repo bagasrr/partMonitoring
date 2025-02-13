@@ -25,6 +25,7 @@ import TestingPage from "./pages/testing";
 import Register from "./pages/Register";
 import Layout from "./pages/layout";
 import ErrorElement from "./components/ErrorElement";
+import Profile from "./pages/Profile";
 
 // const router = createBrowserRouter([
 //   {
@@ -134,7 +135,7 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
-  { path: "/yourenotadmin", element: <YoureNotAdmin /> },
+  { path: "/access-denied", element: <YoureNotAdmin /> },
   {
     path: "/",
     element: <Layout />, // 👈 Layout sebagai wrapper
@@ -160,6 +161,7 @@ const router = createBrowserRouter([
       { path: "/vendors/add", element: <AddVendor /> },
       { path: "/testing", element: <TestingPage /> },
       { path: "/itemusehistory", element: <ItemUseHistory /> },
+      { path: "/profile", element: <Profile /> },
     ],
   },
 ]);
