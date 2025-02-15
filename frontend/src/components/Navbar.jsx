@@ -59,7 +59,7 @@ const Navbar = () => {
                 <FaSignOutAlt className="mr-2" />
                 Logout
               </button>
-              <Link to="/profile" className="flex items-center gap-3">
+              <Link to="/profile" className="flex items-center gap-3 hover:text-indigo-200">
                 <FaUser className="ml-2" />
                 <h1>{user && user.name}</h1>
               </Link>

@@ -1,7 +1,7 @@
 import React from "react";
 import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
 import { BsBuildingFillGear } from "react-icons/bs";
-import { MdOutlineManageHistory } from "react-icons/md";
+import { MdPublishedWithChanges } from "react-icons/md";
 import { PiEngineFill, PiNotePencilBold } from "react-icons/pi";
 import { IoMdListBox } from "react-icons/io";
 import { MdCreateNewFolder, MdMeetingRoom } from "react-icons/md";
@@ -17,7 +17,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const handleLogout = () => {
     dispatch(Logout());
     dispatch(reset());
-    navigate("/");
+    navigate("/login");
   };
 
   const AllAccessGeneral = [
@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     {
       id: 3,
       name: "Pemakaian",
-      icon: <MdOutlineManageHistory className="mr-2" />,
+      icon: <MdPublishedWithChanges className="mr-2" size={20} />,
       path: "/itemusehistory",
     },
   ];
