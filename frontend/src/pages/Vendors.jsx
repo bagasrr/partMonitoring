@@ -1,5 +1,5 @@
 import React from "react";
-import HeaderPages from "../components/headerPages";
+import HeaderPages from "../components/HeaderPages";
 import VendorTable from "../components/VendorTable";
 import ScrollToTop from "../utils/scrollToTop";
 import { adminArea } from "../utils/adminArea";

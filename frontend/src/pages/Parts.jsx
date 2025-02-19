@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ScrollToTop from "../utils/scrollToTop";
-import HeaderPages from "../components/headerPages";
+import HeaderPages from "../components/HeaderPages";
 import ButtonTypeParts from "../components/ButtonTypeParts";
 import FormField from "../components/FormField";
 import useSections from "../hooks/useSections";

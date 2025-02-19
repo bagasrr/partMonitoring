@@ -1,7 +1,7 @@
 import UsersTable from "../components/UsersTable";
 import { adminArea } from "../utils/adminArea";
 import scrollToTop from "../utils/scrollToTop";
-import HeaderPages from "../components/headerPages";
+import HeaderPages from "../components/HeaderPages";
 import { Helmet } from "react-helmet-async";
 
 const Users = () => {
