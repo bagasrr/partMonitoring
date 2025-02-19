@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { FaSignOutAlt, FaUser, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout, reset, getMe } from "../features/authSlice";
+import { Logout, reset, getMe } from "../features/AuthSlice";
 import { toggleSidebar } from "../features/sidebarSlice";
 import { MdClose } from "react-icons/md";
 

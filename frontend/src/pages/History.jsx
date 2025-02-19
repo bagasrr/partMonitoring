@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import SearchBar from "../components/SearchBar"; // Import SearchBar component
 import highlightText from "../element/highlightText"; // Import highlightText function
 import TablePagination from "../components/TablePagination";

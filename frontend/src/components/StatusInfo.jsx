@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { getBrokenItems, getInUseItems, getRepairItems, getSpareItems } from "../utils/items";
+import React, { useState } from "react";
 import InfoBox from "./InfoBox"; // Import komponen InfoBox
 
 const StatusInfo = ({ statusData }) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { FaTachometerAlt, FaBox, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
+import { FaTachometerAlt, FaUsers, FaSignOutAlt, FaHistory } from "react-icons/fa";
 import { BsBuildingFillGear } from "react-icons/bs";
 import { MdPublishedWithChanges } from "react-icons/md";
 import { PiEngineFill, PiNotePencilBold } from "react-icons/pi";
@@ -7,7 +7,7 @@ import { IoMdListBox } from "react-icons/io";
 import { MdCreateNewFolder, MdMeetingRoom } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Logout, reset } from "../features/authSlice";
+import { Logout, reset } from "../features/AuthSlice";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const dispatch = useDispatch();
