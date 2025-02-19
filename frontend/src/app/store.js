@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/authSlice";
+import authReducer from "../features/AuthSlice";
 import notificationReducer from "../features/notificationSlice";
 import itemsPerPageReducer from "../features/itemsPerPagesSlice";
 import sidebarReducer from "../features/sidebarSlice";
