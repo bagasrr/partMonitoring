@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { LoginUser, reset, getMe, authSlice } from "../features/authSlice";
+import { LoginUser, reset, getMe, authSlice } from "../features/AuthSlice";
 import { Helmet } from "react-helmet-async";
 
 const Login = () => {
