@@ -1,7 +1,7 @@
 import React from "react";
 import MachinesTable from "../components/MachinesTable";
 import scrollToTop from "../utils/scrollToTop";
-import HeaderPages from "../components/headerPages";
+import HeaderPages from "../components/HeaderPages";
 import { adminArea } from "../utils/adminArea";
 import { Helmet } from "react-helmet-async";
 
