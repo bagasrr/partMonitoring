@@ -27,6 +27,7 @@ import Layout from "./pages/layout";
 import ErrorElement from "./components/ErrorElement";
 import Profile from "./pages/Profile";
 import EditSection from "./pages/EditGroup/EditSection";
+import EditVendor from "./pages/EditGroup/EditVendor";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
       { path: "/sections/:id/edit", element: <EditSection /> },
       { path: "/vendors", element: <Vendors /> },
       { path: "/vendors/add", element: <AddVendor /> },
+      { path: "/vendors/:id/edit", element: <EditVendor /> },
       { path: "/testing", element: <TestingPage /> },
       { path: "/itemusehistory", element: <ItemUseHistory /> },
       { path: "/profile", element: <Profile /> },

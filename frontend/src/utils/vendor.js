@@ -28,3 +28,21 @@ export const createVendor = async (data) => {
     throw new Error(error.response.data.error || error.response.data.message || "Error creating vendor");
   }
 };
+
+export const getVendorByID = async (id) => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching vendor");
+  }
+};
+
+export const updateVendor = async (uuid, data) => {
+  try {
+    const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/vendors/${uuid}/edit`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating vendor");
+  }
+};
