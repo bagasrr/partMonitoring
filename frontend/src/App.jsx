@@ -28,6 +28,7 @@ import ErrorElement from "./components/ErrorElement";
 import Profile from "./pages/Profile";
 import EditSection from "./pages/EditGroup/EditSection";
 import EditVendor from "./pages/EditGroup/EditVendor";
+import Error500 from "./components/Page500Error";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
+  { path: "/error500", element: <Error500 /> },
   { path: "/access-denied", element: <YoureNotAdmin /> },
   {
     path: "/",
