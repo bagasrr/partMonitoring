@@ -138,7 +138,7 @@ const AddItemForm = () => {
     }
 
     try {
-      console.log("formData: ", formData);
+      // console.log("formData: ", formData);
       setIsLoading(true);
       await createItem(cleanedFormData);
       dispatch(setNotification(`Part ${formData.name} Added`));
