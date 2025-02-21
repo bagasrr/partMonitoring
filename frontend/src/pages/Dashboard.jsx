@@ -11,7 +11,6 @@ import useSections from "../hooks/useSections";
 import { SectionFilter } from "./Parts";
 import PartList from "../components/PartList";
 import { Helmet } from "react-helmet-async";
-import { LuMonitorCog } from "react-icons/lu";
 
 const Dashboard = () => {
   const navigate = useNavigate();

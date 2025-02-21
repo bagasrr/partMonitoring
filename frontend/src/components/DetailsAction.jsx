@@ -7,6 +7,7 @@ import { formatDate, FormatStatusColor } from "../utils/format";
 const DetailsAction = ({ data, setIsOpen }) => {
   const histori = data?.itemHistories;
 
+  console.log(data);
   console.log("histori:", histori);
   return (
     <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity z-50">
@@ -21,7 +22,7 @@ const DetailsAction = ({ data, setIsOpen }) => {
             <DetailsKey>Year</DetailsKey>
             <DetailsKey>Status</DetailsKey>
             <DetailsKey>Machine</DetailsKey>
-            <DetailsKey>Part Usage</DetailsKey>
+            {data?.replacementType === "Swap" ? <DetailsKey>Day Used</DetailsKey> : null}
           </div>
           <div>
             <DetailsProperty>:{data?.item_number || "NA"}</DetailsProperty>
@@ -31,7 +32,7 @@ const DetailsAction = ({ data, setIsOpen }) => {
             <DetailsProperty>:{data?.year || "NA"}</DetailsProperty>
             <DetailsProperty>:{data?.status || "NA"}</DetailsProperty>
             <DetailsProperty>:{data?.machine?.machine_name || "NA"}</DetailsProperty>
-            <DetailsProperty>:{data?.dayUsed || "0"} Day</DetailsProperty>
+            {data?.replacementType === "Swap" ? <DetailsProperty>:{data?.dayUsed || "0"} Day</DetailsProperty> : null}
           </div>
         </div>
         {histori.length !== 0 && (

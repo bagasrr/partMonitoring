@@ -42,7 +42,7 @@ const StatusInfo = ({ statusData }) => {
                   ))}
                 </ul>
               ) : (
-                <p>No items found.</p>
+                <p>No part found.</p>
               )}
             </div>
           </div>
