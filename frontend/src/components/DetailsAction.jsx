@@ -6,9 +6,6 @@ import { formatDate, FormatStatusColor } from "../utils/format";
 
 const DetailsAction = ({ data, setIsOpen }) => {
   const histori = data?.itemHistories;
-
-  console.log(data);
-  console.log("histori:", histori);
   return (
     <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity z-50">
       <div className="bg-white rounded-lg p-6 w- transform transition-all flex flex-col items-center">

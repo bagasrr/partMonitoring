@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createItem, getItems } from "../../utils/items";
+import { createItem, getTypeSwapItem } from "../../utils/items";
 import FormField from "../FormField";
 import { useNavigate } from "react-router-dom";
 import { getMachines } from "../../utils/machines";
@@ -51,37 +51,73 @@ const AddItemForm = () => {
     vendor_name: null,
   });
 
-  console.log(isNew.replaceType);
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   const isType = name === "replacementType";
+  //   if (isType && value === "Swap") {
+  //     setIsNew((prev) => ({ ...prev, replaceType: true }));
+  //   } else if (isType && value !== "Swap") {
+  //     setIsNew((prev) => ({ ...prev, replaceType: false }));
+  //   } else {
+  //     console.log("WHY");
+  //   }
+
+  //   let newValue;
+  //   if (name === "amount" || name === "lowerLimit") {
+  //     newValue = Number(value);
+  //   } else if (name === "year") {
+  //     newValue = value === "" ? null : Number(value); // Ubah string kosong jadi null
+  //   } else {
+  //     newValue = value;
+  //   }
+  //   setFormData({ ...formData, [name]: newValue });
+
+  //   if (name === "amount" || name === "lowerLimit") {
+  //     if (newValue < 0) {
+  //       setErrors({ ...errors, [name]: "Nilai Harus lebih dari 0" });
+  //     } else {
+  //       const newErrors = { ...errors };
+  //       delete newErrors[name];
+  //       setErrors(newErrors);
+  //     }
+  //   }
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    const isType = name === "replacementType";
-    if (isType && value === "Swap") {
-      setIsNew((prev) => ({ ...prev, replaceType: true }));
-    } else if (isType && value !== "Swap") {
-      setIsNew((prev) => ({ ...prev, replaceType: false }));
-      // console.log("Aneh Ngentot");
-    } else {
-      console.log("Aneh ngentot");
+    setFormData((prev) => {
+      let newValue;
+
+      if (name === "amount" || name === "lowerLimit") {
+        newValue = Number(value);
+      } else if (name === "year") {
+        newValue = value === "" ? null : Number(value);
+      } else {
+        newValue = value;
+      }
+
+      return { ...prev, [name]: newValue };
+    });
+
+    if (name === "replacementType") {
+      setIsNew((prev) => ({
+        ...prev,
+        replaceType: value === "Swap",
+      }));
     }
-    let newValue;
-    if (name === "amount" || name === "lowerLimit") {
-      newValue = Number(value);
-    } else if (name === "year") {
-      newValue = value === "" ? null : Number(value); // Ubah string kosong jadi null
-    } else {
-      newValue = value;
-    }
-    setFormData({ ...formData, [name]: newValue });
 
     if (name === "amount" || name === "lowerLimit") {
-      if (newValue < 0) {
-        setErrors({ ...errors, [name]: "Nilai Harus lebih dari 0" });
-      } else {
-        const newErrors = { ...errors };
-        delete newErrors[name];
-        setErrors(newErrors);
-      }
+      setErrors((prevErrors) => {
+        if (Number(value) < 0) {
+          return { ...prevErrors, [name]: "Nilai Harus lebih dari 0" };
+        } else {
+          const newErrors = { ...prevErrors };
+          delete newErrors[name];
+          return newErrors;
+        }
+      });
     }
   };
 
@@ -137,15 +173,15 @@ const AddItemForm = () => {
       setFormData({ ...formData, name: "", amount: "", description: "" });
     } else {
       setIsNew((prev) => ({ ...prev, part: false }));
-      const selectedPart = list.part.find((part) => part.name === value);
+      // const selectedPart = list.part.find((part) => part.name === value);
       setFormData({
         ...formData,
         name: value,
-        year: selectedPart?.year || "",
-        lowerLimit: selectedPart?.lowerLimit || "",
-        replacementType: selectedPart?.replacementType || "",
-        machine_name: selectedPart?.machine?.machine_name || "",
-        machine_number: selectedPart?.machine?.machine_number || "",
+        // year: selectedPart?.year || "",
+        // lowerLimit: selectedPart?.lowerLimit || "",
+        // replacementType: selectedPart?.replacementType || "",
+        // machine_name: selectedPart?.machine?.machine_name || "",
+        // machine_number: selectedPart?.machine?.machine_number || "",
       });
     }
   };
@@ -196,7 +232,7 @@ const AddItemForm = () => {
 
   const fetchData = async () => {
     try {
-      const [machines, sections, parts, vendors] = await Promise.all([getMachines(), getSections(), getItems(), getVendors()]);
+      const [machines, sections, parts, vendors] = await Promise.all([getMachines(), getSections(), getTypeSwapItem(), getVendors()]);
 
       setList((prev) => ({
         ...prev,
@@ -230,18 +266,22 @@ const AddItemForm = () => {
 
         {isNew.replaceType && <FormField label="Part Number" name="item_number" value={formData.item_number} onChange={handleChange} placeholder="Masukkan nomor part" />}
 
-        <FormField label="Part Name" name="name" value={isNew.part ? "new" : formData.name} onChange={handlePartChange} type="select">
-          <option value="" disabled>
-            Pilih Part
-          </option>
-          {/* admin can add new part dan user can add to if replaceType = false */}
-          {(!isNew.replaceType || user.role === "admin") && <option value="new">Enter New Part</option>}
-          {uniqueParts.map((data) => (
-            <option key={data.uuid} value={data.name}>
-              {data.name}
+        {formData.replacementType === "Replace" ? (
+          <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder="Masukkan nama part baru" />
+        ) : (
+          <FormField label="Part Name" name="name" value={isNew.part ? "new" : formData.name} onChange={handlePartChange} type="select">
+            <option value="" disabled>
+              Pilih Part
             </option>
-          ))}
-        </FormField>
+            {/* admin can add new part dan user can add to if replaceType = false */}
+            {(!isNew.replaceType || user.role === "admin") && <option value="new">Enter New Part</option>}
+            {uniqueParts.map((data) => (
+              <option key={data.uuid} value={data.name}>
+                {data.name}
+              </option>
+            ))}
+          </FormField>
+        )}
 
         {isNew.part && <FormField label="New Part Name" name="name" value={formData.name} onChange={handleChange} placeholder="Masukkan nama part baru" />}
 

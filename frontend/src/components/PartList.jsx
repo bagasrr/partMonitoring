@@ -42,7 +42,6 @@ const PartList = ({ section, type }) => {
         setData(cache[type]);
       } else {
         const response = await getItemType(type);
-        console.log("API Call for getItemType:", type);
         setData(response);
         setCache((prevCache) => ({ ...prevCache, [type]: response }));
       }

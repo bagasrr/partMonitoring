@@ -24,7 +24,6 @@ export const getItems = async () => {
 export const getSpareItems = async () => {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/spare`);
-    console.log(response.length);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
@@ -164,7 +163,6 @@ export const updateItemStatusForm = async (data) => {
 export const getItemsBySection = async (sectionId, type) => {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/sections/${sectionId}/items-${type}`);
-    console.log("id: ", sectionId);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
@@ -174,7 +172,6 @@ export const getItemsBySection = async (sectionId, type) => {
 export const getItemType = async (type) => {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/items/type-${type}`);
-    console.log("API Call");
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Part");
