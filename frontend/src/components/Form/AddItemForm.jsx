@@ -306,8 +306,6 @@ const AddItemForm = () => {
             <option value="" disabled>
               Pilih Vendor
             </option>
-            {/* <option value={null}>NA</option> */}
-            {user.role === "admin" && <option value="new">Enter New Vendor</option>}
             {list.vendor &&
               list.vendor.map((data) => (
                 <option key={data.uuid} value={data.vendor_name}>
@@ -316,11 +314,6 @@ const AddItemForm = () => {
               ))}
           </FormField>
         )}
-
-        {isNew.vendor && <FormField label="New Vendor" name="vendor_name" value={formData.vendor_name} onChange={handleChange} placeholder={"Masukkan vendor baru"} />}
-
-        {/* {isNewPart && (
-          <> */}
 
         <FormField label="Status" name="status" type="select" value={formData.status} onChange={handleChange}>
           <option value="Not Set" disabled>
@@ -338,7 +331,6 @@ const AddItemForm = () => {
           <option value="" disabled>
             Pilih Machine
           </option>
-          {user.role === "admin" && <option value="new">Enter New Machine</option>}
           {list.machine &&
             list.machine.map((data) => (
               <option key={data.uuid} value={data.machine_name}>
@@ -346,32 +338,7 @@ const AddItemForm = () => {
               </option>
             ))}
         </FormField>
-        {isNew.machine && (
-          <>
-            <FormField label="New Machine Name" name="machine_name" value={formData.machine_name} onChange={handleChange} placeholder={"Masukkan nama machine baru"} />
-            <FormField label="Machine Number" name="machine_number" value={formData.machine_number} onChange={handleChange} placeholder={"Masukkan nomor machine"} />
 
-            <FormField label="Room Name" name="section_name" value={isNew.section ? "new" : formData.section_name} onChange={handleSectionChange} type="select">
-              <option value="" disabled>
-                Pilih Ruangan
-              </option>
-              <option value="new">Enter New Section Room</option>
-              {list.section &&
-                list.section.map((data) => (
-                  <option key={data.uuid} value={data.section_name}>
-                    {data.section_name}
-                  </option>
-                ))}
-            </FormField>
-            {isNew.section && (
-              <>
-                <FormField label="New Room Name" name="section_name" value={formData.section_name} onChange={handleChange} placeholder={"Masukkan nama ruangan baru"} />
-
-                <FormField label="Room Number" name="section_number" value={formData.section_number} onChange={handleChange} placeholder={"Masukkan nomor ruangan"} />
-              </>
-            )}
-          </>
-        )}
         {notification && <Notification message={notification} deleted={deleted} />}
         <Button type="submit" buttonName="Add Part" />
       </form>
