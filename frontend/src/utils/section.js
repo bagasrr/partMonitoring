@@ -36,3 +36,12 @@ export const deleteSection = async (id) => {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Deleting Section");
   }
 };
+
+export const getSectionByID = async (id) => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/sections/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching section");
+  }
+};

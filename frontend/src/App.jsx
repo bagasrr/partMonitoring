@@ -26,6 +26,7 @@ import Register from "./pages/Register";
 import Layout from "./pages/layout";
 import ErrorElement from "./components/ErrorElement";
 import Profile from "./pages/Profile";
+import EditSection from "./pages/EditGroup/EditSection";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
       { path: "/machines/:id/edit", element: <EditMachine /> },
       { path: "/sections", element: <Sections /> },
       { path: "/sections/add", element: <AddSection /> },
+      { path: "/sections/:id/edit", element: <EditSection /> },
       { path: "/vendors", element: <Vendors /> },
       { path: "/vendors/add", element: <AddVendor /> },
       { path: "/testing", element: <TestingPage /> },

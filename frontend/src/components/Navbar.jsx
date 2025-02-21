@@ -12,7 +12,6 @@ const Navbar = () => {
   const { user, isError } = useSelector((state) => state.auth);
   const isOpen = useSelector((state) => state.sidebar.isOpen);
 
-  console.log(isError);
   const hasFetchedUser = useRef(false);
 
   useEffect(() => {

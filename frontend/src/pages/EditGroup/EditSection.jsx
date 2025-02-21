@@ -1,12 +1,12 @@
 import React from "react";
-import EditItemForm from "../../components/Form/EditItemForm";
 import Title from "../../element/Title";
 import BackPrev from "../../element/BackPrev";
 import { adminArea } from "../../utils/adminArea";
 import scrollToTop from "../../utils/scrollToTop";
 import { Helmet } from "react-helmet-async";
+import EditSectionForm from "../../components/Form/EditSectionForm";
 
-const EditItem = () => {
+const EditSection = () => {
   adminArea();
   scrollToTop();
   return (
@@ -16,9 +16,9 @@ const EditItem = () => {
       </Helmet>
       <BackPrev url="/sections" />
       <Title>Edit Section</Title>
-      <EditItemForm />
+      <EditSectionForm />
     </>
   );
 };
 
-export default EditItem;
+export default EditSection;

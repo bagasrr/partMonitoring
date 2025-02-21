@@ -148,7 +148,7 @@ const SectionsTable = () => {
                 <TData>
                   <div className="flex gap-5 items-center justify-center">
                     <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleOpenModal(section.uuid, section.section_name)} />
-                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/sections/edit/${section.uuid}`)} />
+                    <FaEdit className="text-blue-500 cursor-pointer" onClick={() => navigate(`/sections/${section.uuid}/edit`)} />
                   </div>
                 </TData>
               </TRow>
