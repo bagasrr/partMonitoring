@@ -1,17 +1,30 @@
 import axios from "axios";
+import { handleApiError } from "./items";
 
 export const getUsers = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`);
-  return response.data;
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 export const getUserById = async (id) => {
-  const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`);
-  return response.data;
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 export const deleteUser = async (id) => {
-  await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}/delete`);
+  try {
+    await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}/delete`);
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 
 export const createUser = async (data) => {
@@ -19,7 +32,8 @@ export const createUser = async (data) => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating user");
+    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating user");
+    handleApiError(error);
   }
 };
 
@@ -28,6 +42,7 @@ export const updateUser = async (id, data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`, data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating user");
+    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating user");
+    handleApiError(error);
   }
 };

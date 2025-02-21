@@ -5,6 +5,7 @@ export const getHistories = async () => {
     const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/history`);
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Histories");
+    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error fetching Histories");
+    handleApiError(error);
   }
 };
