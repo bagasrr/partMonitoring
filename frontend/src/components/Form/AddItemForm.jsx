@@ -204,21 +204,6 @@ const AddItemForm = () => {
     }
   };
 
-  const handleSectionChange = (e) => {
-    const { value } = e.target;
-    if (value === "new") {
-      setIsNew((prev) => ({ ...prev, section: true }));
-      setFormData({ ...formData, section_name: "", section_number: "" });
-    } else {
-      setIsNew((prev) => ({ ...prev, section: false }));
-      setFormData({
-        ...formData,
-        section_name: value,
-        section_number: list.section.find((section) => section.section_name === value)?.section_number || "",
-      });
-    }
-  };
-
   const handleVendorChange = (e) => {
     const { value } = e.target;
     if (value === "new") {
