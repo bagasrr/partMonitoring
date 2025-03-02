@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleApiError } from "./items";
 
 export const getItemUseHistories = async () => {
   try {
