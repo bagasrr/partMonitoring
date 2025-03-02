@@ -76,7 +76,7 @@ const Profile = () => {
           {error && <p className="text-red-500 font-bold text-center text-sm my-2">{error}</p>}
           <div className="flex flex-col gap-4">
             <Button type="submit">Save</Button>
-            <BackPrev url="/users" />
+            <BackPrev url="/dashboard" />
           </div>
         </form>
       </div>
