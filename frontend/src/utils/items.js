@@ -18,8 +18,8 @@ export const createItem = async (itemData) => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/items`, itemData);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating item");
     handleApiError(error);
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating item");
   }
 };
 
@@ -183,7 +183,7 @@ export const updateItemStatusForm = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/status`, data);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
     handleApiError(error);
   }
 };

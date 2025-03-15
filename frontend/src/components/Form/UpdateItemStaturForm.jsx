@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
+import { formatDate } from "../../utils/format";
 
 const UpdateItemStatusForm = () => {
   const [items, setItems] = useState([]);
@@ -17,9 +18,13 @@ const UpdateItemStatusForm = () => {
     status: "",
     itemYear: "",
     reason: "",
+    item_number: "",
+    itemStartUseDate: null,
+    itemEndUseDate: null,
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [loadOption, setLoadOption] = useState(true);
 
   useEffect(() => {
     fetchItems();
@@ -38,23 +43,28 @@ const UpdateItemStatusForm = () => {
         }
         return 0;
       });
+      setItems(sortRes.length > 0 ? sortRes : []);
       setItems(sortRes);
+      setLoadOption(false);
     } catch (error) {
+      setLoadOption(false);
       setErrors({ getPart: error.message || "Error fetching Part" });
     }
   };
 
   const handleItemChange = (e) => {
-    const [name, year] = e.target.value.split(" - ");
-    const item = items.find((item) => item.name === name && item.year.toString() === year);
+    const item_uuid = e.target.value;
+    const item = items.find((item) => item.uuid === item_uuid);
     if (item) {
       setSelectedItem(item);
       setFormData({
         ...formData,
         itemName: item.name,
         itemYear: item.year,
+        itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
+        item_number: item.item_number,
       });
-      console.log("Item selected: ", item); // Log item selected
+      console.log(`${item.status} - ${item.name} (${item.year}) - ${item.machine.machine_name}`); // Log item selected
     } else {
       setSelectedItem(null);
       setFormData({
@@ -85,39 +95,43 @@ const UpdateItemStatusForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
       if (formData.status === selectedItem.status) {
         setErrors({ submit: `Cannot change status to '${formData.status}' again` });
         return;
       }
+      await updateItemStatusForm(formData);
       setIsLoading(true);
-      await updateItemStatusForm({ itemName: formData.itemName, status: formData.status, itemYear: formData.itemYear, reason: formData.reason });
       dispatch(setNotification(`Item ${formData.itemName} - ${formData.itemYear} status updated to ${formData.status}`));
       navigate("/parts");
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.error("Error updating item status:", error);
       setErrors(error || { submit: "Error updating item status" });
+      console.error("Error updating item status:", error);
     }
   };
 
   return (
     <div>
       {isLoading && formData.status === "Broken" && <LoadingAnimate isOpen={isLoading}>Wait for Update & Send Mail...</LoadingAnimate>}
-      {isLoading && formData.status !== "Broken" && <LoadingAnimate isOpen={isLoading}>Wait for Update...</LoadingAnimate>}
       <form onSubmit={handleSubmit}>
-        <FormField label="Select Parts" name="itemName" value={formData.itemName ? `${formData.itemName} - ${formData.itemYear}` : ""} onChange={handleItemChange} type="select" error={errors.getPart}>
+        <FormField label="Select Parts" name="itemName" value={selectedItem?.uuid} onChange={handleItemChange} type="select" error={errors.getPart}>
           <option value="" disabled>
-            Select Item
+            {isLoading ? "Loading..." : items.length === 0 ? "No Data Found" : "Select Item"}
           </option>
-          {items.map((item) => (
-            <option key={item.uuid} value={`${item.name} - ${item.year}`}>
-              {item.status + " - " + item.name} ({item.year}) - {item.machine.machine_name}
-            </option>
-          ))}
+
+          {!loadOption &&
+            items.length > 0 &&
+            items.map((item) => (
+              <option key={item.uuid} value={item.uuid}>
+                [{item.item_number}] {item.name} ({item.year}) - {item.status} | {item.machine.machine_name}
+              </option>
+            ))}
         </FormField>
 
+        <ReadOnlyForm label="Item Number" name="item_number" value={formData.item_number} />
         <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} />
 
         <FormField label="Status" name="status" value={formData.status} onChange={handleStatusChange} type="select" error={errors.status}>
@@ -130,6 +144,15 @@ const UpdateItemStatusForm = () => {
           <option value="Broken">Broken</option>
         </FormField>
 
+        {selectedItem && selectedItem.status === "In Use" && (
+          <>
+            <div className="flex gap-5 w-full ">
+              <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
+
+              <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+            </div>
+          </>
+        )}
         <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} type="text" />
 
         <Button type="submit" buttonName={"Save"} />
