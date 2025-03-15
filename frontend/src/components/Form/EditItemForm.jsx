@@ -9,6 +9,7 @@ import LoadingAnimate from "../LoadingAnimate";
 
 const EditItemForm = () => {
   const [formData, setFormData] = useState({
+    item_number: "",
     name: "",
     amount: "",
     description: "",
@@ -93,6 +94,7 @@ const EditItemForm = () => {
       {isLoading && <LoadingAnimate isOpen={isLoading}>Editing Part...</LoadingAnimate>}
       {notif && <div className="mt-4 p-2 text-white bg-red-500 rounded">{notif}</div>}
       <form onSubmit={handleSubmit}>
+        <FormField label="Item Number" name="item_number" value={formData.item_number || ""} onChange={handleChange} />
         <FormField label="Name" name="name" value={formData.name || ""} onChange={handleChange} />
         <FormField label="Amount" name="amount" type="number" value={formData.amount || ""} onChange={handleChange} error={errors.amount} />
         <FormField label="Description" name="description" value={formData.description || ""} onChange={handleChange} />

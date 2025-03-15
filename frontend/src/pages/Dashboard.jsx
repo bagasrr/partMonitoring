@@ -11,6 +11,7 @@ import useSections from "../hooks/useSections";
 import { SectionFilter } from "./Parts";
 import PartList from "../components/PartList";
 import { Helmet } from "react-helmet-async";
+import ChartSwiper from "../components/ChartSwiper";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,14 +62,15 @@ const Dashboard = () => {
       </Helmet>
 
       <h1 className="text-xl font-bold mb-6 ">Welcome - {user && user.name}</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* <div className="grid grid-cols-1 gap-5">
         <div className=" p-4 bg-white shadow rounded-lg">
           <DayUsedChart data={statusData.swapPart} />
         </div>
         <div className="p-4 bg-white shadow rounded-lg">
           <AmountLimitChart data={statusData.replacePart} />
         </div>
-      </div>
+      </div> */}
+      <ChartSwiper statusData={statusData} />
       <div className="mt-5">
         <StatusInfo statusData={memoizedStatusData} />
       </div>

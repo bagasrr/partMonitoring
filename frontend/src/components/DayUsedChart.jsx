@@ -8,7 +8,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const DayUsedChart = ({ data }) => {
   // Siapkan data untuk chart
   const chartData = {
-    labels: data.map((item) => item.name), // Nama item sebagai label
+    labels: data.map((item) => `${item.name} (${item.item_number})`), // Nama item sebagai label
     datasets: [
       {
         label: "Hari Pemakaian",
@@ -40,6 +40,9 @@ const DayUsedChart = ({ data }) => {
           display: true,
           text: "Hari Digunakan",
         },
+        ticks: {
+          stepSize: 1, // Menampilkan hanya angka bulat
+        },
       },
       y: {
         title: {
@@ -50,7 +53,11 @@ const DayUsedChart = ({ data }) => {
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <div className="w-full min-h-[250px]">
+      <Bar data={chartData} options={options} />;
+    </div>
+  );
 };
 
 export default DayUsedChart;

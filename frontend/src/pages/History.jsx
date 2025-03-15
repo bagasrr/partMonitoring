@@ -106,6 +106,8 @@ const History = () => {
                 {his.newStock != null && <p>Jumlah Baru </p>}
                 {his.usedStock != null && <p>Jumlah Terpakai </p>}
                 {his.afterStock != null && <p>Jumlah Akhir </p>}
+                {his.statusBefore != null && <p>Status Sebelum </p>}
+                {his.statusAfter != null && <p>Status Sesudah</p>}
                 <p>Deskripsi </p>
               </div>
               <div className="font-bold">
@@ -117,6 +119,8 @@ const History = () => {
                 {his.newStock != null && <p>: {his.newStock}</p>}
                 {his.usedStock != null && <p>: {his.usedStock}</p>}
                 {his.afterStock != null && <p>: {his.afterStock}</p>}
+                {his.statusBefore != null && <p>: {his.statusBefore}</p>}
+                {his.statusAfter != null && <p>: {his.statusAfter}</p>}
                 <p>: {his.description}</p>
               </div>
             </div>
