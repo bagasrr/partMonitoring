@@ -1,5 +1,5 @@
 import { changeItem, getInUseItems, getTypeSwapReplaceItem } from "../../utils/items";
-import FormField, { ReadOnlyForm } from "../FormField";
+import FormField, { ReadOnlyForm, SelectFormField } from "../FormField";
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -59,14 +59,7 @@ const SwapPartForm = () => {
 
     setItems(sortedData);
   };
-  // console.log(selectedMachineName);
-  // const fetchSwapReplaceItem = async () => {
-  //   if (selectedItem) {
-  //     const data = await getTypeSwapReplaceItem(selectedMachineName);
-  //     // console.log("replaceItem : ", data);
-  //     setReplaceItems(data);
-  //   }
-  // };
+
   const fetchSwapReplaceItem = async () => {
     if (selectedItem) {
       console.log("Fetching swap replace items for machine:", selectedMachineName);
@@ -84,33 +77,6 @@ const SwapPartForm = () => {
     });
     // console.log(name + " : " + value);
   };
-
-  // const handleItemChange = (e) => {
-  //   const uuid = e.target.value;
-  //   const item = items.find((item) => item.uuid === uuid);
-
-  //   setSelectedValue(uuid);
-
-  //   if (item) {
-  //     setSelectedItem(item);
-  //     setSelectedMachineName(item.machine.machine_name);
-  //     setFormData({
-  //       ...formData,
-  //       itemName: item.name,
-  //       itemYear: item.year,
-  //       itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
-  //     });
-  //     // console.log("Item selected: ", item);
-  //     // console.log("Machine selected: ", item.machine.machine_name);
-  //   } else {
-  //     setSelectedItem(null);
-  //     setFormData({
-  //       ...formData,
-  //       itemName: "",
-  //       itemYear: "",
-  //     });
-  //   }
-  // };
 
   const handleItemChange = (e) => {
     const uuid = e.target.value;
@@ -174,17 +140,15 @@ const SwapPartForm = () => {
       ...formData,
       replaceItemName: null,
     };
-    // console.log(data);
     try {
       setIsLoading(true);
-      await changeItem(formData);
-      dispatch(setNotification(`${formData.itemName} - ${formData.itemYear} Swap to ${formData.replaceItemName} - ${formData.replaceItemYear} Sucess with ${formData.itemName} status : ${formData.itemStatus}`));
+      await changeItem(data);
+      dispatch(setNotification(`${formData.itemName} - ${formData.itemYear} Swap Success`));
       navigate("/parts");
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       setErrors(error);
-      // alert("Error updating item");
     }
   };
 
@@ -194,50 +158,58 @@ const SwapPartForm = () => {
     <div>
       {isLoading && <LoadingAnimate isOpen={isLoading}>Swapping Part ...</LoadingAnimate>}
       <form onSubmit={handleSubmit} className="mx-auto p-4 bg-white shadow-md rounded-lg overflow-x-hidden">
-        <FormField label="Part yang ingin diganti" name="itemName" value={selectedValue} onChange={handleItemChange} type="select">
-          <option value="" disabled>
-            Select Item
-          </option>
-          {items.map((item) => (
-            <option key={item.uuid} value={item.uuid}>
-              {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
-            </option>
-          ))}
-        </FormField>
-
-        <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} placeholder={"Tahun Part"} />
-
-        <FormField label="Status Part Sekarang" name="itemStatus" value={formData.itemStatus} onChange={handleChange} type="select">
-          <option value="" disabled>
-            Select Status
-          </option>
-          <option value="Spare">Spare</option>
-          <option value="Broken">Broken</option>
-          <option value="Repair">Repair</option>
-        </FormField>
-        <div className="flex gap-5 w-full ">
-          <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
-
-          <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
-        </div>
-
-        <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />
-
-        {/* {replaceItems && ( */}
-        <FormField label="Part Pengganti" name="replaceItemName" value={formData.replaceItemName ? `${formData.replaceItemName} - ${formData.replaceItemYear}` : ""} onChange={handleReplaceItemChange} type="select">
-          <option value="" disabled>
-            Select Replace Item
-          </option>
-          <option value="NA">NA</option>
-          {replaceItems &&
-            replaceItems.map((item) => (
-              <option key={item.uuid} value={`${item.name} - ${item.year}`}>
-                {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
+        {items.length === 0 ? (
+          <p className="text-xl mb-4 text-center">Tidak ada part saat yang digunakan saat ini</p>
+        ) : (
+          <>
+            <FormField label="Part saat ini" name="itemName" value={selectedValue} onChange={handleItemChange} type="select">
+              <option value="" disabled>
+                Select Item
               </option>
-            ))}
-        </FormField>
 
-        <Button type="submit" buttonName="Ganti Part" />
+              {items.map((item) => (
+                <option key={item.uuid} value={item.uuid}>
+                  {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
+                </option>
+              ))}
+            </FormField>
+
+            <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} placeholder={"Tahun Part"} />
+
+            <SelectFormField label="Status Part Sekarang" name="itemStatus" value={formData.itemStatus} onChange={handleChange} type="select">
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="Spare">Spare</option>
+              <option value="Broken">Broken</option>
+              <option value="Repair">Repair</option>
+            </SelectFormField>
+            <div className="flex gap-5 w-full ">
+              <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
+
+              <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+            </div>
+
+            <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />
+
+            <FormField label="Part Pengganti" name="replaceItemName" value={formData.replaceItemName ? `${formData.replaceItemName} - ${formData.replaceItemYear}` : ""} onChange={handleReplaceItemChange} type="select">
+              <option value="" disabled>
+                Select Replace Item
+              </option>
+              <option value="NA">NA</option>
+              <option value="holaa">holaa</option>
+              {replaceItems &&
+                replaceItems.map((item) => (
+                  <option key={item.uuid} value={`${item.name} - ${item.year}`}>
+                    {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
+                  </option>
+                ))}
+            </FormField>
+
+            <Button type="submit" buttonName="Ganti Part" />
+          </>
+        )}
+
         {errors && <ErrorText message={errors.message} />}
       </form>
     </div>

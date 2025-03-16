@@ -55,3 +55,14 @@ export const ReadOnlyForm = ({ label, name, value, placeholder }) => {
     </div>
   );
 };
+
+export const SelectFormField = ({ label, name, value, onChange, children }) => {
+  return (
+    <div className="mb-4">
+      <label className="block font-bold text-gray-700 mb-2">{label}:</label>
+      <select name={name} value={value || ""} onChange={onChange} className="mt-1 block w-full p-2 border focus:outline-none focus:ring focus:ring-green-600 rounded-md" required>
+        {children}
+      </select>
+    </div>
+  );
+};
