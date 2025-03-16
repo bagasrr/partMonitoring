@@ -6,6 +6,8 @@ import "swiper/css/pagination";
 import { useEffect, useRef } from "react";
 import AmountLimitChart from "./AmountLimitChart";
 import DayUsedChart from "./DayUsedChart";
+import { IoIosArrowDropleftCircle } from "react-icons/io";
+import { IoIosArrowDroprightCircle } from "react-icons/io";
 
 const ChartSwiper = ({ statusData }) => {
   const prevRef = useRef(null);
@@ -24,11 +26,11 @@ const ChartSwiper = ({ statusData }) => {
     <div className="relative w-full">
       {/* Custom Navigation untuk PC */}
       <div className="hidden md:flex absolute top-0 right-4 z-10 space-x-2">
-        <button ref={prevRef} className="p-2 bg-gray-300 rounded-lg shadow">
-          ⬅️
+        <button ref={prevRef}>
+          <IoIosArrowDropleftCircle size={30} />
         </button>
-        <button ref={nextRef} className="p-2 bg-gray-300 rounded-lg shadow">
-          ➡️
+        <button ref={nextRef}>
+          <IoIosArrowDroprightCircle size={30} />
         </button>
       </div>
 

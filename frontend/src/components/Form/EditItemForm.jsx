@@ -33,7 +33,7 @@ const EditItemForm = () => {
   const fetchItem = async () => {
     try {
       const data = await getItemById(id);
-      console.log(data);
+      // console.log(data);
 
       setFormData({
         ...data,
@@ -77,7 +77,7 @@ const EditItemForm = () => {
       return;
     }
 
-    console.log(formData);
+    // console.log(formData);
     try {
       setIsLoading(true);
       await updateItem(id, formData);
