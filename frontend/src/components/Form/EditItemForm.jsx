@@ -77,6 +77,7 @@ const EditItemForm = () => {
       return;
     }
 
+    console.log(formData);
     try {
       setIsLoading(true);
       await updateItem(id, formData);
