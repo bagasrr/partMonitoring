@@ -4,6 +4,10 @@ export const formatDate = (date) => {
   return format(new Date(date), "dd-MM-yyyy");
 };
 
+export const formatDateForm = (dateString) => {
+  return format(new Date(dateString), "yyyy-MM-dd");
+};
+
 export const FormatStatusColor = (status, red, yellow, green, blue) => {
   return status.includes(red)
     ? "bg-red-100 text-red-700"

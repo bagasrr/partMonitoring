@@ -9,10 +9,7 @@ import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
 import ErrorText from "../ErrorText";
 import { format } from "date-fns";
-
-const formatDate = (dateString) => {
-  return format(new Date(dateString), "yyyy-MM-dd");
-};
+import { formatDateForm } from "../../utils/format";
 
 const SwapPartForm = () => {
   const [items, setItems] = useState([]);
@@ -27,8 +24,8 @@ const SwapPartForm = () => {
   const [formData, setFormData] = useState({
     itemName: "",
     replaceItemName: "",
-    itemStartUseDate: "",
-    itemEndUseDate: "",
+    itemStartUseDate: null,
+    itemEndUseDate: null,
     reason: "",
     itemYear: "",
     replaceItemYear: "",
@@ -87,13 +84,13 @@ const SwapPartForm = () => {
     if (item) {
       setSelectedItem(item);
       setSelectedMachineName(item.machine.machine_name);
-      console.log("Selected item:", item);
-      console.log("Selected machine name:", item.machine.machine_name);
+      // console.log("Selected item:", item);
+      // console.log("Selected machine name:", item.machine.machine_name);
       setFormData({
         ...formData,
         itemName: item.name,
         itemYear: item.year,
-        itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
+        itemStartUseDate: item.replacementDate ? formatDateForm(item.replacementDate) : "",
       });
     } else {
       setSelectedItem(null);
@@ -151,7 +148,7 @@ const SwapPartForm = () => {
       setErrors(error);
     }
   };
-
+  // console.log("Item start : ", formData.itemStartUseDate);
   // console.log(formData);
 
   return (
@@ -169,7 +166,7 @@ const SwapPartForm = () => {
 
               {items.map((item) => (
                 <option key={item.uuid} value={item.uuid}>
-                  {item.status + " - " + item.name} ({item.year}) {item.machine?.machine_name}
+                  [{item.item_number}] - {item.name} ({item.machine?.machine_name})
                 </option>
               ))}
             </FormField>
@@ -187,7 +184,7 @@ const SwapPartForm = () => {
             <div className="flex gap-5 w-full ">
               <FormField label="Part mulai dipakai" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
 
-              <FormField label="Part terakhir dipakai" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+              <FormField label="Part berakhir dipakai" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
             </div>
 
             <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />

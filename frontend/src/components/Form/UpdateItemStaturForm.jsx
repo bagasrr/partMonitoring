@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { getTypeSwapItem, updateItemStatusForm } from "../../utils/items";
-import FormField, { ReadOnlyForm } from "../FormField";
+import FormField, { ReadOnlyForm, SelectFormField } from "../FormField";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
-import { formatDate } from "../../utils/format";
+import { formatDateForm } from "../../utils/format";
 
 const UpdateItemStatusForm = () => {
   const [items, setItems] = useState([]);
@@ -55,16 +55,19 @@ const UpdateItemStatusForm = () => {
   const handleItemChange = (e) => {
     const item_uuid = e.target.value;
     const item = items.find((item) => item.uuid === item_uuid);
+    console.log("replacementDate : ", item.replacementDate);
     if (item) {
       setSelectedItem(item);
       setFormData({
         ...formData,
         itemName: item.name,
         itemYear: item.year,
-        itemStartUseDate: item.replacementDate ? formatDate(item.replacementDate) : "",
+        itemStartUseDate: item.replacementDate ? formatDateForm(item.replacementDate) : "",
         item_number: item.item_number,
       });
-      console.log(`${item.status} - ${item.name} (${item.year}) - ${item.machine.machine_name}`); // Log item selected
+      console.log(`${item.status} - ${item.name} (${item.year}) - ${item.machine.machine_name}`);
+      // Log item selected
+      console.log(item);
     } else {
       setSelectedItem(null);
       setFormData({
@@ -83,6 +86,7 @@ const UpdateItemStatusForm = () => {
     });
   };
 
+  // console.log("item start : ", formData.itemStartUseDate);
   const handleStatusChange = (e) => {
     const newStatus = e.target.value;
     if (selectedItem && selectedItem.status === newStatus) {
@@ -126,7 +130,7 @@ const UpdateItemStatusForm = () => {
             items.length > 0 &&
             items.map((item) => (
               <option key={item.uuid} value={item.uuid}>
-                [{item.item_number}] {item.name} ({item.year}) - {item.status} | {item.machine.machine_name}
+                [{item.item_number}] {item.name} ( {item.machine.machine_name} ) | {item.status}
               </option>
             ))}
         </FormField>
@@ -134,22 +138,22 @@ const UpdateItemStatusForm = () => {
         <ReadOnlyForm label="Item Number" name="item_number" value={formData.item_number} />
         <ReadOnlyForm label="Tahun" name="itemYear" value={formData.itemYear} />
 
-        <FormField label="Status" name="status" value={formData.status} onChange={handleStatusChange} type="select" error={errors.status}>
+        <SelectFormField label="Status Part Sekarang" name="itemStatus" value={formData.status} onChange={handleStatusChange} type="select" error={errors.status}>
           <option value="" disabled>
             Select Status
           </option>
           <option value="In Use">In Use</option>
           <option value="Spare">Spare</option>
-          <option value="Repair">Repair</option>
           <option value="Broken">Broken</option>
-        </FormField>
+          <option value="Repair">Repair</option>
+        </SelectFormField>
 
         {selectedItem && selectedItem.status === "In Use" && (
           <>
             <div className="flex gap-5 w-full ">
-              <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
+              <FormField label="Part mulai dipakai" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
 
-              <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+              <FormField label="Part berakhir dipakai" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
             </div>
           </>
         )}
