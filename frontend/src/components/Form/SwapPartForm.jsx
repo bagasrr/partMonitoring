@@ -185,9 +185,9 @@ const SwapPartForm = () => {
               <option value="Repair">Repair</option>
             </SelectFormField>
             <div className="flex gap-5 w-full ">
-              <FormField label="Item Start Use Date" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
+              <FormField label="Part mulai dipakai" name="itemStartUseDate" value={formData.itemStartUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal mulai digunakan" className={"w-1/3"} />
 
-              <FormField label="Item End Use Date" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
+              <FormField label="Part terakhir dipakai" name="itemEndUseDate" value={formData.itemEndUseDate} onChange={handleChange} type="date" placeholder="Masukkan tanggal berakhir digunakan" className={"w-1/3"} />
             </div>
 
             <FormField label="Alasan Penggantian" name="reason" value={formData.reason} onChange={handleChange} placeholder="Masukkan alasan penggantian" />
