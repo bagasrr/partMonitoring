@@ -20,7 +20,7 @@ const ChangePartPages = () => {
       </Helmet>
       <BackPrev url="/parts" />
       <Title>Penggantian Part</Title>
-      <FormField type="select" label="Change Type" onChange={handleChange} value={render ? render : ""}>
+      <FormField type="select" label="Tipe Penggantian" onChange={handleChange} value={render ? render : ""}>
         <option value="" disabled>
           Pilih tipe penggantian
         </option>
