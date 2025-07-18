@@ -18,7 +18,7 @@ export const createItem = async (itemData) => {
     const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/items`, itemData);
     return response.data;
   } catch (error) {
-    handleApiError(error);
+    // handleApiError(error);
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error creating item");
   }
 };
@@ -113,8 +113,8 @@ export const updateItem = async (itemId, itemData) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/${itemId}`, itemData);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating Part");
-    handleApiError(error);
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error updating Part");
+    // handleApiError(error);
   }
 };
 
@@ -123,8 +123,8 @@ export const changeItem = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/change/swap`, data);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
-    handleApiError(error);
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
+    // handleApiError(error);
   }
 };
 export const replaceItem = async (data) => {
@@ -132,8 +132,8 @@ export const replaceItem = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/change/replace`, data);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
-    handleApiError(error);
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error Changing Part");
+    // handleApiError(error);
   }
 };
 
@@ -173,8 +173,8 @@ export const addItemAmount = async (data) => {
     const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/items/add-amount`, data);
     return response.data;
   } catch (error) {
-    // throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
-    handleApiError(error);
+    throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
+    // handleApiError(error);
   }
 };
 
@@ -184,7 +184,7 @@ export const updateItemStatusForm = async (data) => {
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.error || error.response?.data?.message || "Error while Add Amount");
-    handleApiError(error);
+    // handleApiError(error);
   }
 };
 

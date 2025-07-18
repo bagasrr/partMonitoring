@@ -1,4 +1,3 @@
-import React from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Dashboard from "./pages/Dashboard";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";

@@ -1,14 +1,13 @@
 import { changeItem, getInUseItems, getTypeSwapReplaceItem } from "../../utils/items";
 import FormField, { ReadOnlyForm, SelectFormField } from "../FormField";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setNotification } from "../../features/notificationSlice";
 import Button from "../../element/Button";
 import LoadingAnimate from "../LoadingAnimate";
 import ErrorText from "../ErrorText";
-import { format } from "date-fns";
 import { formatDateForm } from "../../utils/format";
 
 const SwapPartForm = () => {
@@ -135,7 +134,7 @@ const SwapPartForm = () => {
     e.preventDefault();
     const data = {
       ...formData,
-      replaceItemName: null,
+      // replaceItemName: null,
     };
     try {
       setIsLoading(true);
@@ -193,8 +192,7 @@ const SwapPartForm = () => {
               <option value="" disabled>
                 Select Replace Item
               </option>
-              <option value="NA">NA</option>
-              <option value="holaa">holaa</option>
+              <option value={null}>NA</option>
               {replaceItems &&
                 replaceItems.map((item) => (
                   <option key={item.uuid} value={`${item.name} - ${item.year}`}>
