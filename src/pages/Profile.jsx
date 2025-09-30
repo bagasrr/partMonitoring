@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getUserById, updateUser } from "../utils/users";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "../features/notificationSlice";
 import { Button, NormalInput, PasswordInput } from "../element/Input";

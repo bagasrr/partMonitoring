@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getUserById, updateUser } from "../utils/users";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import { Button, NormalInput, PasswordInput } from "../element/Input";
 import { adminArea } from "../utils/adminArea";
 import BackPrev from "../element/BackPrev";
 import { Helmet } from "react-helmet-async";
+import LoadingAnimate from "../components/LoadingAnimate";
 
 const EditUser = () => {
   adminArea();
@@ -23,7 +24,7 @@ const EditUser = () => {
 
   useEffect(() => {
     fetchUserDetails();
-  }, []);
+  }, [id]);
 
   const fetchUserDetails = async () => {
     const User = await getUserById(id); // Mendapatkan detail User berdasarkan id
@@ -101,6 +102,7 @@ const EditUser = () => {
             <BackPrev url="/users" />
           </div>
         </form>
+        {isLoading && <LoadingAnimate isOpen={isLoading}>Editing User...</LoadingAnimate>}
       </div>
     </>
   );

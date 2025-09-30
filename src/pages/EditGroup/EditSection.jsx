@@ -1,4 +1,3 @@
-import React from "react";
 import Title from "../../element/Title";
 import BackPrev from "../../element/BackPrev";
 import { adminArea } from "../../utils/adminArea";
