@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InfoBox from "./InfoBox"; // Import komponen InfoBox
 
 const StatusInfo = ({ statusData }) => {

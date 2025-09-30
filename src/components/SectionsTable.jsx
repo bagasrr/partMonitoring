@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { TableContainer, TData, ThData, TRow } from "../element/Table";
 import { useSelector, useDispatch } from "react-redux";
